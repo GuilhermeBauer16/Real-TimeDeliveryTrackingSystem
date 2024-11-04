@@ -28,6 +28,35 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<springdoc.version>2.3.0</springdoc.version>
+		<model-mapper.version>3.1.1</model-mapper.version>
+		<jacoco.plugin.version>0.8.9</jacoco.plugin.version>
+		<testcontainers.version>1.19.8</testcontainers.version>
+		<jwt.version>0.12.3</jwt.version>
+
+		<sonar.projectKey>GuilhermeBauer16_Real-TimeDeliveryTrackingSystem</sonar.projectKey>
+		<sonar.organization>guilhermebauer16</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml
+		</sonar.coverage.jacoco.xmlReportPaths>
+<!--		<sonar.coverage.exclusions>-->
+
+<!--			**/config/**,-->
+<!--			**/enums/**,-->
+<!--			**/exception/**,-->
+<!--			**/factory/**,-->
+<!--			**/filters/**,-->
+<!--			**/handler/**,-->
+<!--			**/model/**,-->
+<!--			**/response/**,-->
+<!--			**/request/**,-->
+<!--			**/mapper/**,-->
+<!--			**/utils/PaginatedResponse.java,-->
+<!--			**/controller/UserRegistrationController.java,-->
+<!--			**/service/JwtTokenService.java,-->
+<!--			**/com/github/guilhermebauer/studymanagement/StudymanagementApplication.java-->
+
+<!--		</sonar.coverage.exclusions>-->
 	</properties>
 	<dependencies>
 		<dependency>
