@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class RealTimeDeliveryTrackingSystemApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(RealTimeDeliveryTrackingSystemApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(RealTimeDeliveryTrackingSystemApplication.class, args);
+    }
 
 }

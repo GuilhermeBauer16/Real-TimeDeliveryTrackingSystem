@@ -1,0 +1,2 @@
+ALTER TABLE vehicles
+    ADD COLUMN name VARCHAR(100) NOT NULL;
