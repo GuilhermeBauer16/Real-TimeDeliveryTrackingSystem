@@ -12,7 +12,7 @@ public class LicencePlateUtils {
     private static final String INVALID_LICENSE_PLATE = "The license plate %s is invalid. Please verify if the license plate matches " +
             "with these patters XXX-0000 | XXX0XX0";
     private static final String OLD_LICENSE_PLATE_PATTERN = "^[A-Z]{3}-\\d{4}$";
-    private static final String NEW_LICENSE_PLATE_PATTERN = "^[a-zA-Z]{3}\\d[a-zA-Z]{2}\\d$";
+    private static final String NEW_LICENSE_PLATE_PATTERN = "^[A-Z]{3}\\d[A-Z]\\d{2}$";
 
 
     public static String validateLicencePlate(String licencePlate) {

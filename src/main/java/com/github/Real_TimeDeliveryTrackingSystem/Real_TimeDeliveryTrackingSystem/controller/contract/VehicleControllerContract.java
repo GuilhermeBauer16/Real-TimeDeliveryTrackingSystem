@@ -63,11 +63,10 @@ public interface VehicleControllerContract {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<VehicleVO> findById(@PathVariable("id") String id) throws NoSuchFieldException, IllegalAccessException;
+    ResponseEntity<VehicleVO> findById(@PathVariable("id") String id);
 
 
-
-    @GetMapping
+    @GetMapping("/findByLicensePlate/{licensePlate}")
 //    @Operation(summary = "Find All Courses",
 //            description = "Finds all courses in the system and returns a paginated list.",
 //            tags = "Courses")
@@ -75,7 +74,10 @@ public interface VehicleControllerContract {
 //            @ApiResponse(responseCode = "200", description = "Successful operation",
 //                    content = @Content(schema = @Schema(implementation = VehicleVO.class)))
 
-    ResponseEntity<Page<VehicleVO>> findAll(@PageableDefault(size = 20, page = 0, sort = "title") Pageable pageable) throws NoSuchFieldException, IllegalAccessException;
+    ResponseEntity<VehicleVO> findByLicensePlate(@PathVariable("licensePlate") String licensePlate);
+
+    @GetMapping
+    ResponseEntity<Page<VehicleVO>> findAll(@PageableDefault(size = 20, page = 0) Pageable pageable);
 
 
     @DeleteMapping(value = "/{id}")

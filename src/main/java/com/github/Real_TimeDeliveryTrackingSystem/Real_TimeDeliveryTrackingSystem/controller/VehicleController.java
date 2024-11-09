@@ -15,38 +15,47 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/vehicle")
 public class VehicleController implements VehicleControllerContract {
 
-    private final VehicleService vehicleService;
+    private final VehicleService service;
 
     @Autowired
     public VehicleController(VehicleService vehicleService) {
-        this.vehicleService = vehicleService;
+        this.service = vehicleService;
     }
 
     @Override
     public ResponseEntity<VehicleVO> create(VehicleVO vehicleVO)  {
-        VehicleVO createdVehicle = vehicleService.create(vehicleVO);
+        VehicleVO createdVehicle = service.create(vehicleVO);
         return new ResponseEntity<>(createdVehicle, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<VehicleVO> update(VehicleVO vehicleVO)  {
-        VehicleVO updatedVehicle = vehicleService.update(vehicleVO);
+        VehicleVO updatedVehicle = service.update(vehicleVO);
         return ResponseEntity.ok(updatedVehicle);
     }
 
     @Override
     public ResponseEntity<VehicleVO> findById(String id) {
-        VehicleVO vehicleVO = vehicleService.findById(id);
+        VehicleVO vehicleVO = service.findById(id);
         return ResponseEntity.ok(vehicleVO);
     }
 
     @Override
-    public ResponseEntity<Page<VehicleVO>> findAll(Pageable pageable)  {
-        return null;
+    public ResponseEntity<VehicleVO> findByLicensePlate(String licensePlate) {
+        VehicleVO byLicensePlate = service.findByLicensePlate(licensePlate);
+        return ResponseEntity.ok(byLicensePlate);
+    }
+
+    @Override
+    public ResponseEntity<Page<VehicleVO>> findAll(Pageable pageable){
+        Page<VehicleVO> vehicles = service.findAll(pageable);
+        return ResponseEntity.ok(vehicles);
     }
 
     @Override
     public ResponseEntity<Void> delete(String id) {
-        return null;
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+
     }
 }
