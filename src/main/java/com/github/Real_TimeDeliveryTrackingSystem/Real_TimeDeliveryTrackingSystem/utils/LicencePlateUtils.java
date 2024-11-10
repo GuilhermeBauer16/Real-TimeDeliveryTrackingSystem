@@ -5,8 +5,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 
 public class LicencePlateUtils {
 
-    private LicencePlateUtils() {
-    }
+    private LicencePlateUtils() {}
+
 
     private static final String LICENSE_PLATE_NOT_FOUND = "The license plate cannot be null or empty!";
     private static final String INVALID_LICENSE_PLATE = "The license plate %s is invalid. Please verify if the license plate matches " +
@@ -15,26 +15,26 @@ public class LicencePlateUtils {
     private static final String NEW_LICENSE_PLATE_PATTERN = "^[A-Z]{3}\\d[A-Z]\\d{2}$";
 
 
-    public static String validateLicencePlate(String licencePlate) {
+    public static String validateLicencePlate(String licensePlate) {
 
-        licencePlate = licencePlate.toUpperCase();
+        licensePlate = licensePlate.toUpperCase();
 
-        if (licencePlate.isBlank() || licencePlate.isEmpty()) {
+        if (licensePlate.isBlank()) {
 
             throw new LicensePlateNotFoundException(LICENSE_PLATE_NOT_FOUND);
 
         }
-        if (licencePlate.matches("^[A-Z]{3}\\d{4}$")) {
+        if (licensePlate.matches("^[A-Z]{3}\\d{4}$")) {
 
-            licencePlate = licencePlate.substring(0, 3) + "-" + licencePlate.substring(3);
+            licensePlate = licensePlate.substring(0, 3) + "-" + licensePlate.substring(3);
         }
 
-        if (licencePlate.matches(OLD_LICENSE_PLATE_PATTERN) || licencePlate.matches(NEW_LICENSE_PLATE_PATTERN)) {
+        if (licensePlate.matches(OLD_LICENSE_PLATE_PATTERN) || licensePlate.matches(NEW_LICENSE_PLATE_PATTERN)) {
 
-            return licencePlate;
+            return licensePlate;
         }
 
-        throw new InvalidLicensePlateException(String.format(INVALID_LICENSE_PLATE, licencePlate));
+        throw new InvalidLicensePlateException(String.format(INVALID_LICENSE_PLATE, licensePlate));
 
     }
 
