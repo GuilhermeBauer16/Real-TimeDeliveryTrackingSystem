@@ -40,24 +40,25 @@
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml
 		</sonar.coverage.jacoco.xmlReportPaths>
-<!--		<sonar.coverage.exclusions>-->
+		<sonar.coverage.exclusions>
 
-<!--			**/config/**,-->
-<!--			**/enums/**,-->
-<!--			**/exception/**,-->
-<!--			**/factory/**,-->
-<!--			**/filters/**,-->
-<!--			**/handler/**,-->
-<!--			**/model/**,-->
-<!--			**/response/**,-->
-<!--			**/request/**,-->
-<!--			**/mapper/**,-->
-<!--			**/utils/PaginatedResponse.java,-->
-<!--			**/controller/UserRegistrationController.java,-->
-<!--			**/service/JwtTokenService.java,-->
-<!--			**/com/github/guilhermebauer/studymanagement/StudymanagementApplication.java-->
+			**/config/**,
+			**/enums/**,
+			**/exception/**,
+			**/factory/**,
+			**/filters/**,
+			**/handler/**,
+			**/model/**,
+			**/response/**,
+			**/request/**,
+			**/mapper/**,
+			**/utils/PaginatedResponse.java,
+			**/utils/ValidatorUtils.java,
+			**/controller/UserRegistrationController.java,
+			**/service/JwtTokenService.java,
+			**/com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem/RealTimeDeliveryTrackingSystemApplication.class
 
-<!--		</sonar.coverage.exclusions>-->
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 
