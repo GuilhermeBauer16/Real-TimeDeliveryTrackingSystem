@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mysql:8.3.0
+    container_name: mysql_db_Real-Time_Delivery_Tracking_System
+    command: mysqld --default_authentication_plugin=mysql_native_password
+
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_TCP_PORT: ${DB_PORT}
+
+    ports:
+      - "${DB_EXPOSE_PORT}:${DB_PORT}"
+
+    expose:
+      - ${DB_PORT}
+
+    networks:
+      - Real-Time_Delivery_Tracking_System_network
+
+  real-time_delivery_tracking_system:
+
+    image: guilhermebauer/real-timedeliverytrackingsystem:latest
+    container_name: Real-Time_Delivery_Tracking_System
+    build: .
+#
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:${DB_PORT}/${DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "${EXPOSE_PORT}:${CONTAINER_PORT}"
+
+
+    depends_on:
+      - db
+
+    networks:
+      - Real-Time_Delivery_Tracking_System_network
+
+networks:
+  Real-Time_Delivery_Tracking_System_network:
+    driver: bridge
