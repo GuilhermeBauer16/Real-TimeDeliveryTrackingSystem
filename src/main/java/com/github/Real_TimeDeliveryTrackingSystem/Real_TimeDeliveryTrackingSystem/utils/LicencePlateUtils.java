@@ -2,7 +2,16 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.LicensePlateNotFoundException;
-
+/**
+ * Utility class for validating and formatting vehicle license plates.
+ * Provides methods to ensure that license plates conform to specific formats
+ * and throws appropriate exceptions if they are invalid.
+ * <p>
+ * The formats supported are:
+ * - Old format: XXX-0000
+ * - New format: XXX0XX0
+ * </p>
+ */
 public class LicencePlateUtils {
 
     private LicencePlateUtils() {}
@@ -14,6 +23,20 @@ public class LicencePlateUtils {
     private static final String OLD_LICENSE_PLATE_PATTERN = "^[A-Z]{3}-\\d{4}$";
     private static final String NEW_LICENSE_PLATE_PATTERN = "^[A-Z]{3}\\d[A-Z]\\d{2}$";
 
+    /**
+     * Validates and formats a given license plate string. This method:
+     * <ul>
+     *   <li>Ensures that the license plate is not null or empty.</li>
+     *   <li>Automatically formats license plates that match the pattern XXX0000 to XXX-0000.</li>
+     *   <li>Verifies if the license plate matches either the old or new format.</li>
+     * </ul>
+     * If the license plate is invalid, an {@link InvalidLicensePlateException} is thrown.
+     *
+     * @param licensePlate the license plate to validate
+     * @return a properly formatted license plate string
+     * @throws LicensePlateNotFoundException if the license plate is null or empty
+     * @throws InvalidLicensePlateException if the license plate does not match valid formats
+     */
 
     public static String validateLicencePlate(String licensePlate) {
 

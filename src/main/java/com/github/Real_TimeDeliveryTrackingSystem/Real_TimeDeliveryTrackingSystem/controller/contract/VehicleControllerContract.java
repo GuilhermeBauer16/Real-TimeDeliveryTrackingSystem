@@ -1,6 +1,10 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DuplicatedLicensePlateException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidLicensePlateException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.LicensePlateNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.VehicleNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,9 +21,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+/**
+ * VehicleControllerContract interface defines the API endpoints for managing vehicles
+ * in the Real-Time Delivery Tracking System application.
+ * It provides methods to create, update, retrieve, and delete vehicles.
+ */
 
 public interface VehicleControllerContract {
 
+    /**
+     * Registers a new vehicle in the system.
+     *
+     * @param vehicleVO the vehicle data to create a new vehicle
+     * @return ResponseEntity containing the created VehicleVO
+     * @throws InvalidLicensePlateException
+     * @throws DuplicatedLicensePlateException
+     * @throws VehicleNotFoundException
+     * @throws LicensePlateNotFoundException
+     * @see VehicleVO
+     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Register a new Vehicle",
@@ -37,6 +57,17 @@ public interface VehicleControllerContract {
     })
     ResponseEntity<VehicleVO> create(@RequestBody VehicleVO vehicleVO) throws InstantiationException, IllegalAccessException, NoSuchFieldException;
 
+    /**
+     * Updates an existing vehicle in the system.
+     *
+     * @param vehicleVO the vehicle data to update an existing vehicle
+     * @return ResponseEntity containing the updated {@link VehicleVO}
+     * @throws InvalidLicensePlateException
+     * @throws DuplicatedLicensePlateException
+     * @throws VehicleNotFoundException
+     * @throws LicensePlateNotFoundException
+     * @see VehicleVO
+     */
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a Vehicle",
@@ -54,7 +85,14 @@ public interface VehicleControllerContract {
     })
     ResponseEntity<VehicleVO> update(@RequestBody VehicleVO vehicleVO) throws NoSuchFieldException, IllegalAccessException;
 
-
+    /**
+     * Finds a vehicle by its ID.
+     *
+     * @param id the unique identifier of the vehicle
+     * @return ResponseEntity containing the found {@link VehicleVO}
+     * @throws VehicleNotFoundException
+     * @see VehicleVO
+     */
     @GetMapping(value = "/{id}")
     @Operation(summary = "Find a single vehicle",
             description = "Finds a vehicle by its ID and returns it.",
@@ -69,6 +107,17 @@ public interface VehicleControllerContract {
     })
     ResponseEntity<VehicleVO> findById(@PathVariable("id") String id);
 
+    /**
+     * Finds a vehicle by its license plate.
+     *
+     * @param licensePlate the license plate of the vehicle
+     * @return ResponseEntity containing the found {@link VehicleVO}
+     * @throws InvalidLicensePlateException
+     * @throws DuplicatedLicensePlateException
+     * @throws VehicleNotFoundException
+     * @throws LicensePlateNotFoundException
+     * @see VehicleVO
+     */
 
     @GetMapping("/findByLicensePlate/{licensePlate}")
     @Operation(summary = "Find a vehicle by its license plate",
@@ -86,6 +135,14 @@ public interface VehicleControllerContract {
     })
     ResponseEntity<VehicleVO> findByLicensePlate(@PathVariable("licensePlate") String licensePlate);
 
+    /**
+     * Finds all vehicles with pagination support.
+     *
+     * @param pageable the pagination information
+     * @return ResponseEntity containing a paginated list of VehicleVO
+     * @see Pageable
+     * @see VehicleVO
+     */
     @GetMapping
     @Operation(summary = "Find All vehicles",
             description = "Finds all vehicles in the system and returns a paginated list.",
@@ -97,6 +154,12 @@ public interface VehicleControllerContract {
     })
     ResponseEntity<Page<VehicleVO>> findAll(@PageableDefault(size = 20, page = 0) Pageable pageable);
 
+    /**
+     * Deletes a vehicle by its ID.
+     *
+     * @param id the unique identifier of the vehicle to be deleted
+     * @return ResponseEntity with no content if successful
+     */
 
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Delete a vehicle",
