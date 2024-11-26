@@ -10,6 +10,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.UserRegistrationServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.EmailValidatorUtils;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +38,10 @@ public class UserRegistrationService implements UserRegistrationServiceContract 
 
         ValidatorUtils.checkObjectIsNullOrThrowException(userVO,USER_NOT_FOUND_MESSAGE, UserNotFoundException.class);
         userVO.setPassword(passwordEncoder.encode(userVO.getPassword()));
+
+        EmailValidatorUtils.verifyEmailPattern(userVO.getEmail());
         checkIfEmailAlreadyRegistered(userVO.getEmail());
+
         UserEntity userFactory = UserFactory.create(userVO.getName(),userVO.getEmail(),userVO.getPassword(),userVO.getUserProfile());
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(userFactory,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
         UserEntity userEntity = userRepository.save(userFactory);

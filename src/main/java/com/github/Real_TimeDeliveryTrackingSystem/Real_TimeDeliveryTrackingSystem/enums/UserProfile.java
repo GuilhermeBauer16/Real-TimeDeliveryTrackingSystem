@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public enum UserProfile {
     @JsonProperty("customer")
-    CUSTOMER("CUSTOMER"),
+    ROLE_CUSTOMER("CUSTOMER"),
     @JsonProperty("driver")
-    DRIVER("DRIVER"),
+    ROLE_DRIVER("DRIVER"),
     @JsonProperty("admin")
-    ADMIN("ADMIN");
+    ROLE_ADMIN("ADMIN");
 
     private final String profile;
 

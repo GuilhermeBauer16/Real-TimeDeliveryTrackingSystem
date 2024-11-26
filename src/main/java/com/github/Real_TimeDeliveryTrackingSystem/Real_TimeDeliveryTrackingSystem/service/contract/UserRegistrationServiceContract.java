@@ -2,6 +2,9 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.EmailAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
 
 /**
@@ -23,14 +26,12 @@ public interface UserRegistrationServiceContract {
      * @param userVO The {@link UserVO} object containing the user's registration details,
      *               such as username, email, password, and any other relevant information.
      * @return {@link UserRegistrationResponse} object with details of the newly created user,
-     *         including a unique user ID and other registration-related information.
-     *
-     * @throws UserNotFoundException if the {@link UserVO} object was empty or null .
-     * @throws FieldNotFound if there is an issue with the registration values, such as empty or null field.
+     * including a unique user ID and other registration-related information.
+     * @throws UserNotFoundException          if the {@link UserVO} object was empty or null .
+     * @throws FieldNotFound                  if there is an issue with the registration values, such as empty or null field.
      * @throws EmailAllReadyRegisterException if the email passed is all ready register into the database preventing duplicated values.
      * @see UserRegistrationResponse
      * @see UserVO
-     *
      */
 
     UserVO createUser(UserVO userVO);

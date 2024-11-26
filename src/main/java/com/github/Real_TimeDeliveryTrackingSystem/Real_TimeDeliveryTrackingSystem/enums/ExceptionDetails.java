@@ -13,6 +13,7 @@ public enum ExceptionDetails {
     INVALID_LICENSE_PLATE_MESSAGE("These license plate is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     DUPLICATED_LICENSE_PLATE_MESSAGE("These license plate is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_REGISTER_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL_PATTERN_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
     ROLE_ALREADY_REGISTER_MESSAGE("Occur an error into the registration of the role in reason of: %s", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN_MESSAGE("Occur an error to generate the token for the reason: %s", HttpStatus.BAD_REQUEST),
     FIELD_NOT_FOUND_MESSAGE("The field %s can not be null or empty!", HttpStatus.NOT_FOUND),

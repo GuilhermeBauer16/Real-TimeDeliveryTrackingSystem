@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.EmailAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ExceptionResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidEmailPatternException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.LicensePlateNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserNotFoundException;
@@ -29,6 +30,7 @@ public class CustomizedResponseEntityExceptionHandler {
             LicensePlateNotFoundException.class,
             UserNotFoundException.class,
 
+
     })
     public final ResponseEntity<ExceptionResponse> handlerNotFoundException(
             Exception ex,
@@ -47,7 +49,8 @@ public class CustomizedResponseEntityExceptionHandler {
     @ExceptionHandler({ValidationUtilsException.class,
             InvalidLicensePlateException.class,
             DuplicatedLicensePlateException.class,
-            EmailAllReadyRegisterException.class})
+            EmailAllReadyRegisterException.class,
+            InvalidEmailPatternException.class})
     public final ResponseEntity<ExceptionResponse> handlerInternalServerErrorException(
             Exception ex,
             WebRequest webRequest

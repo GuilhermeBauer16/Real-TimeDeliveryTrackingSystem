@@ -27,7 +27,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] DRIVER_RESOURCES = {"/vehicle/**"};
-    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/signIn", "/api/login"};
+    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login"};
     private static final String[] ADMIN_RESOURCES = {"/api/role/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
