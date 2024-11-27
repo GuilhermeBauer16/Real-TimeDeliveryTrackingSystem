@@ -16,7 +16,7 @@ import java.util.Collections;
 public class JwtDetailsService implements UserDetailsService {
 
     private static final String USER_NOT_FOUND_MESSAGE = "An User with that email %s was not found!";
-//    private static final String ROLE_PREFIX = "ROLE_";
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private final UserRepository userRepository;
 
@@ -30,7 +30,7 @@ public class JwtDetailsService implements UserDetailsService {
 
         return this.userRepository.findUserByEmail(username).map( user->
         {
-            SimpleGrantedAuthority authorities = new SimpleGrantedAuthority(user.getUserProfile().getProfile());
+            SimpleGrantedAuthority authorities = new SimpleGrantedAuthority(ROLE_PREFIX + user.getUserProfile().getProfile());
 
             return new User(user.getEmail(), user.getPassword(), Collections.singleton(authorities));
         }).orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username)));
