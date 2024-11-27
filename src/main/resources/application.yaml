@@ -16,8 +16,13 @@ spring:
 
     show-sql: false
 
-  logging:
-    level:
-      org.springframework.security: DEBUG
+
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
   main:
     allow-bean-definition-overriding: true
