@@ -1,10 +1,12 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.handler;
 
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.CustomerNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DuplicatedLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.EmailAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ExceptionResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidCustomerException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidEmailPatternException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.LicensePlateNotFoundException;
@@ -29,7 +31,7 @@ public class CustomizedResponseEntityExceptionHandler {
             VehicleNotFoundException.class,
             LicensePlateNotFoundException.class,
             UserNotFoundException.class,
-
+            CustomerNotFoundException.class,
 
     })
     public final ResponseEntity<ExceptionResponse> handlerNotFoundException(
@@ -50,7 +52,8 @@ public class CustomizedResponseEntityExceptionHandler {
             InvalidLicensePlateException.class,
             DuplicatedLicensePlateException.class,
             EmailAllReadyRegisterException.class,
-            InvalidEmailPatternException.class})
+            InvalidEmailPatternException.class,
+            InvalidCustomerException.class,})
     public final ResponseEntity<ExceptionResponse> handlerInternalServerErrorException(
             Exception ex,
             WebRequest webRequest

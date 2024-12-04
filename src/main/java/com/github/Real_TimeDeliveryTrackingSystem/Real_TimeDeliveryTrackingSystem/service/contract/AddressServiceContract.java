@@ -1,8 +1,18 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
 
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AddressServiceContract {
 
-    AddressEntity create(AddressEntity addressEntity);
+    AddressVO create(AddressVO addressVO);
+
+    AddressVO update(AddressVO addressVO);
+
+    AddressVO findById(AddressVO addressVO);
+
+    Page<AddressVO> findAll(Pageable pageable);
+
+    void delete(AddressVO addressVO);
 }
