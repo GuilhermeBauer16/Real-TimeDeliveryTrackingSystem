@@ -2,6 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract.CustomerRegistrationControllerContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.CustomerRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,9 @@ public class CustomerRegistrationController implements CustomerRegistrationContr
     }
 
     @Override
-    public ResponseEntity<CustomerVO> registerCustomer(CustomerVO customerVO) {
+    public ResponseEntity<CustomerRegistrationResponse> registerCustomer(CustomerVO customerVO) {
 
-        CustomerVO createdCustomer = service.create(customerVO);
+        CustomerRegistrationResponse createdCustomer = service.create(customerVO);
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
     }
 }

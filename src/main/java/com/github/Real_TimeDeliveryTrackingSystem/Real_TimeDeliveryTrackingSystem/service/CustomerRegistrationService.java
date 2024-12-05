@@ -11,6 +11,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.CustomerFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CustomerRegistrationServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.util.Set;
 public class CustomerRegistrationService implements CustomerRegistrationServiceContract {
 
     private static final String INVALID_CUSTOMER_MESSAGE = "This customer is invalid, please verify the fields and try again.";
+
 
     private final UserRegistrationService userRegistrationService;
 
@@ -38,7 +41,7 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
     }
 
     @Override
-    public CustomerVO create(CustomerVO customerVO) {
+    public CustomerRegistrationResponse create(CustomerVO customerVO) {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(customerVO,INVALID_CUSTOMER_MESSAGE, InvalidCustomerException.class);
         customerVO.getUser().setUserProfile(UserProfile.ROLE_CUSTOMER);
@@ -47,10 +50,14 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
         UserVO user = userRegistrationService.createUser(userVO);
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
         CustomerEntity customerEntity = CustomerFactory.create(customerVO.getPhoneNumber(), addressEntities, userEntity);
-        CustomerEntity save = customerRepository.save(customerEntity);
+        CustomerEntity savedCustomer = customerRepository.save(customerEntity);
+        CustomerRegistrationResponse customerRegistrationResponse = BuildMapper.parseObject(new CustomerRegistrationResponse(), savedCustomer);
+
+        customerRegistrationResponse.setUserRegistrationResponse(
+                BuildMapper.parseObject(new UserRegistrationResponse(), savedCustomer.getUser()));
 
 
-        return BuildMapper.parseObject(new CustomerVO(), save);
+        return customerRegistrationResponse ;
     }
 
     private Set<AddressEntity> saveAddresses(Set<AddressEntity> addresses) {

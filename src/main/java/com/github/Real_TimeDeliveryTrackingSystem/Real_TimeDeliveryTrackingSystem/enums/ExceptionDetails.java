@@ -19,6 +19,7 @@ public enum ExceptionDetails {
     INVALID_CUSTOMER_MESSAGE("Occur an error into the registration of a customer in reason of: %s", HttpStatus.BAD_REQUEST),
     ROLE_ALREADY_REGISTER_MESSAGE("Occur an error into the registration of the role in reason of: %s", HttpStatus.BAD_REQUEST),
     INVALID_TOKEN_MESSAGE("Occur an error to generate the token for the reason: %s", HttpStatus.BAD_REQUEST),
+    INVALID_USER_CREDENTIALS_MESSAGE("Occur an error to registry the user for the reason: %s", HttpStatus.FORBIDDEN),
     FIELD_NOT_FOUND_MESSAGE("The field %s can not be null or empty!", HttpStatus.NOT_FOUND),
     EXCEPTION_TYPE_NOT_THROWN("Can not thrown the exception of the type: %s", HttpStatus.NOT_FOUND);
 

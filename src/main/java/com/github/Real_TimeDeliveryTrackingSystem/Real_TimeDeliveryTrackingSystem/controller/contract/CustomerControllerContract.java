@@ -1,0 +1,47 @@
+package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
+public interface CustomerControllerContract {
+
+
+
+
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<CustomerVO> update(@RequestBody CustomerVO customerVO);
+
+
+    @DeleteMapping(value = "/{id}")
+    ResponseEntity<Void> delete(@PathVariable("id")String id);
+
+    @PostMapping(value = "/addAddress")
+    ResponseEntity<AddressVO> addAddressToCustomer(@RequestBody AddressVO addressVO);
+
+    @PutMapping("/updateAddress")
+    ResponseEntity<AddressVO> updateAddressOfACustomer(@RequestBody AddressVO addressVO);
+
+    @GetMapping(value = "/findAddress/{id}")
+    ResponseEntity<AddressVO> findAddressOfACustomerByItsId(@PathVariable("id")String AddressId);
+
+    @GetMapping(value = "/findAllAddresses")
+    ResponseEntity<Page<AddressVO>> findAllAddressesOfACustomer(Pageable pageable);
+
+    @DeleteMapping(value = "/deleteAddress/{id}")
+    ResponseEntity<Void> deleteAddressOfACustomer(@PathVariable("id") String AddressId);
+
+    
+}
