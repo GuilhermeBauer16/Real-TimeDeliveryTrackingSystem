@@ -17,16 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface CustomerControllerContract {
 
 
-
-
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<CustomerVO> update(@RequestBody CustomerVO customerVO);
-
-
-    @DeleteMapping(value = "/{id}")
-    ResponseEntity<Void> delete(@PathVariable("id")String id);
+    @DeleteMapping(value = "/{email}")
+    ResponseEntity<Void> delete(@PathVariable("email")String email);
 
     @PostMapping(value = "/addAddress")
     ResponseEntity<AddressVO> addAddressToCustomer(@RequestBody AddressVO addressVO);
@@ -41,7 +33,7 @@ public interface CustomerControllerContract {
     ResponseEntity<Page<AddressVO>> findAllAddressesOfACustomer(Pageable pageable);
 
     @DeleteMapping(value = "/deleteAddress/{id}")
-    ResponseEntity<Void> deleteAddressOfACustomer(@PathVariable("id") String AddressId);
+    ResponseEntity<Void> deleteAddressOfACustomer(@PathVariable("id") String addressId);
 
     
 }

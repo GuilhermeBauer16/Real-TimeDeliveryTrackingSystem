@@ -2,11 +2,11 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract.CustomerControllerContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,28 +24,30 @@ public class CustomerController implements CustomerControllerContract {
 
 
     @Override
-    public ResponseEntity<CustomerVO> update(CustomerVO customerVO) {
-        return null;
-    }
+    public ResponseEntity<Void> delete(String email) {
 
-    @Override
-    public ResponseEntity<Void> delete(String id) {
-        return null;
+        service.delete(email);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<AddressVO> addAddressToCustomer(AddressVO addressVO) {
-        return null;
+
+        AddressVO createdAddress = service.addAddressToCustomer(addressVO);
+        return new ResponseEntity<>(createdAddress, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<AddressVO> updateAddressOfACustomer(AddressVO addressVO) {
-        return null;
+
+        AddressVO updateAddress = service.updateAddressOfACustomer(addressVO);
+        return ResponseEntity.ok(updateAddress);
     }
 
     @Override
     public ResponseEntity<AddressVO> findAddressOfACustomerByItsId(String AddressId) {
-        return null;
+        AddressVO addressOfACustomerByItsId = service.findAddressOfACustomerByItsId(AddressId);
+        return ResponseEntity.ok(addressOfACustomerByItsId);
     }
 
     @Override
@@ -55,7 +57,10 @@ public class CustomerController implements CustomerControllerContract {
     }
 
     @Override
-    public ResponseEntity<Void> deleteAddressOfACustomer(String AddressId) {
-        return null;
+    public ResponseEntity<Void> deleteAddressOfACustomer(String addressId) {
+
+        service.deleteAddressOfACustomer(addressId);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -62,9 +62,9 @@ public class AddressService implements AddressServiceContract {
     }
 
     @Override
-    public AddressVO findById(AddressVO addressVO) {
+    public AddressVO findById(String id) {
 
-        AddressEntity addressEntity = addressRepository.findById(addressVO.getId())
+        AddressEntity addressEntity = addressRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
 
         return BuildMapper.parseObject(new AddressVO(), addressEntity);
@@ -82,9 +82,9 @@ public class AddressService implements AddressServiceContract {
     }
 
     @Override
-    public void delete(AddressVO addressVO) {
+    public void delete(String id) {
 
-        AddressEntity addressEntity = addressRepository.findById(addressVO.getId())
+        AddressEntity addressEntity = addressRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
 
         addressRepository.delete(addressEntity);

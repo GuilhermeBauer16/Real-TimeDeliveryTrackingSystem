@@ -1,6 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.handler;
 
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.AddressNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.CustomerNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DuplicatedLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.EmailAllReadyRegisterException;
@@ -34,6 +35,7 @@ public class CustomizedResponseEntityExceptionHandler {
             LicensePlateNotFoundException.class,
             UserNotFoundException.class,
             CustomerNotFoundException.class,
+            AddressNotFoundException.class,
 
     })
     public final ResponseEntity<ExceptionResponse> handlerNotFoundException(

@@ -3,26 +3,24 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.AddressNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.CustomerNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CustomerServiceContract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class CustomerService implements CustomerServiceContract {
 
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "This customer was not found, please verify the fields and try again.";
-    private static final String INVALID_CUSTOMER_MESSAGE = "This customer is invalid, please verify the fields and try again.";
+    private static final String ADDRESS_NOT_FOUND_MESSAGE = "Was not found this address associated with this customer," +
+            " please verify the fields and try again.";
 
     private final CustomerRepository customerRepository;
     private final AddressService addressService;
@@ -33,29 +31,46 @@ public class CustomerService implements CustomerServiceContract {
         this.addressService = addressService;
     }
 
-    @Override
-    public CustomerVO update(CustomerVO customerVO) {
-        return null;
-    }
 
     @Override
-    public void delete(String id) {
+    public void delete(String email) {
+
+        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(email)
+                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
+
+        customerRepository.delete(customerEntity);
 
     }
 
     @Override
     public AddressVO addAddressToCustomer(AddressVO addressVO) {
-        return null;
+
+        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
+
+        AddressVO createdAddress = addressService.create(addressVO);
+        customerEntity.getAddresses().add(BuildMapper.parseObject(new AddressEntity(), createdAddress));
+        customerRepository.save(customerEntity);
+        return createdAddress;
     }
 
     @Override
     public AddressVO updateAddressOfACustomer(AddressVO addressVO) {
-        return null;
+
+        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
+
+        verifyIfAddressIdIsAssociatedWithCustomer(addressVO.getId(), customerEntity);
+
+
+        return addressService.update(addressVO);
     }
 
     @Override
-    public AddressVO findAddressOfACustomerByItsId(String AddressId) {
-        return null;
+    public AddressVO findAddressOfACustomerByItsId(String addressId) {
+
+
+        return addressService.findById(addressId);
     }
 
     @Override
@@ -69,7 +84,13 @@ public class CustomerService implements CustomerServiceContract {
 
 
     @Override
-    public void deleteAddressOfACustomer(String AddressId) {
+    public void deleteAddressOfACustomer(String addressId) {
+
+        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
+        verifyIfAddressIdIsAssociatedWithCustomer(addressId, customerEntity);
+
+        addressService.delete(addressId);
 
     }
 
@@ -79,4 +100,18 @@ public class CustomerService implements CustomerServiceContract {
         return principal.getUsername();
 
     }
+
+    private void verifyIfAddressIdIsAssociatedWithCustomer(String addressId, CustomerEntity customerEntity) {
+
+        for (AddressEntity addressEntity : customerEntity.getAddresses()) {
+
+            if (addressId.equals(addressEntity.getId())) {
+                return;
+            }
+        }
+
+        throw new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE);
+    }
+
+
 }

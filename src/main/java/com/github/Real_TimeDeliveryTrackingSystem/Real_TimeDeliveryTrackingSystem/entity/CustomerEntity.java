@@ -29,7 +29,7 @@ public class CustomerEntity {
     @Id
     private String id;
     private String phoneNumber;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "customers_address",
             joinColumns = @JoinColumn(name = "customer_id"),

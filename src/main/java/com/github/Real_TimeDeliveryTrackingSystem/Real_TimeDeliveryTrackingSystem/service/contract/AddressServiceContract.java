@@ -10,9 +10,9 @@ public interface AddressServiceContract {
 
     AddressVO update(AddressVO addressVO);
 
-    AddressVO findById(AddressVO addressVO);
+    AddressVO findById(String id);
 
     Page<AddressVO> findAll(Pageable pageable);
 
-    void delete(AddressVO addressVO);
+    void delete(String id);
 }

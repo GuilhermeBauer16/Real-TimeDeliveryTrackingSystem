@@ -53,9 +53,11 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
-//                                .requestMatchers(ADMIN_RESOURCES).hasRole(ROLE_ADMIN)
+//
                                 .requestMatchers(DRIVER_RESOURCES).hasRole(ROLE_DRIVER)
+                                .requestMatchers(CUSTOMER_RESOURCES).hasRole(ROLE_CUSTOMER)
                                 .anyRequest().permitAll()
+
 
 
                 )

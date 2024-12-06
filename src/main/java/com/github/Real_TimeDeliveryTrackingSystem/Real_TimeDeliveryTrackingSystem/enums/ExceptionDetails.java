@@ -7,6 +7,7 @@ public enum ExceptionDetails {
 
     INVALID_UUID_FORMAT_MESSAGE("The ID %s needs to be in a UUID format", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND_MESSAGE("Occur an error in user for the reason: %s", HttpStatus.NOT_FOUND),
+    ADDRESS_NOT_FOUND_MESSAGE("Occur an error in find an address for the reason: %s", HttpStatus.NOT_FOUND),
     ROLE_NOT_FOUND_MESSAGE("Occur an error in find the role for the reason: %s", HttpStatus.NOT_FOUND),
     VEHICLE_NOT_FOUND_MESSAGE("Occur an error in find the vehicle for the reason: %s", HttpStatus.NOT_FOUND),
     CUSTOMER_NOT_FOUND_MESSAGE("Occur an error in find the Customer for the reason: %s", HttpStatus.NOT_FOUND),

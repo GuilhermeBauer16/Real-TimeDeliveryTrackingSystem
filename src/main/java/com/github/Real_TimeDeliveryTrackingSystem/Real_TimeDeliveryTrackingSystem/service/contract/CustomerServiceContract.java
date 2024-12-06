@@ -31,21 +31,18 @@ public interface CustomerServiceContract {
      * @see VehicleVO
      * @see VehicleEntity
      */
-    CustomerVO update(CustomerVO customerVO);
 
-
-
-    void delete(String id);
+    void delete(String email);
 
     AddressVO addAddressToCustomer(AddressVO addressVO);
 
     AddressVO updateAddressOfACustomer(AddressVO addressVO);
 
-    AddressVO findAddressOfACustomerByItsId(String AddressId);
+    AddressVO findAddressOfACustomerByItsId(String addressId);
 
     Page<AddressVO> findAllAddressesOfACustomer(Pageable pageable);
 
-    void deleteAddressOfACustomer(String AddressId);
+    void deleteAddressOfACustomer(String addressId);
 
 }
 
