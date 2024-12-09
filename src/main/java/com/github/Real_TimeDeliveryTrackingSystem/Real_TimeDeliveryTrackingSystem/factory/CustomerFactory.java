@@ -12,6 +12,7 @@ public class CustomerFactory {
     public CustomerFactory() {
     }
 
+
     public static CustomerEntity create(String phoneNumber, Set<AddressEntity> addresses, UserEntity user) {
         return new CustomerEntity(UUID.randomUUID().toString(), phoneNumber, addresses, user);
     }
