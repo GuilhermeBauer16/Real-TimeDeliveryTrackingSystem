@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,23 +36,24 @@ public interface CustomerControllerContract {
      *
      * <p>Endpoint: <code>DELETE /{email}</code></p>
      *
-     * @param email the email address of the customer to delete
+     * @param passwordDTO is necessary to be informed to delete the customer.
      * @return a {@link ResponseEntity} with no content
      */
-    @DeleteMapping(value = "/{email}")
+    @DeleteMapping
     @Operation(summary = "Delete a customer",
-            description = "Delete a customer by its email",
+            description = "Delete a customer and return no content",
             tags = "Customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful operation, will return no content",
                     content = @Content),
-
+            @ApiResponse(responseCode = "400", description = "Will throw Invalid Password",
+                    content = @Content),
             @ApiResponse(responseCode = "404", description = "Will Throw Customer Not Found",
                     content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<Void> delete(@PathVariable("email")String email);
+    ResponseEntity<Void> delete(@RequestBody PasswordDTO passwordDTO);
 
     /**
      * Adds a new address to a customer.

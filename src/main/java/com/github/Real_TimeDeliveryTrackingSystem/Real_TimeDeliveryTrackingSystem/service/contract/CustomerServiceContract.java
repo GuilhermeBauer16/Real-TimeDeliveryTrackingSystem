@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public interface CustomerServiceContract {
      *
      * @param email the email address of the customer to delete
      */
-    void delete(String email);
+    void delete(PasswordDTO passwordDTO);
 
     /**
      * Adds a new address to a customer.

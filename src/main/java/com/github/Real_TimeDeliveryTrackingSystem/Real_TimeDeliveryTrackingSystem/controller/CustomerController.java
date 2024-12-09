@@ -1,6 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract.CustomerControllerContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,9 @@ public class CustomerController implements CustomerControllerContract {
 
 
     @Override
-    public ResponseEntity<Void> delete(String email) {
+    public ResponseEntity<Void> delete(PasswordDTO passwordDTO) {
 
-        service.delete(email);
+        service.delete(passwordDTO);
         return ResponseEntity.noContent().build();
     }
 

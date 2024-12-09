@@ -13,6 +13,7 @@ public enum ExceptionDetails {
     CUSTOMER_NOT_FOUND_MESSAGE("Occur an error in find the Customer for the reason: %s", HttpStatus.NOT_FOUND),
     LICENSE_PLATE_NOT_FOUND_MESSAGE("Occur an error in find the license plate for the reason: %s", HttpStatus.NOT_FOUND),
     INVALID_LICENSE_PLATE_MESSAGE("These license plate is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD_MESSAGE("These password is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     DUPLICATED_LICENSE_PLATE_MESSAGE("These license plate is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_REGISTER_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL_PATTERN_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
