@@ -7,6 +7,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidCustomerException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.CustomerFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
@@ -55,7 +56,7 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
         UserVO user = userRegistrationService.createUser(userVO);
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
         CustomerEntity customerEntity = CustomerFactory.create(customerVO.getPhoneNumber(), addressEntities, userEntity);
-
+        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(customerEntity, INVALID_CUSTOMER_MESSAGE, FieldNotFound.class);
         CustomerEntity savedCustomer = customerRepository.save(customerEntity);
         CustomerRegistrationResponse customerRegistrationResponse = BuildMapper.parseObject(new CustomerRegistrationResponse(), savedCustomer);
 

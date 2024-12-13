@@ -4,6 +4,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.AddressNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.CustomerNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidAddressException;
@@ -51,7 +52,7 @@ public class AddressService implements AddressServiceContract {
     public AddressVO update(AddressVO addressVO) {
 
         AddressEntity addressEntity = addressRepository.findById(addressVO.getId())
-                .orElseThrow(() -> new CustomerNotFoundException(INVALID_ADDRESS_MESSAGE));
+                .orElseThrow(() -> new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
 
         ValidatorUtils.checkObjectIsNullOrThrowException(addressVO,INVALID_ADDRESS_MESSAGE, InvalidAddressException.class);
         AddressEntity updatedAddressFields = ValidatorUtils.updateFieldIfNotNull(addressEntity, addressVO, INVALID_ADDRESS_MESSAGE, FieldNotFound.class);
@@ -65,27 +66,18 @@ public class AddressService implements AddressServiceContract {
     public AddressVO findById(String id) {
 
         AddressEntity addressEntity = addressRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
 
         return BuildMapper.parseObject(new AddressVO(), addressEntity);
     }
 
-    @Override
-    public Page<AddressVO> findAll(Pageable pageable) {
 
-        Page<AddressEntity> addresses = addressRepository.findAll(pageable);
-
-        List<AddressVO> addressVOS = addresses.getContent().stream().map(
-                vehicleEntity -> BuildMapper.parseObject(new AddressVO(), vehicleEntity)).toList();
-
-        return new PageImpl<>(addressVOS, pageable, addresses.getTotalElements());
-    }
 
     @Override
     public void delete(String id) {
 
         AddressEntity addressEntity = addressRepository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE));
 
         addressRepository.delete(addressEntity);
 

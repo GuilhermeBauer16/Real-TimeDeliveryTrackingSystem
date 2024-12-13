@@ -50,17 +50,6 @@ public interface AddressServiceContract {
     AddressVO findById(String id);
 
     /**
-     * Retrieves a paginated list of all addresses.
-     *
-     * <p>This method retrieves a {@link Page} of {@link AddressVO} objects
-     * based on the pagination and sorting parameters provided in the {@link Pageable} object.</p>
-     *
-     * @param pageable the pagination and sorting information encapsulated in a {@link Pageable} object
-     * @return a {@link Page} of {@link AddressVO} objects
-     */
-    Page<AddressVO> findAll(Pageable pageable);
-
-    /**
      * Deletes an address by its unique identifier.
      *
      * <p>This method deletes an address record from the system based on the provided unique ID.</p>
