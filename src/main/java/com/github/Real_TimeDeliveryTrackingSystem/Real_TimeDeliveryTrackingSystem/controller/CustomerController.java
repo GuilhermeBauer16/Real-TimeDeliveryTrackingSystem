@@ -46,8 +46,8 @@ public class CustomerController implements CustomerControllerContract {
     }
 
     @Override
-    public ResponseEntity<AddressVO> findAddressOfACustomerByItsId(String AddressId) {
-        AddressVO addressOfACustomerByItsId = service.findAddressOfACustomerByItsId(AddressId);
+    public ResponseEntity<AddressVO> findAddressOfACustomerByItsId(String addressId) {
+        AddressVO addressOfACustomerByItsId = service.findAddressOfACustomerByItsId(addressId);
         return ResponseEntity.ok(addressOfACustomerByItsId);
     }
 

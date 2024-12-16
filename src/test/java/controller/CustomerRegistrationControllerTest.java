@@ -27,7 +27,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
-import java.util.Set;
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,7 +67,7 @@ class CustomerRegistrationControllerTest extends AbstractionIntegrationTest {
         UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
         AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
 
-        customerVO = new CustomerVO(ID, PHONE_NUMBER, Set.of(addressEntity),userEntity);
+        customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity),userEntity);
 
         specification = new RequestSpecBuilder()
 

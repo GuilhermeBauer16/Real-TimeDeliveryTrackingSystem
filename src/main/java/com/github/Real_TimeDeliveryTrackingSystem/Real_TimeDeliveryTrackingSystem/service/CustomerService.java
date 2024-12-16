@@ -69,7 +69,6 @@ public class CustomerService implements CustomerServiceContract {
         customerRepository.save(customerEntity);
         return createdAddress;
     }
-
     @Override
     public AddressVO updateAddressOfACustomer(AddressVO addressVO) {
 
@@ -132,6 +131,7 @@ public class CustomerService implements CustomerServiceContract {
 
         throw new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE);
     }
+
 
 
 }

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -35,7 +36,7 @@ public class CustomerEntity {
             joinColumns = @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id")
     )
-    private Set<AddressEntity> addresses;
+    private List<AddressEntity> addresses;
 
     @ManyToOne(cascade = ALL)
     @JoinColumn(name = "user_id")

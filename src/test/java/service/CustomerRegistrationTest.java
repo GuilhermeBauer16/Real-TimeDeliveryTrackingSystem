@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,8 +79,8 @@ class CustomerRegistrationTest {
         addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
         UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
         userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, Set.of(addressEntity), userEntity);
-        customerVO = new CustomerVO(ID, PHONE_NUMBER, Set.of(addressEntity), userEntity);
+        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
 
     }
 

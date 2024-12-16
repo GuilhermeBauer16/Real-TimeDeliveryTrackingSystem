@@ -20,7 +20,9 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -51,7 +53,7 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
         customerVO.getUser().setUserProfile(UserProfile.ROLE_CUSTOMER);
         customerVO.setPhoneNumber(PHONE_PREFIX + customerVO.getPhoneNumber());
         PhoneNumberValidator.validatePhoneNumber(customerVO.getPhoneNumber());
-        Set<AddressEntity> addressEntities = saveAddresses(customerVO.getAddresses());
+        List<AddressEntity> addressEntities = saveAddresses(customerVO.getAddresses());
         UserVO userVO = BuildMapper.parseObject(new UserVO(), customerVO.getUser());
         UserVO user = userRegistrationService.createUser(userVO);
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
@@ -67,8 +69,8 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
         return customerRegistrationResponse;
     }
 
-    private Set<AddressEntity> saveAddresses(Set<AddressEntity> addresses) {
-        Set<AddressEntity> savedAddresses = new HashSet<>();
+    private List<AddressEntity> saveAddresses(List<AddressEntity> addresses) {
+        List<AddressEntity> savedAddresses = new ArrayList<>();
         for (AddressEntity address : addresses) {
 
             AddressVO addressVO = BuildMapper.parseObject(new AddressVO(), address);

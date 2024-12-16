@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class CustomerVO {
 
     private String id;
     private String phoneNumber;
-    private Set<AddressEntity> addresses;
+    private List<AddressEntity> addresses;
     private UserEntity user;
 
 }

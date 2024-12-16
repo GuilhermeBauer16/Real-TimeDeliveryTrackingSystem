@@ -27,12 +27,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -66,7 +64,8 @@ class CustomerServiceTest {
     private static final String STATE = "Sample State";
     private static final String POSTAL_CODE = "12345";
     private static final String COUNTRY = "Sample Country";
-
+    private static final String UPDATED_CITY = "Rio De Janeiro";
+    private static final String UPDATED_COUNTRY = "Brazil";
     private static final String EMAIL = "user@example.com";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
@@ -108,7 +107,7 @@ class CustomerServiceTest {
         addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
         addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
         UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, new HashSet<>(Set.of(addressEntity)), userEntity);
+        customerEntity = new CustomerEntity(ID, PHONE_NUMBER,  new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
         passwordDTO = new PasswordDTO(PASSWORD);
 
 
@@ -235,7 +234,8 @@ class CustomerServiceTest {
 
     @Test
     void testUpdateAddressOfCustomer_WhenSuccessful_ShouldReturnUpdatedAddressObject() {
-
+        addressVO.setCity(UPDATED_CITY);
+        addressVO.setCountry(UPDATED_COUNTRY);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -258,10 +258,10 @@ class CustomerServiceTest {
         assertNotNull(updatedAddress.getId());
         assertEquals(ID, updatedAddress.getId());
         assertEquals(STREET, updatedAddress.getStreet());
-        assertEquals(CITY, updatedAddress.getCity());
+        assertEquals(UPDATED_CITY, updatedAddress.getCity());
         assertEquals(STATE, updatedAddress.getState());
         assertEquals(POSTAL_CODE, updatedAddress.getPostalCode());
-        assertEquals(COUNTRY, updatedAddress.getCountry());
+        assertEquals(UPDATED_COUNTRY, updatedAddress.getCountry());
 
         SecurityContextHolder.clearContext();
 
