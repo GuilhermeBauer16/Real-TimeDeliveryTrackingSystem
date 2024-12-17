@@ -2,6 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+import com.google.i18n.phonenumbers.NumberParseException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,5 +46,5 @@ public interface CustomerRegistrationControllerContract {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<CustomerRegistrationResponse> registerCustomer(@RequestBody CustomerVO customerVO);
+    ResponseEntity<CustomerRegistrationResponse> registerCustomer(@RequestBody CustomerVO customerVO) throws NumberParseException;
 }

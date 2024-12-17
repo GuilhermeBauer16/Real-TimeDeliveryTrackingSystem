@@ -4,6 +4,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import lombok.SneakyThrows;
 
 public class PhoneNumberValidator {
 
@@ -13,6 +14,7 @@ public class PhoneNumberValidator {
     private static final String INVALID_PHONE_CHARACTERS_MESSAGE = "Phone number %s contains invalid characters!";
     private static final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
+    @SneakyThrows
     public static void validatePhoneNumber(String phoneNumber) {
 
         if (phoneNumber == null || phoneNumber.isBlank()) {
@@ -25,6 +27,7 @@ public class PhoneNumberValidator {
 
 
         try {
+
             Phonenumber.PhoneNumber parsedNumber = phoneNumberUtil.parse(phoneNumber, null);
 
             if (!phoneNumberUtil.isPossibleNumber(parsedNumber) || !phoneNumberUtil.isValidNumber(parsedNumber)) {
@@ -32,7 +35,9 @@ public class PhoneNumberValidator {
             }
 
         } catch (NumberParseException e) {
-            throw new InvalidPhoneNumberException(String.format(INVALID_PHONE_MESSAGE, phoneNumber));
+            throw new NumberParseException(e.getErrorType(),String.format(INVALID_PHONE_MESSAGE, phoneNumber));
         }
+
+
     }
 }
