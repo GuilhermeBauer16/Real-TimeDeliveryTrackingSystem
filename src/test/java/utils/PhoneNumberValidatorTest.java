@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class PhoneNumberValidatorTest {
@@ -21,13 +21,14 @@ public class PhoneNumberValidatorTest {
     private static final String INVALID_PHONE_CHARACTERS_MESSAGE = "Phone number %s contains invalid characters!";
 
     private static final String PHONE_NUMBER_WITH_PREFIX = "+5511998765432";
-    private static final String PHONE_NUMBER_WITHOUT_PREFIX = "5511998765432";
+    private static final String PHONE_NUMBER_WITHOUT_PREFIX = "1234567890";
     private static final String INVALID_PHONE_NUMBER_WITH_LETTER = "+5511998A65432";
-    private static final String INVALID_PHONE_NUMBER = "+551199832";
+    private static final String INVALID_LONG_PHONE_NUMBER = "+551199876543200000";
+    private static final String INVALID_PHONE_NUMBER = "+11998765432";
 
 
     @Test
-    void testValidPhoneNumber_WhenPhoneNumberIsValid_ShouldDoNothing() throws NumberParseException {
+    void testValidPhoneNumber_WhenPhoneNumberIsValid_ShouldDoNothing() {
 
         assertDoesNotThrow(() -> PhoneNumberValidator.validatePhoneNumber(PHONE_NUMBER_WITH_PREFIX));
 
@@ -65,18 +66,16 @@ public class PhoneNumberValidatorTest {
     }
 
     @Test
-    void testValidPhoneNumber_WhenPhoneNumberIsInvalidNumber_ShouldThrowInvalidPhoneNumberException() throws NumberParseException {
-
-        String invalidPhoneNumber = "+551199876543200000";
+    void testValidPhoneNumber_WhenPhoneNumberIsInvalidNumber_ShouldThrowInvalidPhoneNumberException(){
 
         InvalidPhoneNumberException exception = assertThrows(
                 InvalidPhoneNumberException.class,
-                () -> PhoneNumberValidator.validatePhoneNumber(invalidPhoneNumber)
+                () -> PhoneNumberValidator.validatePhoneNumber(INVALID_LONG_PHONE_NUMBER)
         );
 
         assertNotNull(exception);
         assertEquals(InvalidPhoneNumberException.ERROR.formatErrorMessage(
-                String.format(INVALID_PHONE_MESSAGE, invalidPhoneNumber)
+                String.format(INVALID_PHONE_MESSAGE, INVALID_LONG_PHONE_NUMBER)
         ), exception.getMessage());
     }
 
@@ -84,30 +83,26 @@ public class PhoneNumberValidatorTest {
     @Test
     void validatePhoneNumber_ShouldThrowException_WhenPhoneNumberDoesNotContainPlusSign() {
 
-        String invalidPhoneNumber = "1234567890";
-
         NumberParseException exception = assertThrows(
                 NumberParseException.class,
-                () -> PhoneNumberValidator.validatePhoneNumber(invalidPhoneNumber)
+                () -> PhoneNumberValidator.validatePhoneNumber(PHONE_NUMBER_WITHOUT_PREFIX)
         );
 
         assertNotNull(exception);
-        assertEquals(String.format(INVALID_PHONE_MESSAGE, invalidPhoneNumber), exception.getMessage());
+        assertEquals(String.format(INVALID_PHONE_MESSAGE, PHONE_NUMBER_WITHOUT_PREFIX), exception.getMessage());
     }
 
     @Test
     void validatePhoneNumber_ShouldThrowException_WhenPhoneNumberIsInvalidButMissingPlus() {
 
-        String invalidPhoneNumber = "+11998765432";
-
         InvalidPhoneNumberException exception = assertThrows(
                 InvalidPhoneNumberException.class,
-                () -> PhoneNumberValidator.validatePhoneNumber(invalidPhoneNumber)
+                () -> PhoneNumberValidator.validatePhoneNumber(INVALID_PHONE_NUMBER)
         );
 
         assertNotNull(exception);
         assertEquals(InvalidPhoneNumberException.ERROR.formatErrorMessage(
-                String.format(INVALID_PHONE_MESSAGE, invalidPhoneNumber)
+                String.format(INVALID_PHONE_MESSAGE, INVALID_PHONE_NUMBER)
         ), exception.getMessage());
     }
 

@@ -32,9 +32,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface CustomerControllerContract {
 
     /**
-     * Deletes a customer by their email.
+     * Deletes a customer by their password.
      *
-     * <p>Endpoint: <code>DELETE /{email}</code></p>
+     * <p>Endpoint: <code>DELETE </code></p>
      *
      * @param passwordDTO is necessary to be informed to delete the customer.
      * @return a {@link ResponseEntity} with no content

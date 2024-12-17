@@ -18,11 +18,11 @@ import org.springframework.data.domain.Pageable;
 public interface CustomerServiceContract {
 
     /**
-     * Deletes a customer by their email.
+     * Deletes a customer by their password.
      *
-     * <p>This method removes a customer record from the system based on the provided email address.</p>
+     * <p>This method removes a customer record from the system based on the provided password address.</p>
      *
-     * @param email the email address of the customer to delete
+     * @param passwordDTO the password address of the customer to delete
      */
     void delete(PasswordDTO passwordDTO);
 
