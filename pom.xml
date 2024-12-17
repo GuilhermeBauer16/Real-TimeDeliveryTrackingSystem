@@ -198,6 +198,15 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
+		<!-- libphonenumber -->
+
+		<dependency>
+			<groupId>com.googlecode.libphonenumber</groupId>
+			<artifactId>libphonenumber</artifactId>
+			<version>8.13.42</version>
+		</dependency>
+
+
 
 
     </dependencies>

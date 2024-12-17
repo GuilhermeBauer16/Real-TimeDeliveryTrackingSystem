@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -27,7 +26,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] DRIVER_RESOURCES = {"/vehicle/**"};
-    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login"};
+    private static final String[] CUSTOMER_RESOURCES = {"/customer/**"};
+    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login","/signInCustomer","/customer/**"};
     private static final String[] ADMIN_RESOURCES = {"/api/role/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
@@ -53,9 +53,11 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
-//                                .requestMatchers(ADMIN_RESOURCES).hasRole(ROLE_ADMIN)
+//
                                 .requestMatchers(DRIVER_RESOURCES).hasRole(ROLE_DRIVER)
+                                .requestMatchers(CUSTOMER_RESOURCES).hasRole(ROLE_CUSTOMER)
                                 .anyRequest().permitAll()
+
 
 
                 )

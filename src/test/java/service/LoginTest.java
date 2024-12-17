@@ -1,5 +1,6 @@
 package service;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserCredentialsNotMatchedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.JwtDetailsService;
@@ -85,10 +86,11 @@ public class LoginTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new BadCredentialsException(String.format(BAD_CREDENTIALS_MESSAGE, EMAIL)));
 
-        BadCredentialsException exception = assertThrows(BadCredentialsException.class, () -> loginService.login(loginRequest));
+        UserCredentialsNotMatchedException exception = assertThrows(UserCredentialsNotMatchedException.class, () -> loginService.login(loginRequest));
 
         assertNotNull(exception);
-        assertEquals(exception.getMessage(), String.format(BAD_CREDENTIALS_MESSAGE, EMAIL));
+        assertEquals(exception.getMessage(), UserCredentialsNotMatchedException
+                .ERROR.formatErrorMessage(String.format(BAD_CREDENTIALS_MESSAGE, EMAIL)));
 
         verify(jwtDetailsService, never()).loadUserByUsername(anyString());
         verify(jwtTokenService, never()).generateToken(any(UserDetails.class));

@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserCredentialsNotMatchedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.LoginServiceContract;
@@ -42,7 +43,7 @@ public class LoginService implements LoginServiceContract {
 
         }catch (BadCredentialsException e) {
 
-            throw new BadCredentialsException(String.format(BAD_CREDENTIALS_MESSAGE, loginRequest.getEmail()));
+            throw new UserCredentialsNotMatchedException(String.format(BAD_CREDENTIALS_MESSAGE, loginRequest.getEmail()));
         }
     }
 }
