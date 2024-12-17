@@ -1,0 +1,5 @@
+ALTER TABLE users
+    MODIFY user_profile ENUM('ROLE_CUSTOMER', 'ROLE_DRIVER', 'ROLE_ADMIN') NOT NULL;
+
+
+

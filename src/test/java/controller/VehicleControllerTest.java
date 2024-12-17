@@ -5,9 +5,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
 import config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
@@ -21,8 +26,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
 import static io.restassured.RestAssured.given;
@@ -46,26 +53,57 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     private static final String LICENSE_PLATE = "AQE1F34";
     private static final Type TYPE = Type.CAR;
     private static final Status STATUS = Status.AVAILABLE;
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private static final String UPDATED_NAME = "Gol";
     private static final String UPDATED_LICENSE_PLATE = "AXE1F34";
 
+    private static final String EMAIL = "john@gmail.com";
+    private static final String USERNAME = "user";
+    private static final String PASSWORD = "password";
+    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
+
     @BeforeAll
-    static void setUp() {
+    static void setUp(@Autowired UserRepository userRepository, @Autowired PasswordEncoder passwordEncoder) {
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        specification = new RequestSpecBuilder()
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
-                .setBasePath(URL_PREFIX)
-                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
-                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
-                .build();
+        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
+        userRepository.save(userEntity);
 
         vehicleVO = new VehicleVO(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
     }
 
     @Test
     @Order(1)
+    void authorization() {
+        LoginRequest loginRequest = new LoginRequest(EMAIL, PASSWORD);
+
+        var accessToken = given()
+                .basePath("/api/login")
+                .port(TestConfigs.SERVER_PORT)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(loginRequest)
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .when()
+                .post()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body().as(LoginResponse.class).getToken();
+
+        specification = new RequestSpecBuilder()
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + accessToken)
+                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .setBasePath(URL_PREFIX)
+                .disableCsrf()
+                .addFilter(new RequestLoggingFilter(LogDetail.ALL))
+                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
+                .build();
+    }
+
+    @Test
+    @Order(2)
     void givenVehicleObject_whenCreateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -94,7 +132,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void givenVehicleObject_whenFindVehicleById_ShouldReturnVehicleObject() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -122,7 +160,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void givenVehicleObject_whenFindVehicleByLicensePlate_ShouldReturnVehicleObject() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -150,7 +188,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void givenVehicleObject_whenFindAllVehicle_ShouldReturnVehicleObjectList() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -181,7 +219,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     void givenVehicleObject_whenUpdateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
 
         vehicleVO.setLicensePlate(UPDATED_LICENSE_PLATE);
@@ -211,7 +249,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
 
     }
 
-    @Order(6)
+    @Order(7)
     @Test
     void givenVehicleObject_when_delete_ShouldReturnNoContent() {
 
