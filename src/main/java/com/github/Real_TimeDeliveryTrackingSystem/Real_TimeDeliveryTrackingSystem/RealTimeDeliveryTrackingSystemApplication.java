@@ -8,6 +8,8 @@ public class RealTimeDeliveryTrackingSystemApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(RealTimeDeliveryTrackingSystemApplication.class, args);
-    }
 
+    }
 }
+
+

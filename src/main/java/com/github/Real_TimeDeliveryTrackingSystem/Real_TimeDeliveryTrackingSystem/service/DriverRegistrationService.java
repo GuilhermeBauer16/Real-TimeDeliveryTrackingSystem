@@ -17,6 +17,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.DriverRegistrationServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.DriverLicenseValidatorUtils;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -62,6 +63,8 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
         PhoneNumberValidator.validatePhoneNumber(driverVO.getPhoneNumber());
 
+        DriverLicenseValidatorUtils.validateCNH(driverVO.getDriverLicense());
+
         List<AddressEntity> savedAddresses = saveAddresses(driverVO.getAddresses());
         List<VehicleEntity> savedVehicles = saveVehicles(driverVO.getVehicles());
         UserVO userVO = BuildMapper.parseObject(new UserVO(), driverVO.getUser());
@@ -69,7 +72,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
         UserVO user = userRegistrationService.createUser(userVO);
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
 
-        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getLicenseNumber(), savedAddresses, userEntity, savedVehicles);
+        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, userEntity, savedVehicles);
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_CUSTOMER_MESSAGE, FieldNotFound.class);
         DriverEntity savedDriver = repository.save(driverEntity);
         DriverRegistrationResponse driverRegistrationResponse = BuildMapper.parseObject(new DriverRegistrationResponse(), savedDriver);

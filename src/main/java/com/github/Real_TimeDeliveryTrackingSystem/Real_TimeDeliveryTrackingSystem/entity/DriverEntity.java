@@ -28,7 +28,7 @@ public class DriverEntity {
     @Id
     private String id;
     private String phoneNumber;
-    private String licenseNumber;
+    private String driverLicense;
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "driver_address",

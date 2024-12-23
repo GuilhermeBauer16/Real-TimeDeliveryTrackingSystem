@@ -14,8 +14,8 @@ public class DriverFactory {
     }
 
 
-    public static DriverEntity create(String phoneNumber, String licenseNumber, List<AddressEntity> addresses, UserEntity user,
+    public static DriverEntity create(String phoneNumber, String driverLicense, List<AddressEntity> addresses, UserEntity user,
                                       List<VehicleEntity> vehicles) {
-        return new DriverEntity(UUID.randomUUID().toString(), phoneNumber, licenseNumber, addresses, user, vehicles);
+        return new DriverEntity(UUID.randomUUID().toString(), phoneNumber, driverLicense, addresses, user, vehicles);
     }
 }
