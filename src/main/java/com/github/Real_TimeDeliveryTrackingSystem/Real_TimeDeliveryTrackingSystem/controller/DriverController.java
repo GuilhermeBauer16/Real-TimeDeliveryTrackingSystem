@@ -31,37 +31,5 @@ public class DriverController implements DriverControllerContract {
         return ResponseEntity.noContent().build();
     }
 
-    @Override
-    public ResponseEntity<AddressVO> addAddressToDriver(AddressVO addressVO) {
 
-        AddressVO createdAddress = service.addAddressToDriver(addressVO);
-        return new ResponseEntity<>(createdAddress, HttpStatus.CREATED);
-    }
-
-    @Override
-    public ResponseEntity<AddressVO> updateAddressOfADriver(AddressVO addressVO) {
-
-        AddressVO updateAddress = service.updateAddressOfADriver(addressVO);
-        return ResponseEntity.ok(updateAddress);
-    }
-
-    @Override
-    public ResponseEntity<AddressVO> findAddressOfADriverByItsId(String addressId) {
-        AddressVO addressOfACustomerByItsId = service.findAddressOfADriverByItsId(addressId);
-        return ResponseEntity.ok(addressOfACustomerByItsId);
-    }
-
-    @Override
-    public ResponseEntity<Page<AddressVO>> findAllAddressesOfADriver(Pageable pageable) {
-        Page<AddressVO> allAddressesOfACustomer = service.findAllAddressesOfADriver(pageable);
-        return ResponseEntity.ok(allAddressesOfACustomer);
-    }
-
-    @Override
-    public ResponseEntity<Void> deleteAddressOfADriver(String addressId) {
-
-        service.deleteAddressOfADriver(addressId);
-
-        return ResponseEntity.noContent().build();
-    }
 }
