@@ -4,11 +4,11 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DriverLicenseAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidCustomerException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.DriverFactory;
@@ -32,6 +32,8 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
 
     private static final String INVALID_CUSTOMER_MESSAGE = "This customer is invalid, please verify the fields and try again.";
+    private static final String DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE = "This driver license is already registered, " +
+            "please verify the fields and try again.";
 
     private static final String PHONE_PREFIX = "+";
 
@@ -43,13 +45,15 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
     private final AddressService addressService;
 
     private final VehicleService vehicleService;
+    private final DriverRepository driverRepository;
 
     @Autowired
-    public DriverRegistrationService(UserRegistrationService userRegistrationService, DriverRepository repository, AddressService addressService, VehicleService vehicleService) {
+    public DriverRegistrationService(UserRegistrationService userRegistrationService, DriverRepository repository, AddressService addressService, VehicleService vehicleService, DriverRepository driverRepository) {
         this.userRegistrationService = userRegistrationService;
         this.repository = repository;
         this.addressService = addressService;
         this.vehicleService = vehicleService;
+        this.driverRepository = driverRepository;
     }
 
 
@@ -63,9 +67,10 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
         PhoneNumberValidator.validatePhoneNumber(driverVO.getPhoneNumber());
 
-        DriverLicenseValidatorUtils.validateCNH(driverVO.getDriverLicense());
+        DriverLicenseValidatorUtils.validateDriverLicense(driverVO.getDriverLicense());
+        validIfDriverLicenseAlreadyRegistered(driverVO.getDriverLicense());
 
-        List<AddressEntity> savedAddresses = saveAddresses(driverVO.getAddresses());
+        List<AddressEntity> savedAddresses = addressService.createAddresses(driverVO.getAddresses());
         List<VehicleEntity> savedVehicles = saveVehicles(driverVO.getVehicles());
         UserVO userVO = BuildMapper.parseObject(new UserVO(), driverVO.getUser());
 
@@ -85,18 +90,6 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
     }
 
-    private List<AddressEntity> saveAddresses(List<AddressEntity> addresses) {
-
-        List<AddressEntity> savedAddresses = new ArrayList<>();
-        for (AddressEntity address : addresses) {
-
-            AddressVO addressVO = BuildMapper.parseObject(new AddressVO(), address);
-            savedAddresses.add(BuildMapper.parseObject(new AddressEntity(), addressService.create(addressVO)));
-        }
-
-        return savedAddresses;
-    }
-
     private List<VehicleEntity> saveVehicles(List<VehicleEntity> vehicleEntities) {
         List<VehicleEntity> savedVehicles = new ArrayList<>();
         for (VehicleEntity vehicle : vehicleEntities) {
@@ -106,6 +99,12 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
         }
 
         return savedVehicles;
+    }
+
+    private void validIfDriverLicenseAlreadyRegistered(String driverLicense) {
+        if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()){
+            throw  new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);
+        }
     }
 
 
