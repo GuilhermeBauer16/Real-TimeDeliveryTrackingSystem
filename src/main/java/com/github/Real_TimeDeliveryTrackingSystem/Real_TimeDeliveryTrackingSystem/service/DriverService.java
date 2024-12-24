@@ -3,9 +3,12 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DriverNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidPasswordException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.VehicleNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.DriverServiceContract;
@@ -18,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class DriverService implements DriverServiceContract {
 
@@ -25,15 +30,20 @@ public class DriverService implements DriverServiceContract {
     private static final String INVALID_PASSWORD_MESSAGE = "The password typed is incorrect," +
             " please verify and try again.";
 
+    private static final String VEHICLE_NOT_ASSOCIATED_MESSAGE = "That vehicle was not associated with this user," +
+            " please verify the fields and try again.";
+
     private final DriverRepository repository;
     private final AddressService addressService;
     private final PasswordEncoder passwordEncoder;
+    private final VehicleService vehicleService;
 
     @Autowired
-    public DriverService(DriverRepository repository, AddressService addressService, PasswordEncoder passwordEncoder) {
+    public DriverService(DriverRepository repository, AddressService addressService, PasswordEncoder passwordEncoder, VehicleService vehicleService) {
         this.repository = repository;
         this.addressService = addressService;
         this.passwordEncoder = passwordEncoder;
+        this.vehicleService = vehicleService;
     }
 
     @Override
@@ -111,6 +121,97 @@ public class DriverService implements DriverServiceContract {
 
         addressService.delete(addressId);
 
+    }
+
+    @Override
+    public VehicleVO createVehicle(VehicleVO vehicleVO) {
+
+        DriverEntity driverEntity = repository.findDriverByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE));
+        VehicleVO createdVehicle = vehicleService.create(vehicleVO);
+        driverEntity.getVehicles().add(BuildMapper.parseObject(new VehicleEntity(), createdVehicle));
+        repository.save(driverEntity);
+
+        return createdVehicle;
+    }
+
+    @Override
+    public VehicleVO updateVehicle(VehicleVO vehicleVO) {
+
+        DriverEntity driverEntity = repository.findDriverByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE));
+
+        verifyIfVehicleIdIsAssociatedWithDriver(vehicleVO.getId(), driverEntity.getVehicles());
+
+        return vehicleService.update(vehicleVO);
+    }
+
+    @Override
+    public VehicleVO findVehicleById(String id) {
+
+        DriverEntity driverEntity = repository.findDriverByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE));
+
+        verifyIfVehicleIdIsAssociatedWithDriver(id, driverEntity.getVehicles());
+
+        return vehicleService.findById(id);
+    }
+
+    @Override
+    public VehicleVO findVehicleByLicensePlate(String licensePlate) {
+
+        DriverEntity driverEntity = repository.findDriverByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE));
+
+        verifyIfLicensePlateIdIsAssociatedWithDriver(licensePlate, driverEntity.getVehicles());
+
+        return vehicleService.findByLicensePlate(licensePlate);
+    }
+
+    @Override
+    public Page<VehicleVO> findAllVehicles(Pageable pageable) {
+
+        Page<VehicleEntity> vehiclesEntities = repository.findVehiclesByDriverEmail(retrieveUserEmail(), pageable);
+
+
+        return vehiclesEntities.map(vehicleEntity -> BuildMapper.parseObject(new VehicleVO(), vehicleEntity));
+    }
+
+    @Override
+    @Transactional
+    public void deleteVehicle(String id) {
+
+        DriverEntity driverEntity = repository.findDriverByUserEmail(retrieveUserEmail())
+                .orElseThrow(() -> new DriverNotFoundException(DRIVER_NOT_FOUND_MESSAGE));
+
+        verifyIfVehicleIdIsAssociatedWithDriver(id, driverEntity.getVehicles());
+
+        vehicleService.delete(id);
+
+    }
+
+    private void verifyIfVehicleIdIsAssociatedWithDriver(String vehicleId, List<VehicleEntity> vehicles) {
+
+        for (VehicleEntity vehicleEntity : vehicles) {
+
+            if (vehicleId.equals(vehicleEntity.getId())) {
+                return;
+            }
+        }
+
+        throw new VehicleNotFoundException(VEHICLE_NOT_ASSOCIATED_MESSAGE);
+    }
+
+    private void verifyIfLicensePlateIdIsAssociatedWithDriver(String licensePlate, List<VehicleEntity> vehicles) {
+
+        for (VehicleEntity vehicleEntity : vehicles) {
+
+            if (licensePlate.equals(vehicleEntity.getLicensePlate())) {
+                return;
+            }
+        }
+
+        throw new VehicleNotFoundException(VEHICLE_NOT_ASSOCIATED_MESSAGE);
     }
 
 
