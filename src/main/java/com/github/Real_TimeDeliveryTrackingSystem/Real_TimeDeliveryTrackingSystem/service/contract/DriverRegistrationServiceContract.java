@@ -1,32 +1,34 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
 
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.google.i18n.phonenumbers.NumberParseException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidDriverException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DriverLicenseAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
 
 /**
- * Service contract for managing customer registration.
- *
- * <p>This interface defines the contract for customer registration services,
- * including creating new customer records and returning the registration result.</p>
- *
- * @see CustomerVO
- * @see CustomerRegistrationResponse
+ * Contract for the Driver Registration Service, defining the operations related to driver registration.
+ * This interface provides a method for creating driver registrations while validating input details.
  */
 
 public interface DriverRegistrationServiceContract {
 
     /**
-     * Registers a new customer in the system.
+     * Registers a new driver using the provided {@link DriverVO}.
+     * <p>
+     * The method validates the driver's information and processes the registration.
+     * If there is an error parsing the phone number, a {@link NumberParseException} is thrown.
      *
-     * <p>This method takes a {@link CustomerVO} object containing customer details
-     * and creates a new customer record in the system. The result of the registration
-     * process is returned as a {@link CustomerRegistrationResponse} object.</p>
-     *
-     * @param customerVO the customer details encapsulated in a {@link CustomerVO} object
-     * @return a {@link CustomerRegistrationResponse} object containing the result of the registration process
+     * @param driverVO the driver value object containing the registration details of the driver
+     * @return a {@link DriverRegistrationResponse} containing the details of the successful registration
+     * @throws NumberParseException if the phone number provided in {@link DriverVO} is invalid or cannot be parsed
+     * @throws InvalidDriverException When the provided {@link DriverVO} is invalid or cannot be parsed
+     * @throws DriverLicenseAllReadyRegisterException When the driver license provided by the {@link DriverVO} is already register in the system.
+     * @see DriverEntity
+     * @see DriverVO
+     * @see DriverRegistrationResponse
      */
+
     DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException;
 }

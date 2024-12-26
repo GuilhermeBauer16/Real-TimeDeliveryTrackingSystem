@@ -11,6 +11,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DriverLicenseAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidCustomerException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidDriverException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.DriverFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
@@ -31,7 +32,7 @@ import java.util.List;
 public class DriverRegistrationService implements DriverRegistrationServiceContract {
 
 
-    private static final String INVALID_CUSTOMER_MESSAGE = "This customer is invalid, please verify the fields and try again.";
+    private static final String INVALID_DRIVER_MESSAGE = "This Driver is invalid, please verify the fields and try again.";
     private static final String DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE = "This driver license is already registered, " +
             "please verify the fields and try again.";
 
@@ -45,6 +46,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
     private final AddressService addressService;
 
     private final VehicleService vehicleService;
+
     private final DriverRepository driverRepository;
 
     @Autowired
@@ -60,7 +62,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
     @Override
     public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException {
 
-        ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_CUSTOMER_MESSAGE, InvalidCustomerException.class);
+        ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_DRIVER_MESSAGE, InvalidDriverException.class);
         driverVO.getUser().setUserProfile(UserProfile.ROLE_DRIVER);
 
         driverVO.setPhoneNumber(PHONE_PREFIX + driverVO.getPhoneNumber());
@@ -78,7 +80,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
 
         DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, userEntity, savedVehicles);
-        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_CUSTOMER_MESSAGE, FieldNotFound.class);
+        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_DRIVER_MESSAGE, FieldNotFound.class);
         DriverEntity savedDriver = repository.save(driverEntity);
         DriverRegistrationResponse driverRegistrationResponse = BuildMapper.parseObject(new DriverRegistrationResponse(), savedDriver);
 
@@ -102,6 +104,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
     }
 
     private void validIfDriverLicenseAlreadyRegistered(String driverLicense) {
+
         if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()){
             throw  new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);
         }

@@ -10,6 +10,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ExceptionResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidCustomerException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidDriverException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidDriverLicenseException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidEmailPatternException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidLicensePlateException;
@@ -66,7 +67,8 @@ public class CustomizedResponseEntityExceptionHandler {
             InvalidCustomerException.class,
             InvalidPasswordException.class,
             InvalidPhoneNumberException.class,
-            InvalidDriverLicenseException.class,})
+            InvalidDriverLicenseException.class,
+            InvalidDriverException.class})
     public final ResponseEntity<ExceptionResponse> handlerBadRequestException(
             Exception ex,
             WebRequest webRequest

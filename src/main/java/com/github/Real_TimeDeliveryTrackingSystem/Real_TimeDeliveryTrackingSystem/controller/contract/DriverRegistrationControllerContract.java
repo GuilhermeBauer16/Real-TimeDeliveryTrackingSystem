@@ -1,8 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
 
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.google.i18n.phonenumbers.NumberParseException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,35 +12,43 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.VehicleService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.AddressService;
 
 /**
- * REST API contract for customer registration operations.
- *
- * <p>This interface defines an endpoint for registering new customers, handling the creation of customer records,
- * and returning the appropriate response based on the operation's success or failure.</p>
- *
- * @see CustomerVO
- * @see CustomerRegistrationResponse
+ * Interface for the Driver Registration Controller.
+ * <p>
+ * Defines the contract for registering a new driver in the system.
+ * Includes API documentation for Swagger/OpenAPI integration.
  */
 
 public interface DriverRegistrationControllerContract {
 
+
     /**
-     * Registers a new customer.
+     * Registers a new driver in the system.
+     * <p>
+     * This endpoint allows creating a new driver and returns the created driver's details
+     * upon successful registration.
      *
-     * <p>Endpoint: <code>POST</code> with content type <code>application/json</code>.</p>
-     * <p>This method creates a new customer record using the provided {@link CustomerVO} object and returns a
-     * {@link CustomerRegistrationResponse} object with the details of the registered customer.</p>
+     * @param driverVO the {@link DriverVO} object containing the driver's details
+     * @return a {@link ResponseEntity} containing the {@link DriverRegistrationResponse}
+     * @throws NumberParseException if the driver's phone number is invalid
+     * @see DriverVO
+     * @see DriverRegistrationResponse
+     * @see VehicleService
+     * @see AddressService
      */
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Register a new customer",
-            description = "Creates a new customer and returns the created customer.",
-            tags = "Customer")
+    @Operation(summary = "Register a new driver",
+            description = "Creates a new driver and returns the created driver.",
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successful operation",
-                    content = @Content(schema = @Schema(implementation = CustomerRegistrationResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Will throw Invalid Customer, Invalid Address",
+                    content = @Content(schema = @Schema(implementation = DriverRegistrationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Will throw Invalid Invalid, Invalid Address, Invalid Vehicle",
                     content = @Content),
 
             @ApiResponse(responseCode = "500", description = "Internal server error",

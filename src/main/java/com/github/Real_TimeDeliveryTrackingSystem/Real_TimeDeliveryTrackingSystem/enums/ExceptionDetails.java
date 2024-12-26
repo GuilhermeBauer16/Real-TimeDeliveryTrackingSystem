@@ -30,6 +30,7 @@ public enum ExceptionDetails {
     INVALID_EMAIL_PATTERN_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
 
     //Driver
+    INVALID_DRIVER_MESSAGE("Occur an error into the registration of a driver in reason of: %s", HttpStatus.BAD_REQUEST),
     INVALID_DRIVER_LICENSE_MESSAGE("Occur an error into the registration of a driver license in reason of: %s", HttpStatus.BAD_REQUEST),
     DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE("Occur an error into the registration of the driver license in reason of: %s", HttpStatus.BAD_REQUEST),
     DRIVER_NOT_FOUND_MESSAGE("Occur an error in find the Driver for the reason: %s", HttpStatus.NOT_FOUND),
