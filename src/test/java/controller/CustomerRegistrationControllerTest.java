@@ -81,7 +81,7 @@ class CustomerRegistrationControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(1)
-    void givenVehicleObject_whenCreateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
+    void givenCustomerObject_whenRegisterCustomer_ShouldReturnCustomerObject() throws JsonProcessingException {
 
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidDriverException extends RuntimeException {
 
-    public static final ExceptionDetails ERROR = ExceptionDetails.INVALID_CUSTOMER_MESSAGE;
+    public static final ExceptionDetails ERROR = ExceptionDetails.INVALID_DRIVER_MESSAGE;
 
     public InvalidDriverException(String message) {
         super(ERROR.formatErrorMessage(message));
