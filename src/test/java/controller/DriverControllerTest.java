@@ -1,22 +1,20 @@
 package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
 import config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -43,14 +41,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class VehicleControllerTest extends AbstractionIntegrationTest {
+class DriverControllerTest extends AbstractionIntegrationTest {
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
-    private static VehicleVO vehicleVO;
     private static DriverVO driverVO;
 
-    private static final String URL_PREFIX = "/vehicle";
+    private static final String URL_PREFIX = "/driver";
     private static final String SIGN_IN_URL_PREFIX = "/signInDriver";
     private static final String LOGIN_URL_PREFIX = "/api/login";
     private static final String HOST_PREFIX = "http://localhost:";
@@ -58,23 +55,19 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
 
     private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
     private static final String NAME = "Voyage";
-    private static final String LICENSE_PLATE = "AQX1F34";
-    private static final String SECOND_LICENSE_PLATE = "AAX1F34";
+    private static final String LICENSE_PLATE = "AQZ1F34";
     private static final Type TYPE = Type.CAR;
     private static final Status STATUS = Status.AVAILABLE;
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private static final String UPDATED_NAME = "Gol";
-    private static final String UPDATED_LICENSE_PLATE = "AXA1F34";
-
-    private static final String EMAIL = "johnzero@gmail.com";
+    private static final String EMAIL = "driver@gmail.com";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
     private static final String PHONE_PREFIX = "+";
     private static final String PHONE_NUMBER = "5511995765432";
-    private static final String DRIVER_LICENSE = "82435476439";
+    private static final String DRIVER_LICENSE = "82101864590";
     private static final String STREET = "123 Main State";
     private static final String CITY = "Sample Cities";
     private static final String STATE = "Sample Statess";
@@ -87,8 +80,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
         AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        vehicleVO = new VehicleVO(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, SECOND_LICENSE_PLATE, TYPE, STATUS);
+        VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
         driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
                 , userEntity, new ArrayList<>(List.of(vehicleEntity)));
     }
@@ -98,7 +90,7 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     void givenDriverObject_whenRegisterDriver_ShouldReturnDriverObject() throws JsonProcessingException {
 
         var content = given()
-                .basePath("/signInDriver")
+                .basePath(SIGN_IN_URL_PREFIX )
                 .port(TestConfigs.SERVER_PORT)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .body(driverVO)
@@ -156,152 +148,15 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
     }
 
 
-    @Test
     @Order(3)
-    void givenVehicleObject_whenCreateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
-
-        var content = given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .body(vehicleVO)
-                .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .extract()
-                .body()
-                .asString();
-
-        VehicleVO createdVehicle = objectMapper.readValue(content, VehicleVO.class);
-
-        Assertions.assertNotNull(createdVehicle);
-        Assertions.assertNotNull(createdVehicle.getId());
-        Assertions.assertTrue(createdVehicle.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertEquals(NAME, createdVehicle.getName());
-        assertEquals(LICENSE_PLATE, createdVehicle.getLicensePlate());
-        assertEquals(TYPE, createdVehicle.getType());
-        assertEquals(STATUS, createdVehicle.getStatus());
-
-        vehicleVO.setId(createdVehicle.getId());
-    }
-
     @Test
-    @Order(4)
-    void givenVehicleObject_whenFindVehicleById_ShouldReturnVehicleObject() throws JsonProcessingException {
-
-        var content = given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .pathParam("id", vehicleVO.getId())
-                .when()
-                .get("/{id}")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString();
-
-        VehicleVO vehicle = objectMapper.readValue(content, VehicleVO.class);
-
-        Assertions.assertNotNull(vehicle);
-        Assertions.assertNotNull(vehicle.getId());
-        Assertions.assertTrue(vehicle.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertEquals(NAME, vehicle.getName());
-        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());
-        assertEquals(TYPE, vehicle.getType());
-        assertEquals(STATUS, vehicle.getStatus());
-
-    }
-
-    @Test
-    @Order(5)
-    void givenVehicleObject_whenFindVehicleByLicensePlate_ShouldReturnVehicleObject() throws JsonProcessingException {
-
-        var content = given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .pathParam("licensePlate", vehicleVO.getLicensePlate())
-                .when()
-                .get("/findByLicensePlate/{licensePlate}")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString();
-
-        VehicleVO vehicle = objectMapper.readValue(content, VehicleVO.class);
-
-        Assertions.assertNotNull(vehicle);
-        Assertions.assertNotNull(vehicle.getId());
-        Assertions.assertTrue(vehicle.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertEquals(NAME, vehicle.getName());
-        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());
-        assertEquals(TYPE, vehicle.getType());
-        assertEquals(STATUS, vehicle.getStatus());
-
-    }
-
-    @Test
-    @Order(6)
-    void givenVehicleObject_whenFindAllVehicle_ShouldReturnVehicleObjectList() throws JsonProcessingException {
-
-        var content = given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .when()
-                .get()
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString();
-
-        PaginatedResponse<VehicleVO> paginatedResponse =
-                objectMapper.readValue(content, new TypeReference<>() {
-                });
-
-        assertEquals(2,paginatedResponse.getContent().size());
-
-    }
-
-    @Test
-    @Order(7)
-    void givenVehicleObject_whenUpdateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
-
-        vehicleVO.setLicensePlate(UPDATED_LICENSE_PLATE);
-        vehicleVO.setName(UPDATED_NAME);
-
-        var content = given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .body(vehicleVO)
-                .when()
-                .put()
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString();
-
-        VehicleVO createdVehicle = objectMapper.readValue(content, VehicleVO.class);
-
-        Assertions.assertNotNull(createdVehicle);
-        Assertions.assertNotNull(createdVehicle.getId());
-        Assertions.assertTrue(createdVehicle.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertEquals(UPDATED_NAME, createdVehicle.getName());
-        assertEquals(UPDATED_LICENSE_PLATE, createdVehicle.getLicensePlate());
-        assertEquals(TYPE, createdVehicle.getType());
-        assertEquals(STATUS, createdVehicle.getStatus());
-
-    }
-
-    @Order(8)
-    @Test
-    void givenVehicleObject_when_delete_ShouldReturnNoContent() {
-
+    void givenDriverObject_when_delete_ShouldReturnNoContent() {
+        PasswordDTO passwordDTO = new PasswordDTO(driverVO.getUser().getPassword());
         given().spec(specification)
-                .pathParam("id", vehicleVO.getId())
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(passwordDTO)
                 .when()
-                .delete("{id}")
+                .delete()
                 .then()
                 .statusCode(204);
 
