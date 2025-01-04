@@ -44,7 +44,7 @@ public interface VehicleControllerContract {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Register a new Vehicle",
             description = "Creates a new vehicle and returns the created vehicle.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = VehicleVO.class))),
@@ -72,7 +72,7 @@ public interface VehicleControllerContract {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update a Vehicle",
             description = "Update a vehicle and returns the updated vehicle.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = VehicleVO.class))),
@@ -96,7 +96,7 @@ public interface VehicleControllerContract {
     @GetMapping(value = "/{id}")
     @Operation(summary = "Find a single vehicle",
             description = "Finds a vehicle by its ID and returns it.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = VehicleVO.class))),
@@ -122,7 +122,7 @@ public interface VehicleControllerContract {
     @GetMapping("/findByLicensePlate/{licensePlate}")
     @Operation(summary = "Find a vehicle by its license plate",
             description = "Find a vehicle by its license plate and returns it.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = VehicleVO.class))),
@@ -146,7 +146,7 @@ public interface VehicleControllerContract {
     @GetMapping
     @Operation(summary = "Find All vehicles",
             description = "Finds all vehicles in the system and returns a paginated list.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = VehicleVO.class)))
@@ -164,7 +164,7 @@ public interface VehicleControllerContract {
     @DeleteMapping(value = "/{id}")
     @Operation(summary = "Delete a vehicle",
             description = "Deletes a vehicle by its ID.",
-            tags = "Vehicles")
+            tags = "Driver")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Successful operation, will return a not content",
                     content = @Content),

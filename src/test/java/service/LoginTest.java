@@ -64,6 +64,7 @@ public class LoginTest {
 
     @Test
     void testLogin_WhenSuccess_ShouldReturnLoginResponse() {
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
         when(jwtDetailsService.loadUserByUsername(EMAIL)).thenReturn(userDetails);
         when(jwtTokenService.generateToken(userDetails)).thenReturn(JWT_TOKEN);

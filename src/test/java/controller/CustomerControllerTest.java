@@ -42,7 +42,6 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 class CustomerControllerTest extends AbstractionIntegrationTest {
 
 
