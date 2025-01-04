@@ -100,8 +100,6 @@ class CustomerRegistrationTest {
 
             when(repository.save(any(CustomerEntity.class))).thenReturn(customerEntity);
             when(userRegistrationService.createUser(any(UserVO.class))).thenReturn(userVO);
-            when(addressService.create(any(AddressVO.class))).thenReturn(addressVO);
-
 
             CustomerRegistrationResponse customer = service.create(customerVO);
 

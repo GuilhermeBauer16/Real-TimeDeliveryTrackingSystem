@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerService implements CustomerServiceContract {
 
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "This customer was not found, please verify the fields and try again.";
-    private static final String ADDRESS_NOT_FOUND_MESSAGE = "Was not found this address associated with this customer," +
+    private static final String ADDRESS_NOT_FOUND_MESSAGE = "That address was not associated with this customer," +
             " please verify the fields and try again.";
 
     private static final String INVALID_PASSWORD_MESSAGE = "The password typed is incorrect," +
@@ -103,6 +103,7 @@ public class CustomerService implements CustomerServiceContract {
 
 
     @Override
+    @Transactional
     public void deleteAddressOfACustomer(String addressId) {
 
         CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
