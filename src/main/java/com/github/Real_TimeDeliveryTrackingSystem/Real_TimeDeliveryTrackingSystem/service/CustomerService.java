@@ -4,7 +4,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.AddressNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.CustomerNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidPasswordException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerService implements CustomerServiceContract {
 
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "This customer was not found, please verify the fields and try again.";
-    private static final String ADDRESS_NOT_FOUND_MESSAGE = "That address was not associated with this customer," +
-            " please verify the fields and try again.";
 
     private static final String INVALID_PASSWORD_MESSAGE = "The password typed is incorrect," +
             " please verify and try again.";
@@ -75,7 +72,7 @@ public class CustomerService implements CustomerServiceContract {
         CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
 
-        verifyIfAddressIdIsAssociatedWithCustomer(addressVO.getId(), customerEntity);
+        addressService.verifyIfAddressIdIsAssociatedWithUser(addressVO.getId(), customerEntity.getAddresses());
 
 
         return addressService.update(addressVO);
@@ -87,7 +84,7 @@ public class CustomerService implements CustomerServiceContract {
         CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
 
-        verifyIfAddressIdIsAssociatedWithCustomer(addressId, customerEntity);
+        addressService.verifyIfAddressIdIsAssociatedWithUser(addressId, customerEntity.getAddresses());
 
         return addressService.findById(addressId);
     }
@@ -108,7 +105,7 @@ public class CustomerService implements CustomerServiceContract {
 
         CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
-        verifyIfAddressIdIsAssociatedWithCustomer(addressId, customerEntity);
+        addressService.verifyIfAddressIdIsAssociatedWithUser(addressId, customerEntity.getAddresses());
 
         addressService.delete(addressId);
 
@@ -120,19 +117,6 @@ public class CustomerService implements CustomerServiceContract {
         return principal.getUsername();
 
     }
-
-    private void verifyIfAddressIdIsAssociatedWithCustomer(String addressId, CustomerEntity customerEntity) {
-
-        for (AddressEntity addressEntity : customerEntity.getAddresses()) {
-
-            if (addressId.equals(addressEntity.getId())) {
-                return;
-            }
-        }
-
-        throw new AddressNotFoundException(ADDRESS_NOT_FOUND_MESSAGE);
-    }
-
 
 
 }

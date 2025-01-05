@@ -53,7 +53,7 @@ class CustomerRegistrationControllerTest extends AbstractionIntegrationTest {
     private static final String POSTAL_CODE = "12345";
     private static final String COUNTRY = "Sample Country";
 
-    private static final String EMAIL = "customer@example.com";
+    private static final String EMAIL = "customerRegister@example.com";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
