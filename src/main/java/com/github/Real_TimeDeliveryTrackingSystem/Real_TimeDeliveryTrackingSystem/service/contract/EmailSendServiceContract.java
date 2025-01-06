@@ -4,5 +4,5 @@ import jakarta.mail.MessagingException;
 
 public interface EmailSendServiceContract {
 
-    void sendValidatorCode(String to, String code) throws MessagingException;
+    void sendEmailWithValidatorCodeToUser(String email) throws MessagingException;
 }

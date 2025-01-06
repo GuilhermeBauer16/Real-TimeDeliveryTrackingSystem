@@ -17,6 +17,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidPasswordException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidPhoneNumberException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.LicensePlateNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserAlreadyAuthenticatedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserCredentialsNotMatchedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ValidationUtilsException;
@@ -68,7 +69,8 @@ public class CustomizedResponseEntityExceptionHandler {
             InvalidPasswordException.class,
             InvalidPhoneNumberException.class,
             InvalidDriverLicenseException.class,
-            InvalidDriverException.class})
+            InvalidDriverException.class,
+            UserAlreadyAuthenticatedException.class,})
     public final ResponseEntity<ExceptionResponse> handlerBadRequestException(
             Exception ex,
             WebRequest webRequest

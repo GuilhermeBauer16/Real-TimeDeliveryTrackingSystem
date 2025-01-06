@@ -28,6 +28,7 @@ public enum ExceptionDetails {
     INVALID_USER_CREDENTIALS_MESSAGE("Occur an error to registry the user for the reason: %s", HttpStatus.FORBIDDEN),
     INVALID_PASSWORD_MESSAGE("These password is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL_PATTERN_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_AUTHENTICATED_MESSAGE("Occur an error into the authenticate the user in reason of: %s", HttpStatus.BAD_REQUEST),
 
     //Driver
     INVALID_DRIVER_MESSAGE("Occur an error into the registration of a driver in reason of: %s", HttpStatus.BAD_REQUEST),

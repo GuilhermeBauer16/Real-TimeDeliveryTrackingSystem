@@ -1,10 +1,11 @@
-package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
+package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email;
 
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.EmailSendServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.CodeGeneratorUtils;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,24 +20,27 @@ import java.time.LocalDateTime;
 @Service
 public class EmailSenderService implements EmailSendServiceContract {
 
+    private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = "This user is already authenticated.";
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     private static final String EMAIL_TEMPLATE_PATH = "email/verification-email";
     private static final String SUBJECT = "Verification of the Email";
     private static final String CONTEXT_CODE_VARIABLE = "code";
+    private static final int CODE_LENGTH = 6;
+    private static final int EXPIRATION_TIME = 30;
+
 
 
     @Autowired
-    public EmailSenderService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, UserRepository userRepository) {
+    public EmailSenderService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, UserService userService) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
-    @Override
-    public void sendValidatorCode(String to, String code) throws MessagingException {
+    private void sendValidatorCode(String to, String code) throws MessagingException {
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper =
@@ -57,19 +61,21 @@ public class EmailSenderService implements EmailSendServiceContract {
 
     }
 
-    public void sendValidatorCodeToUser(String email) throws MessagingException {
+    @Override
+    public void sendEmailWithValidatorCodeToUser(String email) throws MessagingException {
 
-        UserEntity userEntity = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
+        UserVO userByEmail = userService.findUserByEmail(email);
 
-        if(userEntity.isAuthenticated()){
-            throw new RuntimeException("user is already authenticated");
+        if(userByEmail.isAuthenticated()){
+            throw new UserAlreadyAuthenticatedException(USER_ALREADY_AUTHENTICATED_MESSAGE);
 
         }
-        String code = CodeGeneratorUtils.generateCode(6);
+        String code = CodeGeneratorUtils.generateCode(CODE_LENGTH);
         sendValidatorCode(email,code);
-        userEntity.setCodeExpiration(LocalDateTime.now().plusMinutes(30));
-        userEntity.setVerifyCode(code);
-        userRepository.save(userEntity);
+
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
+        userService.updateUser(userUpdateRequest);
+
 
     }
 
