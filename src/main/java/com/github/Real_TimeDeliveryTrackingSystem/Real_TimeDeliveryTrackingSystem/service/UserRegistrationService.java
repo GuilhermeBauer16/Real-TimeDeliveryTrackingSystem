@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class UserRegistrationService implements UserRegistrationServiceContract {
 
@@ -43,6 +45,9 @@ public class UserRegistrationService implements UserRegistrationServiceContract 
         checkIfEmailAlreadyRegistered(userVO.getEmail());
 
         UserEntity userFactory = UserFactory.create(userVO.getName(),userVO.getEmail(),userVO.getPassword(),userVO.getUserProfile());
+        userFactory.setAuthenticated(false);
+        userFactory.setVerifyCode("null");
+        userFactory.setCodeExpiration(LocalDateTime.now());
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(userFactory,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
         UserEntity userEntity = userRepository.save(userFactory);
 

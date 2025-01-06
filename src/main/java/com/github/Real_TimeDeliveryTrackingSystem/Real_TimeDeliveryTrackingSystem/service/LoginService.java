@@ -19,18 +19,22 @@ public class LoginService implements LoginServiceContract {
     private final JwtTokenService jwtTokenService;
     private final JwtDetailsService jwtDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final VerifyCodeValidatorService verifyCodeValidatorService;
 
     @Autowired
-    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager) {
+    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager, VerifyCodeValidatorService verifyCodeValidatorService) {
         this.jwtTokenService = jwtTokenService;
         this.jwtDetailsService = jwtDetailsService;
         this.authenticationManager = authenticationManager;
+        this.verifyCodeValidatorService = verifyCodeValidatorService;
     }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         this.authenticate(loginRequest);
         UserDetails userDetails = this.jwtDetailsService.loadUserByUsername(loginRequest.getEmail());
+
+        verifyCodeValidatorService.verifyIfUserIsAuthenticated(loginRequest.getEmail());
         final String token = jwtTokenService.generateToken(userDetails);
 
         return new LoginResponse(loginRequest.getEmail(), token);
@@ -40,6 +44,7 @@ public class LoginService implements LoginServiceContract {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
 
         }catch (BadCredentialsException e) {
 

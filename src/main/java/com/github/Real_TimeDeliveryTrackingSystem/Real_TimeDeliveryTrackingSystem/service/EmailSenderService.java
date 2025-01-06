@@ -1,7 +1,10 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.EmailSendServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.CodeGeneratorUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmailSenderService implements EmailSendServiceContract {
@@ -49,6 +54,22 @@ public class EmailSenderService implements EmailSendServiceContract {
         mimeMessageHelper.setSubject(SUBJECT);
         mimeMessageHelper.setFrom("not-reply@gmail.com");
         mailSender.send(mimeMessage);
+
+    }
+
+    public void sendValidatorCodeToUser(String email) throws MessagingException {
+
+        UserEntity userEntity = userRepository.findUserByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
+
+        if(userEntity.isAuthenticated()){
+            throw new RuntimeException("user is already authenticated");
+
+        }
+        String code = CodeGeneratorUtils.generateCode(6);
+        sendValidatorCode(email,code);
+        userEntity.setCodeExpiration(LocalDateTime.now().plusMinutes(30));
+        userEntity.setVerifyCode(code);
+        userRepository.save(userEntity);
 
     }
 

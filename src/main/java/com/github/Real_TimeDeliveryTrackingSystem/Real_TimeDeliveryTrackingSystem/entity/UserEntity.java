@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name="users")
@@ -31,4 +33,19 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private UserProfile userProfile;
 
+    @Column(name = "verify_code")
+    private String verifyCode;
+
+    private boolean authenticated;
+
+    @Column(name = "code_expiration")
+    private LocalDateTime codeExpiration;
+
+    public UserEntity(String id, String name, String email, String password, UserProfile userProfile) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.userProfile = userProfile;
+    }
 }

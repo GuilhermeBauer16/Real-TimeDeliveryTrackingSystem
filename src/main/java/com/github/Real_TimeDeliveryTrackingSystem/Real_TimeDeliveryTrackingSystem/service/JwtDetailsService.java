@@ -33,6 +33,7 @@ public class JwtDetailsService implements UserDetailsService {
             SimpleGrantedAuthority authorities = new SimpleGrantedAuthority(ROLE_PREFIX + user.getUserProfile().getProfile());
 
             return new User(user.getEmail(), user.getPassword(), Collections.singleton(authorities));
+
         }).orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username)));
     }
 }
