@@ -27,9 +27,11 @@ public class EmailSenderService implements EmailSendServiceContract {
 
     private static final String EMAIL_TEMPLATE_PATH = "email/verification-email";
     private static final String SUBJECT = "Verification of the Email";
+    private static final String CHARSET = "UTF-8";
     private static final String CONTEXT_CODE_VARIABLE = "code";
     private static final int CODE_LENGTH = 6;
     private static final int EXPIRATION_TIME = 30;
+
 
 
 
@@ -46,7 +48,7 @@ public class EmailSenderService implements EmailSendServiceContract {
         MimeMessageHelper mimeMessageHelper =
                 new MimeMessageHelper(mimeMessage,
                         MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                        "UTF-8");
+                        CHARSET);
 
         Context context = new Context();
         context.setVariable(CONTEXT_CODE_VARIABLE, code);
@@ -56,7 +58,6 @@ public class EmailSenderService implements EmailSendServiceContract {
         mimeMessageHelper.setTo(to);
         mimeMessageHelper.setText(html, true);
         mimeMessageHelper.setSubject(SUBJECT);
-        mimeMessageHelper.setFrom("not-reply@gmail.com");
         mailSender.send(mimeMessage);
 
     }

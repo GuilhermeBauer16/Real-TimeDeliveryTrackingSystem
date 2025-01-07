@@ -24,6 +24,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +63,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
 
     @Override
-    public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException {
+    public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException, MessagingException {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_DRIVER_MESSAGE, InvalidDriverException.class);
         driverVO.getUser().setUserProfile(UserProfile.ROLE_DRIVER);

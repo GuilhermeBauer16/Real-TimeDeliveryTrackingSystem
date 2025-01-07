@@ -3,7 +3,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserCredentialsNotMatchedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email.VerifyCodeValidatorService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email.CodeValidatorService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.LoginServiceContract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,10 +20,10 @@ public class LoginService implements LoginServiceContract {
     private final JwtTokenService jwtTokenService;
     private final JwtDetailsService jwtDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final VerifyCodeValidatorService verifyCodeValidatorService;
+    private final CodeValidatorService verifyCodeValidatorService;
 
     @Autowired
-    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager, VerifyCodeValidatorService verifyCodeValidatorService) {
+    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager, CodeValidatorService verifyCodeValidatorService) {
         this.jwtTokenService = jwtTokenService;
         this.jwtDetailsService = jwtDetailsService;
         this.authenticationManager = authenticationManager;

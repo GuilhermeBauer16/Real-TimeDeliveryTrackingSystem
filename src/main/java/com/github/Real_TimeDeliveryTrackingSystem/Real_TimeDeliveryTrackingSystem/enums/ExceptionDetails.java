@@ -29,6 +29,9 @@ public enum ExceptionDetails {
     INVALID_PASSWORD_MESSAGE("These password is invalid for the reason: %s", HttpStatus.BAD_REQUEST),
     INVALID_EMAIL_PATTERN_MESSAGE("Occur an error into the registration of the email in reason of: %s", HttpStatus.BAD_REQUEST),
     USER_ALREADY_AUTHENTICATED_MESSAGE("Occur an error into the authenticate the user in reason of: %s", HttpStatus.BAD_REQUEST),
+    USER_NOT_AUTHENTICATED_MESSAGE("Occur an error into the authenticate the user in reason of: %s", HttpStatus.UNAUTHORIZED),
+    INVALID_VERIFICATION_CODE_MESSAGE("Occur an error into evaluated the verification code in reason of: %s", HttpStatus.BAD_REQUEST),
+    EXPIRED_VERIFICATION_CODE_MESSAGE("Occur an error into evaluated the verification code in reason of: %s", HttpStatus.BAD_REQUEST),
 
     //Driver
     INVALID_DRIVER_MESSAGE("Occur an error into the registration of a driver in reason of: %s", HttpStatus.BAD_REQUEST),

@@ -19,6 +19,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,7 @@ public class CustomerRegistrationService implements CustomerRegistrationServiceC
     }
 
     @Override
-    public CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException {
+    public CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException, MessagingException {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(customerVO, INVALID_CUSTOMER_MESSAGE, InvalidCustomerException.class);
         customerVO.getUser().setUserProfile(UserProfile.ROLE_CUSTOMER);

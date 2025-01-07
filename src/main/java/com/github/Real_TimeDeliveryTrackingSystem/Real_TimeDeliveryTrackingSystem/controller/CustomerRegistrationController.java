@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer.CustomerRegistrationService;
 import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class CustomerRegistrationController implements CustomerRegistrationContr
     }
 
     @Override
-    public ResponseEntity<CustomerRegistrationResponse> registerCustomer(CustomerVO customerVO) throws NumberParseException {
+    public ResponseEntity<CustomerRegistrationResponse> registerCustomer(CustomerVO customerVO) throws NumberParseException, MessagingException {
 
         CustomerRegistrationResponse createdCustomer = service.create(customerVO);
         return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);

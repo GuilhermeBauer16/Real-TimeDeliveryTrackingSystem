@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver.DriverRegistrationService;
 import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class DriverRegistrationController implements DriverRegistrationControlle
 
 
     @Override
-    public ResponseEntity<DriverRegistrationResponse> registerCustomer(DriverVO driverVO) throws NumberParseException {
+    public ResponseEntity<DriverRegistrationResponse> registerCustomer(DriverVO driverVO) throws NumberParseException, MessagingException {
 
         DriverRegistrationResponse driverRegistrationResponse = service.create(driverVO);
         return new ResponseEntity<>(driverRegistrationResponse, HttpStatus.CREATED);

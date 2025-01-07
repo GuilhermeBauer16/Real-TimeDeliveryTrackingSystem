@@ -6,6 +6,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+import jakarta.mail.MessagingException;
 
 /**
  * Service interface for managing user registration within the application.
@@ -34,5 +35,5 @@ public interface UserRegistrationServiceContract {
      * @see UserVO
      */
 
-    UserVO createUser(UserVO userVO);
+    UserVO createUser(UserVO userVO) throws MessagingException;
 }

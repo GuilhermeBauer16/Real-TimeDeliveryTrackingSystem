@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.mail.MessagingException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,5 +55,5 @@ public interface DriverRegistrationControllerContract {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<DriverRegistrationResponse> registerCustomer(@RequestBody DriverVO driverVO) throws NumberParseException;
+    ResponseEntity<DriverRegistrationResponse> registerCustomer(@RequestBody DriverVO driverVO) throws NumberParseException, MessagingException;
 }

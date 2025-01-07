@@ -3,6 +3,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
 
 /**
  * Service contract for managing customer registration.
@@ -26,5 +27,5 @@ public interface CustomerRegistrationServiceContract {
      * @param customerVO the customer details encapsulated in a {@link CustomerVO} object
      * @return a {@link CustomerRegistrationResponse} object containing the result of the registration process
      */
-    CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException;
+    CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException, MessagingException;
 }
