@@ -21,10 +21,6 @@ import java.time.LocalDateTime;
 public class EmailSenderService implements EmailSendServiceContract {
 
     private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = "This user is already authenticated.";
-    private final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine;
-    private final UserService userService;
-
     private static final String EMAIL_TEMPLATE_PATH = "email/verification-email";
     private static final String SUBJECT = "Verification of the Email";
     private static final String CHARSET = "UTF-8";
@@ -33,6 +29,9 @@ public class EmailSenderService implements EmailSendServiceContract {
     private static final int EXPIRATION_TIME = 30;
 
 
+    private final JavaMailSender mailSender;
+    private final SpringTemplateEngine templateEngine;
+    private final UserService userService;
 
 
     @Autowired
@@ -67,19 +66,18 @@ public class EmailSenderService implements EmailSendServiceContract {
 
         UserVO userByEmail = userService.findUserByEmail(email);
 
-        if(userByEmail.isAuthenticated()){
+        if (userByEmail.isAuthenticated()) {
             throw new UserAlreadyAuthenticatedException(USER_ALREADY_AUTHENTICATED_MESSAGE);
 
         }
         String code = CodeGeneratorUtils.generateCode(CODE_LENGTH);
-        sendValidatorCode(email,code);
+        sendValidatorCode(email, code);
 
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
         userService.updateUser(userUpdateRequest);
 
 
     }
-
 
 
 }
