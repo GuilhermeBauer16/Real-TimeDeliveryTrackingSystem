@@ -1,19 +1,22 @@
 package controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import TestClasses.VerificationCodeRequest;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
@@ -21,7 +24,6 @@ import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,11 +34,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,11 +46,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class DriverControllerTest extends AbstractionIntegrationTest {
 
     private static RequestSpecification specification;
-    private static ObjectMapper objectMapper;
     private static DriverVO driverVO;
+    private static DriverEntity driverEntity;
 
     private static final String URL_PREFIX = "/driver";
-    private static final String SIGN_IN_URL_PREFIX = "/signInDriver";
+    private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
+    private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
     private static final String HOST_PREFIX = "http://localhost:";
 
@@ -65,7 +68,6 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
-    private static final String PHONE_PREFIX = "+";
     private static final String PHONE_NUMBER = "5511995765432";
     private static final String DRIVER_LICENSE = "82101864590";
     private static final String STREET = "123 Main State";
@@ -73,57 +75,65 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     private static final String STATE = "Sample Statess";
     private static final String POSTAL_CODE = "12345111";
     private static final String COUNTRY = "Sample Countries";
+    private static final boolean AUTHENTICATED = false;
+    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
+    private static final String VERIFY_CODE = "574077";
 
     @BeforeAll
-    static void setUp( @Autowired PasswordEncoder passwordEncoder) {
-        objectMapper = new ObjectMapper();
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired DriverRepository driverRepository, @Autowired UserRepository userRepository,
+                      @Autowired AddressRepository addressRepository) {
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
+        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
         AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        addressRepository.save(addressEntity);
+        userRepository.save(userEntity);
+
+        addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        addressRepository.save(addressEntity);
         VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
         driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
                 , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+
+
+        driverRepository.save(driverEntity);
     }
 
     @Test
     @Order(1)
-    void givenDriverObject_whenRegisterDriver_ShouldReturnDriverObject() throws JsonProcessingException {
+    void givenVerificationCodeRequestObject_whenVerifyUser_ShouldReturnNothing() {
 
-        var content = given()
-                .basePath(SIGN_IN_URL_PREFIX )
+        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(driverVO.getUser().getEmail(), driverVO.getUser().getVerifyCode(),
+                driverVO.getUser().isAuthenticated(), driverVO.getUser().getCodeExpiration());
+
+
+        given()
+                .basePath(VERIFICATION_CODE_URL_PREFIX)
                 .port(TestConfigs.SERVER_PORT)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .body(driverVO)
+                .body(verificationCodeRequestTest)
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
                 .when()
-                .post()
+                .post(VERIFY_URL_PREFIX)
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .extract()
                 .body()
                 .asString();
 
-        DriverRegistrationResponse createdDriver = objectMapper.readValue(content, DriverRegistrationResponse.class);
-
-        Assertions.assertNotNull(createdDriver);
-        Assertions.assertNotNull(createdDriver.getId());
-        Assertions.assertTrue(createdDriver.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertNotNull(createdDriver);
-        assertNotNull(createdDriver.getId());
-        assertEquals(PHONE_PREFIX + PHONE_NUMBER, createdDriver.getPhoneNumber());
-        assertEquals(1, createdDriver.getAddresses().size());
-        assertEquals(EMAIL, createdDriver.getUserRegistrationResponse().getEmail());
-        assertEquals(USERNAME, createdDriver.getUserRegistrationResponse().getName());
-
-        driverVO.setId(createdDriver.getId());
     }
+
 
     @Test
     @Order(2)
     void login() {
-        LoginRequest loginRequest = new LoginRequest(driverVO.getUser().getEmail(), driverVO.getUser().getPassword());
 
-        var accessToken = given()
+        LoginRequest loginRequest = new LoginRequest(driverEntity.getUser().getEmail(), PASSWORD);
+
+        LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
                 .port(TestConfigs.SERVER_PORT)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
@@ -135,10 +145,13 @@ class DriverControllerTest extends AbstractionIntegrationTest {
                 .then()
                 .statusCode(200)
                 .extract()
-                .body().as(LoginResponse.class).getToken();
+                .body().as(LoginResponse.class);
+
+        assertNotNull(loginResponse);
+
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + accessToken)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
                 .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
@@ -151,7 +164,7 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     @Order(3)
     @Test
     void givenDriverObject_when_delete_ShouldReturnNoContent() {
-        PasswordDTO passwordDTO = new PasswordDTO(driverVO.getUser().getPassword());
+        PasswordDTO passwordDTO = new PasswordDTO(PASSWORD);
         given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .body(passwordDTO)
