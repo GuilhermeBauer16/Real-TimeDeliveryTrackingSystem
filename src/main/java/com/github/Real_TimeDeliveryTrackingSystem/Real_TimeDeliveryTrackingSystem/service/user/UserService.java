@@ -40,7 +40,7 @@ public class UserService implements UserServiceContract {
         UserVO userVO = BuildMapper.parseObject(new UserVO(), userUpdateRequest);
 
         UserEntity updatedUser = ValidatorUtils.updateFieldIfNotNull(userEntity, userVO, USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
-        ValidatorUtils.checkObjectIsNullOrThrowException(updatedUser,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
+        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(updatedUser,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
         userRepository.save(updatedUser);
 
         return BuildMapper.parseObject(new UserVO(), updatedUser);

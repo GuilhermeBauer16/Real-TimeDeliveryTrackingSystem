@@ -10,6 +10,14 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mail:
+    password: springboot
+    username: duke
+    host: 127.0.0.1
+    port: 3025 # default protocol port + 3000 as offset
+    protocol: smtp
+    test-connection: false
   jpa:
     hibernate:
       ddl-auto: update
