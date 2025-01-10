@@ -1,4 +1,4 @@
-package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
+package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user;
 
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
@@ -9,12 +9,16 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.UserFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.UserRegistrationServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.EmailValidatorUtils;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UserRegistrationService implements UserRegistrationServiceContract {
@@ -25,16 +29,18 @@ public class UserRegistrationService implements UserRegistrationServiceContract 
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final EmailSenderService emailSenderService;
 
     @Autowired
-    public UserRegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserRegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailSenderService emailSenderService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailSenderService = emailSenderService;
     }
 
     @Override
-    public UserVO createUser(UserVO userVO) {
+    public UserVO createUser(UserVO userVO) throws MessagingException {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(userVO,USER_NOT_FOUND_MESSAGE, UserNotFoundException.class);
         userVO.setPassword(passwordEncoder.encode(userVO.getPassword()));
@@ -43,9 +49,12 @@ public class UserRegistrationService implements UserRegistrationServiceContract 
         checkIfEmailAlreadyRegistered(userVO.getEmail());
 
         UserEntity userFactory = UserFactory.create(userVO.getName(),userVO.getEmail(),userVO.getPassword(),userVO.getUserProfile());
+        userFactory.setAuthenticated(false);
+        userFactory.setVerifyCode("null");
+        userFactory.setCodeExpiration(LocalDateTime.now());
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(userFactory,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);
         UserEntity userEntity = userRepository.save(userFactory);
-
+        emailSenderService.sendEmailWithValidatorCodeToUser(userEntity.getEmail());
         return BuildMapper.parseObject(new UserVO(),userEntity);
     }
 

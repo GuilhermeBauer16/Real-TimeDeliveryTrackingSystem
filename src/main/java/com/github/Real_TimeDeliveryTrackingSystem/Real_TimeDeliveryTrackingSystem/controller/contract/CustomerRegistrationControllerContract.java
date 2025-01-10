@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.mail.MessagingException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,5 @@ public interface CustomerRegistrationControllerContract {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<CustomerRegistrationResponse> registerCustomer(@RequestBody CustomerVO customerVO) throws NumberParseException;
+    ResponseEntity<CustomerRegistrationResponse> registerCustomer(@RequestBody CustomerVO customerVO) throws NumberParseException, MessagingException;
 }

@@ -6,6 +6,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidDriverException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.DriverLicenseAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import jakarta.mail.MessagingException;
 
 /**
  * Contract for the Driver Registration Service, defining the operations related to driver registration.
@@ -30,5 +31,5 @@ public interface DriverRegistrationServiceContract {
      * @see DriverRegistrationResponse
      */
 
-    DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException;
+    DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException, MessagingException;
 }
