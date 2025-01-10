@@ -1,8 +1,9 @@
-package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
+package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.UserCredentialsNotMatchedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email.CodeValidatorService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.LoginServiceContract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,18 +20,22 @@ public class LoginService implements LoginServiceContract {
     private final JwtTokenService jwtTokenService;
     private final JwtDetailsService jwtDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final CodeValidatorService verifyCodeValidatorService;
 
     @Autowired
-    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager) {
+    public LoginService(JwtTokenService jwtTokenService, JwtDetailsService jwtDetailsService, AuthenticationManager authenticationManager, CodeValidatorService verifyCodeValidatorService) {
         this.jwtTokenService = jwtTokenService;
         this.jwtDetailsService = jwtDetailsService;
         this.authenticationManager = authenticationManager;
+        this.verifyCodeValidatorService = verifyCodeValidatorService;
     }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         this.authenticate(loginRequest);
         UserDetails userDetails = this.jwtDetailsService.loadUserByUsername(loginRequest.getEmail());
+
+        verifyCodeValidatorService.verifyIfUserIsAuthenticated(loginRequest.getEmail());
         final String token = jwtTokenService.generateToken(userDetails);
 
         return new LoginResponse(loginRequest.getEmail(), token);
@@ -40,6 +45,7 @@ public class LoginService implements LoginServiceContract {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
 
         }catch (BadCredentialsException e) {
 

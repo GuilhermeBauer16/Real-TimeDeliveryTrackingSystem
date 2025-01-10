@@ -18,6 +18,7 @@ public class AbstractionIntegrationTest {
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
+
         static MySQLContainer<?> mySQL = new MySQLContainer<>("mysql:8.0.28");
 
 

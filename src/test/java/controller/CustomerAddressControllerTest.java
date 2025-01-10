@@ -1,20 +1,26 @@
 package controller;
 
+import TestClasses.VerificationCodeRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -27,33 +33,48 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
+    @RegisterExtension
+    static GreenMailExtension greenMail =
+            new GreenMailExtension(ServerSetupTest.SMTP)
+                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
+                    .withPerMethodLifecycle(true);
+
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
     private static CustomerVO customerVO;
+    private static CustomerEntity customerEntity;
     private static AddressVO addressVO;
 
+
     private static final String URL_PREFIX = "/customerAddress";
-    private static final String SIGN_IN_URL_PREFIX = "/signInCustomer";
+    private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
+    private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
     private static final String HOST_PREFIX = "http://localhost:";
     private static final String BEARER_PREFIX = "Bearer ";
-    private static final String PHONE_PREFIX = "+";
+
 
     private static final String PHONE_NUMBER = "5511998765432";
     private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
@@ -62,64 +83,67 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     private static final String STATE = "Sample State";
     private static final String POSTAL_CODE = "12345";
     private static final String COUNTRY = "Sample Country";
+
     private static final String EMAIL = "customerAddress@example.com";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
+    private static final boolean AUTHENTICATED = false;
+    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
+    private static final String VERIFY_CODE = "574077";
 
     @BeforeAll
-    static void setUp(@Autowired PasswordEncoder passwordEncoder) {
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired CustomerRepository customerRepository, @Autowired UserRepository userRepository,
+                      @Autowired AddressRepository addressRepository) {
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
+        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
         AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-
+        addressRepository.save(addressEntity);
+        userRepository.save(userEntity);
         addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
         customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        customerRepository.save(customerEntity);
 
 
     }
 
+
     @Test
     @Order(1)
-    void givenCustomerObject_whenCreateCustomer_ShouldReturnCustomerObject() throws JsonProcessingException {
+    void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing() {
 
-        var content = given()
-                .basePath(SIGN_IN_URL_PREFIX)
+        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(customerVO.getUser().getEmail(), customerVO.getUser().getVerifyCode(),
+                customerVO.getUser().isAuthenticated(), customerVO.getUser().getCodeExpiration());
+
+
+        given()
+                .basePath(VERIFICATION_CODE_URL_PREFIX)
                 .port(TestConfigs.SERVER_PORT)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .body(customerVO)
+                .body(verificationCodeRequestTest)
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
                 .when()
-                .post()
+                .post(VERIFY_URL_PREFIX)
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .extract()
                 .body()
                 .asString();
 
-        CustomerRegistrationResponse createdCustomer = objectMapper.readValue(content, CustomerRegistrationResponse.class);
-
-        Assertions.assertNotNull(createdCustomer);
-        Assertions.assertNotNull(createdCustomer.getId());
-        Assertions.assertTrue(createdCustomer.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-
-        assertNotNull(createdCustomer);
-        assertNotNull(createdCustomer.getId());
-        assertEquals(PHONE_PREFIX + PHONE_NUMBER, createdCustomer.getPhoneNumber());
-        assertEquals(1, createdCustomer.getAddresses().size());
-        assertEquals(EMAIL, createdCustomer.getUserRegistrationResponse().getEmail());
-        assertEquals(USERNAME, createdCustomer.getUserRegistrationResponse().getName());
-
-        customerVO.setId(createdCustomer.getId());
     }
+
 
     @Test
     @Order(2)
     void login() {
-        LoginRequest loginRequest = new LoginRequest(customerVO.getUser().getEmail(), customerVO.getUser().getPassword());
 
-        var accessToken = given()
+        LoginRequest loginRequest = new LoginRequest(customerEntity.getUser().getEmail(), PASSWORD);
+
+        LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
                 .port(TestConfigs.SERVER_PORT)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
@@ -131,10 +155,13 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
                 .then()
                 .statusCode(200)
                 .extract()
-                .body().as(LoginResponse.class).getToken();
+                .body().as(LoginResponse.class);
+
+        assertNotNull(loginResponse);
+
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + accessToken)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
                 .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
@@ -142,6 +169,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
     }
+
 
     @Test
     @Order(3)
@@ -162,7 +190,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
         Assertions.assertNotNull(createdAddress);
         Assertions.assertNotNull(createdAddress.getId());
-        Assertions.assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
         assertEquals(STREET, createdAddress.getStreet());
         assertEquals(CITY, createdAddress.getCity());
         assertEquals(STATE, createdAddress.getState());
@@ -171,8 +199,38 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
     }
 
-        @Test
+    @Test
     @Order(4)
+    void givenAddressObject_whenFindAddressToCustomer_ShouldReturnAddressObject() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .get("/{id}", ID)
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO createdAddress = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(createdAddress);
+        Assertions.assertNotNull(createdAddress.getId());
+        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, createdAddress.getStreet());
+        assertEquals(CITY, createdAddress.getCity());
+        assertEquals(STATE, createdAddress.getState());
+        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(COUNTRY, createdAddress.getCountry());
+
+    }
+
+
+    @Test
+    @Order(5)
     void givenAddressObject_whenFindAllAddress_ShouldReturnAddressObjectList() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -193,17 +251,63 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
         Assertions.assertNotNull(paginatedAddress);
         Assertions.assertNotNull(paginatedAddress.getId());
-        Assertions.assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
 
-            Assertions.assertNotNull(paginatedAddress);
-            Assertions.assertNotNull(paginatedAddress.getId());
-            Assertions.assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-            assertEquals(STREET, paginatedAddress.getStreet());
-            assertEquals(CITY, paginatedAddress.getCity());
-            assertEquals(STATE, paginatedAddress.getState());
-            assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
-            assertEquals(COUNTRY, paginatedAddress.getCountry());
+        Assertions.assertNotNull(paginatedAddress);
+        Assertions.assertNotNull(paginatedAddress.getId());
+        assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, paginatedAddress.getStreet());
+        assertEquals(CITY, paginatedAddress.getCity());
+        assertEquals(STATE, paginatedAddress.getState());
+        assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
+        assertEquals(COUNTRY, paginatedAddress.getCountry());
 
+    }
+
+    @Test
+    @Order(6)
+    void givenAddressObject_whenUpdateAddressToCustomer_ShouldReturnAddressObject() throws JsonProcessingException {
+
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(addressVO)
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO address = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getId());
+        assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, address.getStreet());
+        assertEquals(CITY, address.getCity());
+        assertEquals(STATE, address.getState());
+        assertEquals(POSTAL_CODE, address.getPostalCode());
+        assertEquals(COUNTRY, address.getCountry());
+
+    }
+
+    @Test
+    @Order(7)
+    void givenAddressObject_whenDeleteAddress_ShouldDoNothing() {
+
+        given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .delete("/{id}", ID)
+                .then()
+                .statusCode(204)
+                .extract()
+                .body()
+                .asString();
     }
 
 

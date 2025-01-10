@@ -2,7 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.LoginService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +33,7 @@ public interface LoginControllerContract {
      *
      * @param request The {@link LoginRequest} object containing the user's login credentials.
      * @return {@link ResponseEntity} containing the {@link LoginResponse} with a JWT token
-     *         if authentication is successful, or an appropriate error response otherwise.
+     * if authentication is successful, or an appropriate error response otherwise.
      * @see LoginResponse
      * @see LoginRequest
      * @see LoginService
@@ -47,7 +47,7 @@ public interface LoginControllerContract {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successful operation",
                     content = @Content(schema = @Schema(implementation = LoginResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Will throw BadCredentialsException",
+            @ApiResponse(responseCode = "401", description = "BadCredentials Exception or User Not Authenticated Exception",
                     content = @Content),
             @ApiResponse(responseCode = "404", description = "User Not Found",
                     content = @Content),
