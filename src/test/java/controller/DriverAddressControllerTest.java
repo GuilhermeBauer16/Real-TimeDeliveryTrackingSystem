@@ -45,6 +45,7 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -202,6 +203,35 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(4)
+    void givenAddressObject_whenFindAddressToDriver_ShouldReturnAddressObject() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .get("/{id}", ID)
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO createdAddress = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(createdAddress);
+        Assertions.assertNotNull(createdAddress.getId());
+        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, createdAddress.getStreet());
+        assertEquals(CITY, createdAddress.getCity());
+        assertEquals(STATE, createdAddress.getState());
+        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(COUNTRY, createdAddress.getCountry());
+
+    }
+
+    @Test
+    @Order(5)
     void givenAddressObject_whenFindAllAddress_ShouldReturnAddressObjectList() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -233,6 +263,52 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
         assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
         assertEquals(COUNTRY, paginatedAddress.getCountry());
 
+    }
+
+    @Test
+    @Order(6)
+    void givenAddressObject_whenUpdateAddressToCustomer_ShouldReturnAddressObject() throws JsonProcessingException {
+
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(driverVO.getAddresses().getFirst())
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO address = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getId());
+        assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, address.getStreet());
+        assertEquals(CITY, address.getCity());
+        assertEquals(STATE, address.getState());
+        assertEquals(POSTAL_CODE, address.getPostalCode());
+        assertEquals(COUNTRY, address.getCountry());
+
+    }
+
+    @Test
+    @Order(7)
+    void givenAddressObject_whenDeleteAddress_ShouldDoNothing() {
+
+        given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .delete("/{id}", ID)
+                .then()
+                .statusCode(204)
+                .extract()
+                .body()
+                .asString();
     }
 }
 

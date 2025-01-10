@@ -83,6 +83,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     private static final String STATE = "Sample State";
     private static final String POSTAL_CODE = "12345";
     private static final String COUNTRY = "Sample Country";
+
     private static final String EMAIL = "customerAddress@example.com";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "password";
@@ -112,7 +113,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(1)
-    void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing(){
+    void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing() {
 
         VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(customerVO.getUser().getEmail(), customerVO.getUser().getVerifyCode(),
                 customerVO.getUser().isAuthenticated(), customerVO.getUser().getCodeExpiration());
@@ -200,6 +201,36 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(4)
+    void givenAddressObject_whenFindAddressToCustomer_ShouldReturnAddressObject() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .get("/{id}", ID)
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO createdAddress = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(createdAddress);
+        Assertions.assertNotNull(createdAddress.getId());
+        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, createdAddress.getStreet());
+        assertEquals(CITY, createdAddress.getCity());
+        assertEquals(STATE, createdAddress.getState());
+        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(COUNTRY, createdAddress.getCountry());
+
+    }
+
+
+    @Test
+    @Order(5)
     void givenAddressObject_whenFindAllAddress_ShouldReturnAddressObjectList() throws JsonProcessingException {
 
         var content = given().spec(specification)
@@ -231,6 +262,52 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
         assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
         assertEquals(COUNTRY, paginatedAddress.getCountry());
 
+    }
+
+    @Test
+    @Order(6)
+    void givenAddressObject_whenUpdateAddressToCustomer_ShouldReturnAddressObject() throws JsonProcessingException {
+
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .body(addressVO)
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        AddressVO address = objectMapper.readValue(content, AddressVO.class);
+
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getId());
+        assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(STREET, address.getStreet());
+        assertEquals(CITY, address.getCity());
+        assertEquals(STATE, address.getState());
+        assertEquals(POSTAL_CODE, address.getPostalCode());
+        assertEquals(COUNTRY, address.getCountry());
+
+    }
+
+    @Test
+    @Order(7)
+    void givenAddressObject_whenDeleteAddress_ShouldDoNothing() {
+
+        given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .filter(new RequestLoggingFilter(LogDetail.ALL))
+                .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .delete("/{id}", ID)
+                .then()
+                .statusCode(204)
+                .extract()
+                .body()
+                .asString();
     }
 
 
