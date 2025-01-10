@@ -56,7 +56,7 @@
 			**/utils/PaginatedResponse.java,
 			**/utils/ValidatorUtils.java,
 			**/controller/UserRegistrationController.java,
-			**/service/JwtTokenService.java,
+			**/service/user/JwtTokenService.java,
 			**/com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem/RealTimeDeliveryTrackingSystemApplication.class
 
 		</sonar.coverage.exclusions>
