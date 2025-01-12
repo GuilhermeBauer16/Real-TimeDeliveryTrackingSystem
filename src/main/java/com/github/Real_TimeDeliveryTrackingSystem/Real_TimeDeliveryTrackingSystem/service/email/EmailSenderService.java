@@ -73,7 +73,7 @@ public class EmailSenderService implements EmailSendServiceContract {
         String code = CodeGeneratorUtils.generateCode(CODE_LENGTH);
         sendValidatorCode(email, code);
 
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(30));
+        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
         userService.updateUser(userUpdateRequest);
 
 

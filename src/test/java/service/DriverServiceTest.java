@@ -14,6 +14,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.InvalidPasswordException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.VehicleNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver.DriverService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
@@ -41,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -93,6 +95,8 @@ class DriverServiceTest {
 
     private PasswordDTO passwordDTO;
 
+    @Mock
+    private VehicleRepository vehicleRepository;
 
     @Mock
     private DriverRepository repository;
@@ -127,7 +131,7 @@ class DriverServiceTest {
         vehicleEntity = new VehicleEntity(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
         vehicleVO = new VehicleVO(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
         driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(Arrays.asList(addressEntity))
-                , userEntity, new ArrayList<>(Arrays.asList(vehicleEntity)));
+                , new ArrayList<>(List.of(vehicleEntity)), userEntity);
         passwordDTO = new PasswordDTO(PASSWORD);
 
 
@@ -136,23 +140,45 @@ class DriverServiceTest {
     @Test
     void testDeleteDriver_WhenDriverIsDeleted_ShouldDoNothing() {
 
+        List<AddressEntity> addresses = List.of(addressEntity);
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
         SecurityContextHolder.setContext(securityContext);
 
+
         when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));
+
 
         when(passwordEncoder.matches(passwordDTO.getPassword(), driverEntity.getUser().getPassword())).thenReturn(true);
 
-        doNothing().when(repository).delete(driverEntity);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        when(repository.findAddressesByDriverEmail(eq(EMAIL), eq(pageRequest)))
+                .thenReturn(new PageImpl<>(addresses));
+
+
+        doNothing().when(addressService).deleteAllAddresses(anyList());
+
+        List<VehicleEntity> vehiclesEntities = List.of(vehicleEntity);
+
+        when(repository.findVehiclesByDriverEmail(eq(EMAIL), eq(pageRequest))).thenReturn(new PageImpl<>(vehiclesEntities));
+
+
+        doNothing().when(vehicleService).deleteAllVehicles(anyList());
+
 
         service.delete(passwordDTO);
+
+
+        verify(addressService, times(1)).deleteAllAddresses(anyList());
+        verify(vehicleService, times(1)).deleteAllVehicles(anyList());
+
+
         verify(repository, times(1)).delete(driverEntity);
-        verify(repository, times(1)).delete(any());
-
+        
         SecurityContextHolder.clearContext();
-
     }
 
     @Test
@@ -555,13 +581,13 @@ class DriverServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
 
+
         SecurityContextHolder.setContext(securityContext);
 
         DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -> service.updateVehicle(null));
 
         assertNotNull(exception);
         assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());
-
 
 
     }
@@ -597,7 +623,7 @@ class DriverServiceTest {
     }
 
     @Test
-    void testFindVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException(){
+    void testFindVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
@@ -662,7 +688,7 @@ class DriverServiceTest {
     }
 
     @Test
-    void testFindVehicleByLicensePlate_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException(){
+    void testFindVehicleByLicensePlate_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
@@ -752,7 +778,7 @@ class DriverServiceTest {
     }
 
     @Test
-    void testDeleteVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException(){
+    void testDeleteVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
