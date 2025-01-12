@@ -108,9 +108,9 @@ class VehicleControllerTest extends AbstractionIntegrationTest {
         vehicleRepository.save(vehicleEntity);
 
         driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+        ,new ArrayList<>(List.of(vehicleEntity)), userEntity );
         driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
 
         driverRepository.save(driverEntity);

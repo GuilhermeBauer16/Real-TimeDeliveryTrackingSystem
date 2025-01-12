@@ -80,7 +80,7 @@ public class VehicleService implements VehicleServiceContract {
         Page<VehicleEntity> vehicles = repository.findAll(pageable);
 
         List<VehicleVO> vehicleVOS = vehicles.getContent().stream().map(
-                        vehicleEntity -> BuildMapper.parseObject(new VehicleVO(), vehicleEntity)).toList();
+                vehicleEntity -> BuildMapper.parseObject(new VehicleVO(), vehicleEntity)).toList();
 
         return new PageImpl<>(vehicleVOS, pageable, vehicles.getTotalElements());
     }
@@ -94,6 +94,14 @@ public class VehicleService implements VehicleServiceContract {
         repository.delete(vehicleEntity);
 
 
+    }
+
+    @Override
+    public void deleteAllVehicles(List<VehicleVO> vehicleVOS) {
+
+        for (VehicleVO vehicleVO : vehicleVOS) {
+            delete(vehicleVO.getId());
+        }
     }
 
     private void verifyIfLicensePlateIsNotADuplicateValue(String licensePlate) {
