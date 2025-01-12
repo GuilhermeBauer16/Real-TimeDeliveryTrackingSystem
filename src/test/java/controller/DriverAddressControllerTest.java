@@ -106,9 +106,9 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
         addressRepository.save(addressEntity);
         VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
         driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
         driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
 
         driverRepository.save(driverEntity);

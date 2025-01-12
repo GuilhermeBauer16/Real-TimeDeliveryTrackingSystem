@@ -34,6 +34,15 @@ public interface AddressServiceContract {
      */
     AddressVO create(AddressVO addressVO);
 
+    /**
+     * Creates multiple addresses.
+     *
+     * <p>This method takes a list of {@link AddressEntity} objects and creates multiple address records in the system.</p>
+     *
+     * @param addresses a list of {@link AddressEntity} objects representing the addresses to create
+     * @return the list of created {@link AddressEntity} objects
+     */
+
     List<AddressEntity> createAddresses(List<AddressEntity> addresses);
 
 
@@ -67,5 +76,23 @@ public interface AddressServiceContract {
      */
     void delete(String id);
 
+    /**
+     * Verifies if the given address ID is associated with any user.
+     *
+     * <p>This method checks whether the specified address ID exists in the provided list of
+     * {@link AddressEntity} objects.</p>
+     *
+     * @param addressId       the unique identifier of the address
+     * @param addressEntities a list of {@link AddressEntity} objects to verify against
+     */
     void verifyIfAddressIdIsAssociatedWithUser(String addressId, List<AddressEntity> addressEntities);
+
+    /**
+     * Deletes multiple addresses.
+     *
+     * <p>This method deletes all the addresses provided in the list of {@link AddressVO} objects.</p>
+     *
+     * @param addressVOS a list of {@link AddressVO} objects representing the addresses to delete
+     */
+    void deleteAllAddresses(List<AddressVO> addressVOS);
 }

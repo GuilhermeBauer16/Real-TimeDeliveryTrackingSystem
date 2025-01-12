@@ -51,6 +51,8 @@ public class CustomerService implements CustomerServiceContract {
 
         }
 
+        Page<AddressVO> allAddressesOfACustomer = findAllAddressesOfACustomer(Pageable.ofSize(10));
+        addressService.deleteAllAddresses(allAddressesOfACustomer.getContent());
 
         customerRepository.delete(customerEntity);
 
@@ -65,8 +67,10 @@ public class CustomerService implements CustomerServiceContract {
         AddressVO createdAddress = addressService.create(addressVO);
         customerEntity.getAddresses().add(BuildMapper.parseObject(new AddressEntity(), createdAddress));
         customerRepository.save(customerEntity);
+
         return createdAddress;
     }
+
     @Override
     public AddressVO updateAddressOfACustomer(AddressVO addressVO) {
 
@@ -106,6 +110,7 @@ public class CustomerService implements CustomerServiceContract {
 
         CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));
+
         addressService.verifyIfAddressIdIsAssociatedWithUser(addressId, customerEntity.getAddresses());
 
         addressService.delete(addressId);

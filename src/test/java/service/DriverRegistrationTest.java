@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -101,8 +102,8 @@ class DriverRegistrationTest {
         userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
         VehicleEntity vehicleEntity = new VehicleEntity(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
         vehicleVO = new VehicleVO(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), userEntity, List.of(vehicleEntity));
-        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), userEntity, List.of(vehicleEntity));
+        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
+        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
     }
 

@@ -91,6 +91,7 @@ public class AddressService implements AddressServiceContract {
 
     }
 
+
     @Override
     public void verifyIfAddressIdIsAssociatedWithUser(String addressId, List<AddressEntity> addressEntities) {
 
@@ -102,6 +103,16 @@ public class AddressService implements AddressServiceContract {
         }
 
         throw new AddressNotFoundException(ADDRESS_NOT_ASSOCIATED_MESSAGE);
+
+    }
+
+    @Override
+    public void deleteAllAddresses(List<AddressVO> addressVOS) {
+
+        for (AddressVO addressVO : addressVOS) {
+
+            delete(addressVO.getId());
+        }
 
     }
 

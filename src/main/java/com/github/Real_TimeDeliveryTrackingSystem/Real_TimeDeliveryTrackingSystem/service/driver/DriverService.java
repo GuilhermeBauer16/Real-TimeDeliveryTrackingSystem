@@ -12,8 +12,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.DriverServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,6 +61,11 @@ public class DriverService implements DriverServiceContract {
 
         }
 
+        Page<AddressVO> allAddressesOfADriver = findAllAddressesOfADriver(Pageable.ofSize(10));
+        addressService.deleteAllAddresses(allAddressesOfADriver.getContent());
+
+        Page<VehicleVO> allVehicles = findAllVehicles(Pageable.ofSize(10));
+        vehicleService.deleteAllVehicles(allVehicles.getContent());
 
         repository.delete(driverEntity);
 
