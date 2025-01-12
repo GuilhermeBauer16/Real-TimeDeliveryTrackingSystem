@@ -87,7 +87,7 @@ class DriverRegistrationControllerTest extends AbstractionIntegrationTest {
         AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
         VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, SECOND_LICENSE_PLATE, TYPE, STATUS);
         driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , userEntity, new ArrayList<>(List.of(vehicleEntity)));
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
         specification = new RequestSpecBuilder()
 

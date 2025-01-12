@@ -1,4 +1,4 @@
-package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.Email;
+package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ExpiredVerificationCodeException;
@@ -12,6 +12,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -29,10 +30,12 @@ public class CodeValidatorService implements CodeValidatorServiceContract {
     public CodeValidatorService(UserService userService) {
         this.userService = userService;
     }
-
+    @Override
+    @Transactional
     public void evaluatedVerifyCode(VerificationCodeRequest verifyCodeRequest) {
 
         UserVO userVO = userService.findUserByEmail(verifyCodeRequest.getEmail());
+        System.out.println(userVO.getCodeExpiration());
 
 
         if (userVO.isAuthenticated()) {
@@ -54,7 +57,7 @@ public class CodeValidatorService implements CodeValidatorServiceContract {
         UserUpdateRequest userUpdateRequest = BuildMapper.parseObject(new UserUpdateRequest(), userVO);
         userService.updateUser(userUpdateRequest);
     }
-
+    @Override
     public void verifyIfUserIsAuthenticated(String email) {
 
         UserVO userVO = userService.findUserByEmail(email);

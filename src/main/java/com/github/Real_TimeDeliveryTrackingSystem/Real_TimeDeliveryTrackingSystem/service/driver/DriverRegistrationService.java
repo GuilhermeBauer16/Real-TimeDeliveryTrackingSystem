@@ -27,6 +27,7 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
 
     @Override
+    @Transactional
     public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException, MessagingException {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_DRIVER_MESSAGE, InvalidDriverException.class);
@@ -82,7 +84,7 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
         UserVO user = userRegistrationService.createUser(userVO);
         UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);
 
-        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, userEntity, savedVehicles);
+        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, savedVehicles, userEntity);
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_DRIVER_MESSAGE, FieldNotFound.class);
         DriverEntity savedDriver = repository.save(driverEntity);
         DriverRegistrationResponse driverRegistrationResponse = BuildMapper.parseObject(new DriverRegistrationResponse(), savedDriver);
@@ -108,8 +110,8 @@ public class DriverRegistrationService implements DriverRegistrationServiceContr
 
     private void validIfDriverLicenseAlreadyRegistered(String driverLicense) {
 
-        if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()){
-            throw  new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);
+        if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()) {
+            throw new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);
         }
     }
 

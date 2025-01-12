@@ -22,6 +22,7 @@ public class DriverVO {
     private String phoneNumber;
     private String driverLicense;
     private List<AddressEntity> addresses;
-    private UserEntity user;
     private List<VehicleEntity> vehicles;
+    private UserEntity user;
+
 }

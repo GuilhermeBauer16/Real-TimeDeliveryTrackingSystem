@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -115,6 +116,9 @@ class CustomerServiceTest {
     @Test
     void testDeleteCustomer_WhenCustomerIsDeleted_ShouldDoNothing() {
 
+
+        List<AddressEntity> addresses = List.of(addressEntity);
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
@@ -122,13 +126,22 @@ class CustomerServiceTest {
 
         when(repository.findCustomerByUserEmail(anyString())).thenReturn(Optional.of(customerEntity));
 
+        doNothing().when(addressService).deleteAllAddresses(anyList());
+
         when(passwordEncoder.matches(passwordDTO.getPassword(), customerEntity.getUser().getPassword())).thenReturn(true);
+
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        when(repository.findAddressesByCustomerEmail(eq(EMAIL), eq(pageRequest)))
+                .thenReturn(new PageImpl<>(addresses));
+
 
         doNothing().when(repository).delete(customerEntity);
 
         service.delete(passwordDTO);
         verify(repository, times(1)).delete(customerEntity);
-        verify(repository, times(1)).delete(any());
+        verify(addressService, times(1)).deleteAllAddresses(anyList());
 
         SecurityContextHolder.clearContext();
 

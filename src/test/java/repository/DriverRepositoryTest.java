@@ -82,7 +82,7 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
         userRepository.save(userEntity);
         VehicleEntity vehicleEntity = new VehicleEntity(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
         vehicleRepository.save(vehicleEntity);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), userEntity, List.of(vehicleEntity));
+        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), List.of(vehicleEntity), userEntity);
         repository.save(driverEntity);
 
     }

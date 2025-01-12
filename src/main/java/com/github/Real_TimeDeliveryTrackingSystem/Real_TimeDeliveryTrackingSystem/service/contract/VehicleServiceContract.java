@@ -9,6 +9,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service contract interface for vehicle operations in the Real-Time Delivery Tracking System.
  * This interface provides methods for creating, updating, retrieving, and deleting vehicles,
@@ -89,5 +91,14 @@ public interface VehicleServiceContract {
      * @see VehicleEntity
      */
     void delete(String id);
+
+    /**
+     * Deletes multiple vehicles.
+     *
+     * <p>This method deletes all the vehicles provided in the list of {@link VehicleVO} objects.</p>
+     *
+     * @param vehicleVOS a list of {@link VehicleVO} objects representing the vehicles to delete
+     */
+    void deleteAllVehicles(List<VehicleVO> vehicleVOS);
 }
 

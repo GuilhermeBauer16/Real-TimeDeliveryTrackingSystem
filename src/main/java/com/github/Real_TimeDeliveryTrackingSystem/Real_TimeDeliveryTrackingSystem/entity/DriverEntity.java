@@ -37,9 +37,6 @@ public class DriverEntity {
     )
     private List<AddressEntity> addresses;
 
-    @ManyToOne(cascade = ALL)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "driver_vehicles",
@@ -47,4 +44,9 @@ public class DriverEntity {
             inverseJoinColumns = @JoinColumn(name = "vehicle_id")
     )
     private List<VehicleEntity> vehicles;
+
+    @ManyToOne(cascade = ALL)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
 }
