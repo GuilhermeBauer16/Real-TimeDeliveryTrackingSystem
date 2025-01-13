@@ -56,8 +56,15 @@ I also learned how to use GreenMail, which is necessary to develop integration t
 
 ### Gmail Configuration
 
-  * In this pdf have the explanation of how to allow your gmail to use this service of sending email.
+  * This pdf has an explanation of how to configure your Gmail to use this service for sending email.
   * [GMAIL - SMTP Service](https://drive.google.com/file/d/1S3_o-Jwl6JWUR3mIQ-PYwRb5PCspDi-B/view?usp=sharing)
+
+
+
+### GreenMail Configuration
+  * The two archives below explain how to add and configure GreenMail in your project.
+  * [GreenMail For Spring Mail](https://rieckpil.de/use-greenmail-for-spring-mail-javamailsender-junit-5-integration-tests/)
+  * [GitHub Repository](https://github.com/rieckpil/blog-tutorials/tree/master/spring-boot-test-mail-sending)
 
 
   
