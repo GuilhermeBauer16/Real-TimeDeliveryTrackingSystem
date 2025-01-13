@@ -60,7 +60,23 @@ I also learned how to use GreenMail, which is necessary to develop integration t
   * [GMAIL - SMTP Service](https://drive.google.com/file/d/1S3_o-Jwl6JWUR3mIQ-PYwRb5PCspDi-B/view?usp=sharing)
 
 
+### Application.yaml
+  * Here are the commands needed to add to your application.yaml.
+```
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your email
+    password: your password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.trust: smtp.gmail.com
+    test-connection: true
+	
 
+``` 
 ### GreenMail Configuration
   * The two archives below explain how to add and configure GreenMail in your project.
   * [GreenMail For Spring Mail](https://rieckpil.de/use-greenmail-for-spring-mail-javamailsender-junit-5-integration-tests/)
