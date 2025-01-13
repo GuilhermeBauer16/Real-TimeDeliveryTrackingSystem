@@ -2,10 +2,8 @@
 
 
 ## Objective  
-The application allows user to create their study material with a title and description. The user can personalize 
-the study material by adding some links to reference the topic he is studying. 
-The user also can relate that study material with a specific course, being easy to find in the future.
-But before accessing the app, sign up or log in. 
+The implementation goal is to send this email with a verification code to authenticate a new user,
+working like a two-step verification. However, to send mail is necessary for some configurations in your email.
 
 ## Working Example  
 
@@ -20,16 +18,51 @@ But before accessing the app, sign up or log in.
 
 
 ## Learnings 
-In that project, I put into practice the topics I recently learned. The first was to create a login system using Spring Security and JWT(JSON Web Token ) 
-tokens to structure a login system with more security with the implementation of CRSF(Cross-site request forgery) and CORS(Cross-origin resource sharing). 
-I implemented pipelines using GitHub actions in the project to deploy in Docker Hub when the main branch receives a pull request. Another pipeline 
-I implemented only permitted pull requests to the main branch when sent by the develop branch. Implement the Sonar Cloud to control the code quality.
+In this implementation, I learned how to use the class JavaMailSender with the SMTP protocol to send email.
+The JavaMailSender is responsible for sending an email to the user. I also learned how to use Thymeleaf
+with the SpringTemplateEngine to create an HTML template for creating a more personalized template. 
+I also learned how to use GreenMail, which is necessary to develop integration tests.
 
-## Functionalities
+## Configurations 
+* Bellow is the necessary configuratitions to the implementation work.
+
+###  Necessary dependencies 
+  * The necessary depedencies to the implementation work.
+
+
+```
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+    
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail-junit5</artifactId>
+			<version>2.0.1</version>
+			<scope>test</scope>
+		</dependency>
+
+
+```
+
+### Gmail Configuration
+
+  * In this pdf have the explanation of how to allow your gmail to use this service of sending email.
+  * [GMAIL - SMTP Service](https://drive.google.com/file/d/1S3_o-Jwl6JWUR3mIQ-PYwRb5PCspDi-B/view?usp=sharing)
+
 
   
 
-## Docker 
+### Docker 
 
 * You can pull the Docker image using this command:
  ```dotdocker
@@ -56,6 +89,8 @@ jAVA_MAIL_PASSWORD= your password
 ```
 
 ## Swagger
+
+* Do not forget to change the port in the URL by the port you chose.
 
 * [Swagger Documentation](http://localhost:8080/swagger-ui/index.html)
 
