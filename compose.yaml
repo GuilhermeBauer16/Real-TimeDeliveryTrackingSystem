@@ -14,6 +14,7 @@ services:
       MYSQL_ROOT_HOST: '%'
       MYSQL_TCP_PORT: ${DB_PORT}
 
+
     ports:
       - "${DB_EXPOSE_PORT}:${DB_PORT}"
 
@@ -28,13 +29,22 @@ services:
     image: guilhermebauer/real-timedeliverytrackingsystem:latest
     container_name: Real-Time_Delivery_Tracking_System
     build: .
-#
+    #
     restart: always
     environment:
       TZ: America/Sao_Paulo
       SPRING_DATASOURCE_URL: jdbc:mysql://db:${DB_PORT}/${DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: ${jAVA_MAIL_EMAIL}
+      SPRING_MAIL_PASSWORD: ${jAVA_MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_TRUST: smtp.gmail.com
+      SPRING_MAIL_TEST-CONNECTION: true
+
 
     ports:
       - "${EXPOSE_PORT}:${CONTAINER_PORT}"
