@@ -8,10 +8,10 @@ working like a two-step verification. However, to send mail is necessary for som
 
 ## Working Example  
 
-![Web_Photo_Editor](https://github.com/user-attachments/assets/b8b72d17-9eb0-4258-9788-ee708ec7af89)
-
+![Screenshot from 2025-01-13 11-00-59](https://github.com/user-attachments/assets/df0caa99-f5fa-4638-801d-6c4f40a52fa6)
 
 ## Learnings 
+
 In this implementation, I learned how to use the class JavaMailSender with the SMTP protocol to send email.
 The JavaMailSender is responsible for sending an email to the user. I also learned how to use Thymeleaf
 with the SpringTemplateEngine to create an HTML template for creating a more personalized template. 
