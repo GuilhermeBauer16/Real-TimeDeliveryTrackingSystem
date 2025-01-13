@@ -5,16 +5,10 @@
 The implementation goal is to send this email with a verification code to authenticate a new user,
 working like a two-step verification. However, to send mail is necessary for some configurations in your email.
 
+
 ## Working Example  
 
-![Screenshot from 2024-10-30 18-41-22](https://github.com/user-attachments/assets/71d80af9-ef8a-4797-a2d0-598e86a54088)
-
-## Sending 
-![Screenshot from 2024-10-30 18-44-08](https://github.com/user-attachments/assets/f93c62a6-96f2-4aa1-a526-ee5b0e60a588)
-
-## Response
-![Screenshot from 2024-10-30 18-46-34](https://github.com/user-attachments/assets/8192ba06-2fc2-4f33-9439-71a5dfe245e5)
-
+![Web_Photo_Editor](https://github.com/user-attachments/assets/b8b72d17-9eb0-4258-9788-ee708ec7af89)
 
 
 ## Learnings 
