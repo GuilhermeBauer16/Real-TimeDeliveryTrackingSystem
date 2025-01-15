@@ -26,10 +26,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] DRIVER_RESOURCES = {"/vehicle/**", "/driver/**", "/driverAddress/**"};
-    private static final String[] CUSTOMER_RESOURCES = {"/customer/**", };
+    private static final String[] CUSTOMER_RESOURCES = {"/customer/**","/customer/product/**" };
     private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login", "/signInCustomer", "/customer/**",
-            "/signInDriver/**", "/driver/**","/driverAddress/**","/customerAddress/**","/verificationCode/**"};
-    private static final String[] ADMIN_RESOURCES = {"/api/role/**"};
+            "/signInDriver/**", "/driver/**","/driverAddress/**","/customerAddress/**","/verificationCode/**","/product/**"
+            ,"/customer/product/**"};
+    private static final String[] ADMIN_RESOURCES = {"/product/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
     private static final String ROLE_DRIVER = "DRIVER";
@@ -57,6 +58,7 @@ public class SecurityConfig {
 //
                                 .requestMatchers(DRIVER_RESOURCES).hasRole(ROLE_DRIVER)
                                 .requestMatchers(CUSTOMER_RESOURCES).hasRole(ROLE_CUSTOMER)
+                                .requestMatchers(ADMIN_RESOURCES).hasRole(ROLE_ADMIN)
                                 .anyRequest().permitAll()
 
 
