@@ -2,6 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.ProductFactory;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ProductService implements ProductServiceContract {
 
     private static final String PRODUCT_NOT_FOUND = "This product was not found.";
+    private static final String INVALID_PRODUCT_MESSAGE = "This product is invalid, please verify the fields and try again.";
 
     private final ProductRepository repository;
 
@@ -33,9 +35,9 @@ public class ProductService implements ProductServiceContract {
     @Override
     public ProductVO createProduct(ProductVO productVO) {
 
-        ValidatorUtils.checkObjectIsNullOrThrowException(productVO, PRODUCT_NOT_FOUND, ProductNotFoundException.class);
+        ValidatorUtils.checkObjectIsNullOrThrowException(productVO, INVALID_PRODUCT_MESSAGE, InvalidProductException.class);
         ProductEntity productEntity = ProductFactory.create(productVO.getName(), productVO.getDescription(), productVO.getPrice());
-        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(productEntity, PRODUCT_NOT_FOUND, FieldNotFound.class);
+        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(productEntity, INVALID_PRODUCT_MESSAGE, FieldNotFound.class);
         ProductEntity savedProduct = repository.save(productEntity);
         return BuildMapper.parseObject(new ProductVO(), savedProduct);
     }

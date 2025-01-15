@@ -47,6 +47,7 @@ public enum ExceptionDetails {
 
     // Product
 
+    INVALID_PRODUCT_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.NOT_FOUND),
     PRODUCT_NOT_FOUND_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.NOT_FOUND);
 
     private final String message;
