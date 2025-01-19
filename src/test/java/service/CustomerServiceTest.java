@@ -11,6 +11,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer.CustomerService;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,26 +50,13 @@ class CustomerServiceTest {
 
     private static final String CUSTOMER_NOT_FOUND_MESSAGE = "This customer was not found, please verify the fields and try again.";
 
-    private static final String ADDRESS_NOT_FOUND_MESSAGE = "That address was not associated with this customer," +
-            " please verify the fields and try again.";
-
     private static final String INVALID_PASSWORD_MESSAGE = "The password typed is incorrect," +
             " please verify and try again.";
 
 
     private static final String PHONE_NUMBER = "+5511998765432";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String INVALID_ID = "5f68880";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-    private static final String UPDATED_CITY = "Rio De Janeiro";
-    private static final String UPDATED_COUNTRY = "Brazil";
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
+
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
 
     private AddressVO addressVO;
@@ -104,11 +92,18 @@ class CustomerServiceTest {
     @BeforeEach
     public void setUp() {
 
-        addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
-        passwordDTO = new PasswordDTO(PASSWORD);
+        addressVO = new AddressVO(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
+
+        customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
+        passwordDTO = new PasswordDTO(TestConstants.USER_PASSWORD);
 
 
     }
@@ -214,12 +209,12 @@ class CustomerServiceTest {
 
         assertNotNull(createdAddress);
         assertNotNull(createdAddress.getId());
-        assertEquals(ID, createdAddress.getId());
-        assertEquals(STREET, createdAddress.getStreet());
-        assertEquals(CITY, createdAddress.getCity());
-        assertEquals(STATE, createdAddress.getState());
-        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-        assertEquals(COUNTRY, createdAddress.getCountry());
+        assertEquals(TestConstants.ID, createdAddress.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, createdAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, createdAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, createdAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, createdAddress.getCountry());
 
         SecurityContextHolder.clearContext();
 
@@ -246,8 +241,8 @@ class CustomerServiceTest {
 
     @Test
     void testUpdateAddressOfCustomer_WhenSuccessful_ShouldReturnUpdatedAddressObject() {
-        addressVO.setCity(UPDATED_CITY);
-        addressVO.setCountry(UPDATED_COUNTRY);
+        addressVO.setState(TestConstants.ADDRESS_UPDATED_STATE);
+        addressVO.setCountry(TestConstants.ADDRESS_UPDATED_COUNTRY);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -266,14 +261,15 @@ class CustomerServiceTest {
         verify(authentication).getPrincipal();
         verify(userDetails).getUsername();
 
+
         assertNotNull(updatedAddress);
         assertNotNull(updatedAddress.getId());
-        assertEquals(ID, updatedAddress.getId());
-        assertEquals(STREET, updatedAddress.getStreet());
-        assertEquals(UPDATED_CITY, updatedAddress.getCity());
-        assertEquals(STATE, updatedAddress.getState());
-        assertEquals(POSTAL_CODE, updatedAddress.getPostalCode());
-        assertEquals(UPDATED_COUNTRY, updatedAddress.getCountry());
+        assertEquals(TestConstants.ID, updatedAddress.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, updatedAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, updatedAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_UPDATED_STATE, updatedAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, updatedAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_UPDATED_COUNTRY, updatedAddress.getCountry());
 
         SecurityContextHolder.clearContext();
 
@@ -310,7 +306,7 @@ class CustomerServiceTest {
         when(addressService.findById(anyString())).thenReturn(addressVO);
 
 
-        AddressVO addressFounded = service.findAddressOfACustomerByItsId(ID);
+        AddressVO addressFounded = service.findAddressOfACustomerByItsId(TestConstants.ID);
 
 
         verify(repository, times(1)).findCustomerByUserEmail(anyString());
@@ -320,12 +316,13 @@ class CustomerServiceTest {
 
         assertNotNull(addressFounded);
         assertNotNull(addressFounded.getId());
-        assertEquals(ID, addressFounded.getId());
-        assertEquals(STREET, addressFounded.getStreet());
-        assertEquals(CITY, addressFounded.getCity());
-        assertEquals(STATE, addressFounded.getState());
-        assertEquals(POSTAL_CODE, addressFounded.getPostalCode());
-        assertEquals(COUNTRY, addressFounded.getCountry());
+        assertEquals(TestConstants.ID, addressFounded.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, addressFounded.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, addressFounded.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, addressFounded.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, addressFounded.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, addressFounded.getCountry());
+
 
         SecurityContextHolder.clearContext();
 
@@ -376,12 +373,12 @@ class CustomerServiceTest {
 
         assertNotNull(address);
         assertNotNull(address.getId());
-        assertEquals(ID, address.getId());
-        assertEquals(STREET, address.getStreet());
-        assertEquals(CITY, address.getCity());
-        assertEquals(STATE, address.getState());
-        assertEquals(POSTAL_CODE, address.getPostalCode());
-        assertEquals(COUNTRY, address.getCountry());
+        assertEquals(TestConstants.ID, address.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
 
         SecurityContextHolder.clearContext();
 
@@ -400,7 +397,7 @@ class CustomerServiceTest {
         doNothing().when(addressService).delete(anyString());
 
 
-        service.deleteAddressOfACustomer(ID);
+        service.deleteAddressOfACustomer(TestConstants.ID);
 
 
         verify(repository, times(1)).findCustomerByUserEmail(anyString());
@@ -430,42 +427,6 @@ class CustomerServiceTest {
         SecurityContextHolder.clearContext();
 
     }
-
-//    @Test
-//    void testFindAddressOfACustomerByItsId_WhenAddressIsNotAssociatedWithCostumer_ShouldThrowAddressNotFoundException() throws NoSuchMethodException {
-//        when(securityContext.getAuthentication()).thenReturn(authentication);
-//        when(authentication.getPrincipal()).thenReturn(userDetails);
-//        when(userDetails.getUsername()).thenReturn(EMAIL);
-//        SecurityContextHolder.setContext(securityContext);
-//
-//        when(repository.findCustomerByUserEmail(anyString())).thenReturn(Optional.of(customerEntity));
-//
-//        AddressNotFoundException exception = assertThrows(
-//                AddressNotFoundException.class, () -> service.findAddressOfACustomerByItsId(INVALID_ID));
-//
-//        assertNotNull(exception);
-//        assertEquals(AddressNotFoundException.ERROR.formatErrorMessage(ADDRESS_NOT_FOUND_MESSAGE), exception.getMessage());
-//
-//
-//    }
-//
-//    @Test
-//    void testDeleteAddressOfACustomer_WhenAddressIsNotAssociatedWithCostumer_ShouldThrowAddressNotFoundException() throws NoSuchMethodException {
-//        when(securityContext.getAuthentication()).thenReturn(authentication);
-//        when(authentication.getPrincipal()).thenReturn(userDetails);
-//        when(userDetails.getUsername()).thenReturn(EMAIL);
-//        SecurityContextHolder.setContext(securityContext);
-//
-//        when(repository.findCustomerByUserEmail(anyString())).thenReturn(Optional.of(customerEntity));
-//
-//        AddressNotFoundException exception = assertThrows(
-//                AddressNotFoundException.class, () -> service.deleteAddressOfACustomer(INVALID_ID));
-//
-//        assertNotNull(exception);
-//        assertEquals(AddressNotFoundException.ERROR.formatErrorMessage(ADDRESS_NOT_FOUND_MESSAGE), exception.getMessage());
-//
-//
-//    }
 
 
 }

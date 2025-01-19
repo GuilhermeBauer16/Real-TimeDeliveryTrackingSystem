@@ -7,6 +7,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,17 +39,6 @@ class AddressServiceTest {
     private static final String ADDRESS_NOT_ASSOCIATED_MESSAGE = "That address was not associated with this user," +
             " please verify the fields and try again.";
 
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String INVALID_ID = "5f68880";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-
-    private static final String UPDATED_COUNTRY = "Brazil";
-    private static final String UPDATED_STATE = "Rio de Janeiro";
-
 
     private AddressVO addressVO;
     private AddressEntity addressEntity;
@@ -61,8 +51,11 @@ class AddressServiceTest {
 
     @BeforeEach
     void setUp() {
-        addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        addressVO = new AddressVO(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
     }
 
     @Test
@@ -86,12 +79,12 @@ class AddressServiceTest {
 
             assertNotNull(createdAddress);
             assertNotNull(createdAddress.getId());
-            assertEquals(ID, createdAddress.getId());
-            assertEquals(STREET, createdAddress.getStreet());
-            assertEquals(CITY, createdAddress.getCity());
-            assertEquals(STATE, createdAddress.getState());
-            assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-            assertEquals(COUNTRY, createdAddress.getCountry());
+            assertEquals(TestConstants.ID, createdAddress.getId());
+            assertEquals(TestConstants.ADDRESS_STREET, createdAddress.getStreet());
+            assertEquals(TestConstants.ADDRESS_CITY, createdAddress.getCity());
+            assertEquals(TestConstants.ADDRESS_STATE, createdAddress.getState());
+            assertEquals(TestConstants.ADDRESS_POSTAL_CODE, createdAddress.getPostalCode());
+            assertEquals(TestConstants.ADDRESS_COUNTRY, createdAddress.getCountry());
 
 
         }
@@ -113,12 +106,12 @@ class AddressServiceTest {
         assertNotNull(address);
         assertNotNull(address.getId());
         assertEquals(1, savedAddresses.size());
-        assertEquals(ID, address.getId());
-        assertEquals(STREET, address.getStreet());
-        assertEquals(CITY, address.getCity());
-        assertEquals(STATE, address.getState());
-        assertEquals(POSTAL_CODE, address.getPostalCode());
-        assertEquals(COUNTRY, address.getCountry());
+        assertEquals(TestConstants.ID, address.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
 
 
     }
@@ -136,12 +129,12 @@ class AddressServiceTest {
     void testUpdateAddress_WhenSuccess_ShouldReturnUpdatedAddressObject() {
 
         try (MockedStatic<ValidatorUtils> mockedValidatorUtils = mockStatic(ValidatorUtils.class)) {
-            addressEntity.setState(UPDATED_STATE);
-            addressEntity.setCountry(UPDATED_COUNTRY);
+            addressEntity.setState(TestConstants.ADDRESS_UPDATED_STATE);
+            addressEntity.setCountry(TestConstants.ADDRESS_UPDATED_COUNTRY);
 
             mockedValidatorUtils.when(() -> ValidatorUtils.updateFieldIfNotNull(any(AddressEntity.class), any(), anyString(), any()))
                     .thenAnswer(invocation -> addressEntity);
-            when(repository.findById(ID)).thenReturn(Optional.of(addressEntity));
+            when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(addressEntity));
             when(repository.save(any(AddressEntity.class))).thenReturn(addressEntity);
 
             AddressVO updatedAddress = service.update(addressVO);
@@ -151,12 +144,12 @@ class AddressServiceTest {
 
             assertNotNull(updatedAddress);
             assertNotNull(updatedAddress.getId());
-            assertEquals(ID, updatedAddress.getId());
-            assertEquals(STREET, updatedAddress.getStreet());
-            assertEquals(CITY, updatedAddress.getCity());
-            assertEquals(UPDATED_STATE, updatedAddress.getState());
-            assertEquals(POSTAL_CODE, updatedAddress.getPostalCode());
-            assertEquals(UPDATED_COUNTRY, updatedAddress.getCountry());
+            assertEquals(TestConstants.ID, updatedAddress.getId());
+            assertEquals(TestConstants.ADDRESS_STREET, updatedAddress.getStreet());
+            assertEquals(TestConstants.ADDRESS_CITY, updatedAddress.getCity());
+            assertEquals(TestConstants.ADDRESS_UPDATED_STATE, updatedAddress.getState());
+            assertEquals(TestConstants.ADDRESS_POSTAL_CODE, updatedAddress.getPostalCode());
+            assertEquals(TestConstants.ADDRESS_UPDATED_COUNTRY, updatedAddress.getCountry());
 
 
         }
@@ -175,28 +168,28 @@ class AddressServiceTest {
     void testFindAddressById_WhenSuccess_ShouldReturnAddressObject() {
 
 
-        when(repository.findById(ID)).thenReturn(Optional.of(addressEntity));
+        when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(addressEntity));
 
 
-        AddressVO address = service.findById(ID);
+        AddressVO address = service.findById(TestConstants.ID);
 
         verify(repository, times(1)).findById(anyString());
 
 
         assertNotNull(address);
         assertNotNull(address.getId());
-        assertEquals(ID, address.getId());
-        assertEquals(STREET, address.getStreet());
-        assertEquals(CITY, address.getCity());
-        assertEquals(STATE, address.getState());
-        assertEquals(POSTAL_CODE, address.getPostalCode());
-        assertEquals(COUNTRY, address.getCountry());
+        assertEquals(TestConstants.ID, address.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
     }
 
     @Test
     void testFindAddressById_WhenAddressIsNotFound_ShouldThrowAddressNotFoundException() {
 
-        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.findById(ID));
+        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.findById(TestConstants.ID));
         assertNotNull(exception);
         assertEquals(AddressNotFoundException.ERROR.formatErrorMessage(ADDRESS_NOT_FOUND_MESSAGE), exception.getMessage());
 
@@ -207,7 +200,7 @@ class AddressServiceTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(addressEntity));
         doNothing().when(repository).delete(addressEntity);
 
-        service.delete(ID);
+        service.delete(TestConstants.ID);
         verify(repository, times(1)).findById(anyString());
         verify(repository, times(1)).delete(any(AddressEntity.class));
     }
@@ -215,7 +208,7 @@ class AddressServiceTest {
     @Test
     void testDeleteAddress_WhenAddressIsNotFound_ShouldThrowAddressNotFoundException() {
 
-        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.delete(ID));
+        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.delete(TestConstants.ID));
         assertNotNull(exception);
         assertEquals(AddressNotFoundException.ERROR.formatErrorMessage(ADDRESS_NOT_FOUND_MESSAGE), exception.getMessage());
 
@@ -226,7 +219,8 @@ class AddressServiceTest {
 
         List<AddressEntity> addresses = List.of(addressEntity);
 
-        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.verifyIfAddressIdIsAssociatedWithUser(INVALID_ID, addresses));
+        AddressNotFoundException exception = assertThrows(AddressNotFoundException.class, () -> service.
+                verifyIfAddressIdIsAssociatedWithUser(TestConstants.INVALID_ID, addresses));
         assertNotNull(exception);
         assertEquals(AddressNotFoundException.ERROR.formatErrorMessage(ADDRESS_NOT_ASSOCIATED_MESSAGE), exception.getMessage());
     }
@@ -236,7 +230,7 @@ class AddressServiceTest {
 
         List<AddressEntity> addresses = List.of(addressEntity);
 
-        assertDoesNotThrow(() ->  service.verifyIfAddressIdIsAssociatedWithUser(ID, addresses));
+        assertDoesNotThrow(() -> service.verifyIfAddressIdIsAssociatedWithUser(TestConstants.ID, addresses));
     }
 
 

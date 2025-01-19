@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
+import constants.TestConstants;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.spring6.SpringTemplateEngine;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -55,19 +54,19 @@ public class EmailSenderServiceTest {
     @InjectMocks
     private EmailSenderService emailSenderService;
 
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
+
     private static final String EMAIL = "customerAddress@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
     private static final boolean AUTHENTICATED = false;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
+
 
 
     @BeforeEach
     void setUp() {
-        userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
+        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
+                AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
     }
 
     @Test
@@ -87,7 +86,7 @@ public class EmailSenderServiceTest {
 
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
-        when(templateEngine.process(anyString(), any())).thenReturn("processed-email-content"); // Mock email content
+        when(templateEngine.process(anyString(), any())).thenReturn("processed-email-content");
 
 
         emailSenderService.sendEmailWithValidatorCodeToUser(EMAIL);

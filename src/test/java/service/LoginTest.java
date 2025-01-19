@@ -7,6 +7,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.JwtDetailsService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.JwtTokenService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.LoginService;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +36,6 @@ public class LoginTest {
     private static final String BAD_CREDENTIALS_MESSAGE = "An user with that email: %s was not matched";
 
     private static final String EMAIL = "test@gmail.com";
-    private static final String PASSWORD = "test";
     private static final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJST0xFUyI6IltST0xFX1VTRVJdIiwic3ViIjoiam9obmRv" +
             "ZUBleGFtcGxlMTIuY29tIiwiaWF0IjoxNzI5MTk0MzQ1LCJleHAiOjE3MjkxOTYxNDV9.dMP8-0uQ2K67qogZVTdf4KO2YGwMnER_YkGzOV7Xstc";
 
@@ -62,7 +62,7 @@ public class LoginTest {
 
     @BeforeEach
     void setUp() {
-        loginRequest = new LoginRequest(EMAIL, PASSWORD);
+        loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);
     }
 
     @Test
