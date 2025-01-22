@@ -4,6 +4,7 @@ package repository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ProductRepositoryTest extends AbstractionIntegrationTest {
 
 
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String NAME = "Shoes";
-    private static final String DESCRIPTION = "That is the new version of the Shoes";
-    private static final Double PRICE = 100D;
-
-
     private ProductEntity productEntity;
 
     private final ProductRepository repository;
@@ -46,7 +41,8 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        productEntity = new ProductEntity(ID, NAME, DESCRIPTION, PRICE);
+        productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
         repository.save(productEntity);
 
     }
@@ -61,10 +57,10 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
         ProductEntity product = products.getContent().getFirst();
         assertNotNull(product);
         assertNotNull(product.getId());
-        assertEquals(ID, product.getId());
-        assertEquals(NAME, product.getName());
-        assertEquals(DESCRIPTION, product.getDescription());
-        assertEquals(PRICE, product.getPrice());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
 
 
     }

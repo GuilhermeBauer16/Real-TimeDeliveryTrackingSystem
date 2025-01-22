@@ -2,13 +2,12 @@ package service;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DuplicatedLicensePlateException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.VehicleNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,13 +42,7 @@ class VehicleServiceTest {
     private static final String DUPLICATED_LICENSE_PLATE_MESSAGE = "That license plate already registered in the system. " +
             "Please verify the license plate and try again!.";
 
-    private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
-    private static final String NAME = "Voyage";
     private static final String LICENSE_PLATE = "AQE1F34";
-    private static final Type TYPE = Type.CAR;
-    private static final Status STATUS = Status.AVAILABLE;
-
-    private static final String UPDATED_NAME = "Gol";
     private static final String UPDATED_LICENSE_PLATE = "AXE1F34";
 
     @Mock
@@ -66,8 +59,11 @@ class VehicleServiceTest {
 
     @BeforeEach
     void setUp() {
-        vehicleVO = new VehicleVO(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
-        vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
+        vehicleVO = new VehicleVO(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
     }
 
     @Test
@@ -85,11 +81,11 @@ class VehicleServiceTest {
 
             assertNotNull(savedVehicle);
             assertNotNull(savedVehicle.getId());
-            assertEquals(ID, savedVehicle.getId());
-            assertEquals(NAME, savedVehicle.getName());
+            assertEquals(TestConstants.ID, savedVehicle.getId());
+            assertEquals(TestConstants.VEHICLE_NAME, savedVehicle.getName());
             assertEquals(LICENSE_PLATE, savedVehicle.getLicensePlate());
-            assertEquals(TYPE, savedVehicle.getType());
-            assertEquals(STATUS, savedVehicle.getStatus());
+            assertEquals(TestConstants.VEHICLE_TYPE, savedVehicle.getType());
+            assertEquals(TestConstants.VEHICLE_STATUS, savedVehicle.getStatus());
 
 
         }
@@ -120,11 +116,11 @@ class VehicleServiceTest {
 
         try (MockedStatic<ValidatorUtils> mockedValidatorUtils = mockStatic(ValidatorUtils.class)) {
             vehicleEntity.setLicensePlate(UPDATED_LICENSE_PLATE);
-            vehicleEntity.setName(UPDATED_NAME);
+            vehicleEntity.setName(TestConstants.VEHICLE_UPDATED_NAME);
 
             mockedValidatorUtils.when(() -> ValidatorUtils.updateFieldIfNotNull(any(VehicleEntity.class), any(), anyString(), any()))
                     .thenAnswer(invocation -> vehicleEntity);
-            when(repository.findById(ID)).thenReturn(Optional.of(vehicleEntity));
+            when(repository.findById(TestConstants.ID)).thenReturn(Optional.of(vehicleEntity));
             when(repository.save(any(VehicleEntity.class))).thenReturn(vehicleEntity);
 
             VehicleVO updatedVehicle = service.update(vehicleVO);
@@ -134,9 +130,11 @@ class VehicleServiceTest {
 
             assertNotNull(updatedVehicle);
             assertNotNull(updatedVehicle.getId());
-            assertEquals(ID, updatedVehicle.getId());
-            assertEquals(UPDATED_NAME, updatedVehicle.getName());
+            assertEquals(TestConstants.ID, updatedVehicle.getId());
+            assertEquals(TestConstants.VEHICLE_UPDATED_NAME, updatedVehicle.getName());
             assertEquals(UPDATED_LICENSE_PLATE, updatedVehicle.getLicensePlate());
+            assertEquals(TestConstants.VEHICLE_TYPE, updatedVehicle.getType());
+            assertEquals(TestConstants.VEHICLE_STATUS, updatedVehicle.getStatus());
 
 
         }
@@ -156,24 +154,24 @@ class VehicleServiceTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(vehicleEntity));
 
-        VehicleVO vehicleRetrieved = service.findById(ID);
+        VehicleVO vehicleRetrieved = service.findById(TestConstants.ID);
 
         verify(repository, times(1)).findById(anyString());
 
         assertNotNull(vehicleRetrieved);
         assertNotNull(vehicleRetrieved.getId());
-        assertEquals(ID, vehicleRetrieved.getId());
-        assertEquals(NAME, vehicleRetrieved.getName());
+        assertEquals(TestConstants.ID, vehicleRetrieved.getId());
+        assertEquals(TestConstants.VEHICLE_NAME, vehicleRetrieved.getName());
         assertEquals(LICENSE_PLATE, vehicleRetrieved.getLicensePlate());
-        assertEquals(TYPE, vehicleRetrieved.getType());
-        assertEquals(STATUS, vehicleRetrieved.getStatus());
+        assertEquals(TestConstants.VEHICLE_TYPE, vehicleRetrieved.getType());
+        assertEquals(TestConstants.VEHICLE_STATUS, vehicleRetrieved.getStatus());
 
     }
 
     @Test
     void testFindVehicleById_WhenVehicleNotFound_ShouldThrowVehicleNotFoundException() {
 
-        VehicleNotFoundException exception = assertThrows(VehicleNotFoundException.class, () -> service.findById(ID));
+        VehicleNotFoundException exception = assertThrows(VehicleNotFoundException.class, () -> service.findById(TestConstants.ID));
         assertNotNull(exception);
         assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_FOUND), exception.getMessage());
 
@@ -190,11 +188,11 @@ class VehicleServiceTest {
 
         assertNotNull(vehicleRetrieved);
         assertNotNull(vehicleRetrieved.getId());
-        assertEquals(ID, vehicleRetrieved.getId());
-        assertEquals(NAME, vehicleRetrieved.getName());
+        assertEquals(TestConstants.ID, vehicleRetrieved.getId());
+        assertEquals(TestConstants.VEHICLE_NAME, vehicleRetrieved.getName());
         assertEquals(LICENSE_PLATE, vehicleRetrieved.getLicensePlate());
-        assertEquals(TYPE, vehicleRetrieved.getType());
-        assertEquals(STATUS, vehicleRetrieved.getStatus());
+        assertEquals(TestConstants.VEHICLE_TYPE, vehicleRetrieved.getType());
+        assertEquals(TestConstants.VEHICLE_STATUS, vehicleRetrieved.getStatus());
 
     }
 
@@ -221,13 +219,11 @@ class VehicleServiceTest {
         assertNotNull(vehicleRetrieved);
         assertNotNull(vehicleRetrieved.getId());
         assertEquals(1, vehicles.getContent().size());
-        assertNotNull(vehicleRetrieved.getId());
-        assertEquals(ID, vehicleRetrieved.getId());
-        assertEquals(NAME, vehicleRetrieved.getName());
+        assertEquals(TestConstants.ID, vehicleRetrieved.getId());
+        assertEquals(TestConstants.VEHICLE_NAME, vehicleRetrieved.getName());
         assertEquals(LICENSE_PLATE, vehicleRetrieved.getLicensePlate());
-        assertEquals(TYPE, vehicleRetrieved.getType());
-        assertEquals(STATUS, vehicleRetrieved.getStatus());
-
+        assertEquals(TestConstants.VEHICLE_TYPE, vehicleRetrieved.getType());
+        assertEquals(TestConstants.VEHICLE_STATUS, vehicleRetrieved.getStatus());
     }
 
     @Test
@@ -235,7 +231,7 @@ class VehicleServiceTest {
         when(repository.findById(anyString())).thenReturn(Optional.of(vehicleEntity));
         doNothing().when(repository).delete(vehicleEntity);
 
-        service.delete(ID);
+        service.delete(TestConstants.ID);
         verify(repository, times(1)).findById(anyString());
         verify(repository, times(1)).delete(any(VehicleEntity.class));
     }
@@ -243,7 +239,7 @@ class VehicleServiceTest {
     @Test
     void testDeleteVehicle_WhenVehicleNotFound_ShouldThrowVehicleNotFoundException() {
 
-        VehicleNotFoundException exception = assertThrows(VehicleNotFoundException.class, () -> service.delete(ID));
+        VehicleNotFoundException exception = assertThrows(VehicleNotFoundException.class, () -> service.delete(TestConstants.ID));
         assertNotNull(exception);
         assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_FOUND), exception.getMessage());
 

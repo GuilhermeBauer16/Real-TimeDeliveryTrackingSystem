@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.JwtDetailsService;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,9 +32,6 @@ public class JwtDetailsServiceTest {
     private static final String USER_NOT_FOUND_MESSAGE = "An User with that email %s was not found!";
 
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
 
@@ -50,7 +48,8 @@ public class JwtDetailsServiceTest {
     @BeforeEach
     public void setUp() {
 
-        userEntity = new UserEntity(ID,USERNAME,EMAIL,PASSWORD,ROLE_NAME);
+        userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
     }
 
     @Test
@@ -63,7 +62,7 @@ public class JwtDetailsServiceTest {
         verify(userRepository, times(1)).findUserByEmail(EMAIL);
         assertNotNull(userDetails);
         assertEquals(EMAIL,userDetails.getUsername());
-        assertEquals(PASSWORD,userDetails.getPassword());
+        assertEquals(TestConstants.USER_PASSWORD,userDetails.getPassword());
         assertTrue(userDetails.getAuthorities().stream().anyMatch(
                 grantedAuthority -> grantedAuthority.getAuthority().equals(ROLE_NAME.name())));
 
