@@ -8,6 +8,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,14 +35,7 @@ public class UserServiceTest {
     private final String USER_NOT_FOUND_MESSAGE = "User was not found!, Please verify and try again.";
 
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
-    private static final boolean AUTHENTICATED = true;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
-
 
     private UserUpdateRequest userUpdateRequest;
 
@@ -61,8 +54,11 @@ public class UserServiceTest {
     @BeforeEach
     void setUp() {
 
-        userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        userUpdateRequest = new UserUpdateRequest(EMAIL, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
+        userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
+                TestConstants.USER_AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+        userUpdateRequest = new UserUpdateRequest(EMAIL, TestConstants.USER_VERIFY_CODE,
+                TestConstants.USER_AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
 
     }
 
@@ -79,13 +75,13 @@ public class UserServiceTest {
         assertNotNull(user);
         assertNotNull(user.getId());
         assertEquals(EMAIL, user.getEmail());
-        assertEquals(ID, user.getId());
-        assertEquals(USERNAME, user.getName());
-        assertEquals(PASSWORD, user.getPassword());
+        assertEquals(TestConstants.ID, user.getId());
+        assertEquals(TestConstants.USER_USERNAME, user.getName());
+        assertEquals(TestConstants.USER_PASSWORD, user.getPassword());
         assertEquals(ROLE_NAME, user.getUserProfile());
-        assertEquals(AUTHENTICATED, user.isAuthenticated());
-        assertEquals(VERIFY_CODE, user.getVerifyCode());
-        assertEquals(CODE_EXPIRATION, user.getCodeExpiration());
+        assertEquals(TestConstants.USER_AUTHENTICATED, user.isAuthenticated());
+        assertEquals(TestConstants.USER_VERIFY_CODE, user.getVerifyCode());
+        assertEquals(TestConstants.USER_CODE_EXPIRATION, user.getCodeExpiration());
 
 
     }
@@ -122,13 +118,13 @@ public class UserServiceTest {
             assertNotNull(user);
             assertNotNull(user.getId());
             assertEquals(EMAIL, user.getEmail());
-            assertEquals(ID, user.getId());
-            assertEquals(USERNAME, user.getName());
-            assertEquals(PASSWORD, user.getPassword());
+            assertEquals(TestConstants.ID, user.getId());
+            assertEquals(TestConstants.USER_USERNAME, user.getName());
+            assertEquals(TestConstants.USER_PASSWORD, user.getPassword());
             assertEquals(ROLE_NAME, user.getUserProfile());
-            assertEquals(AUTHENTICATED, user.isAuthenticated());
-            assertEquals(VERIFY_CODE, user.getVerifyCode());
-            assertEquals(CODE_EXPIRATION, user.getCodeExpiration());
+            assertEquals(TestConstants.USER_AUTHENTICATED, user.isAuthenticated());
+            assertEquals(TestConstants.USER_VERIFY_CODE, user.getVerifyCode());
+            assertEquals(TestConstants.USER_CODE_EXPIRATION, user.getCodeExpiration());
 
 
         }

@@ -9,6 +9,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,8 @@ class CustomerRepositoryTest extends AbstractionIntegrationTest {
 
 
     private static final String PHONE_NUMBER = "+5511998765432";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-
     private static final String EMAIL = "customeruser@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
+
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
 
 
@@ -65,11 +58,16 @@ class CustomerRepositoryTest extends AbstractionIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,TestConstants.USER_PASSWORD, ROLE_NAME);
+
         addressRepository.save(addressEntity);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
         userRepository.save(userEntity);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+
+        customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
         repository.save(customerEntity);
 
     }
@@ -82,15 +80,16 @@ class CustomerRepositoryTest extends AbstractionIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<AddressEntity> foundedAddresses = repository.findAddressesByCustomerEmail(customerEntity.getUser().getEmail(), pageable);
         AddressEntity addressEntity = foundedAddresses.getContent().getFirst();
+
         assertNotNull(foundedAddresses);
         assertNotNull(addressEntity);
         assertNotNull(addressEntity.getId());
-        assertEquals(ID, addressEntity.getId());
-        assertEquals(STREET, addressEntity.getStreet());
-        assertEquals(CITY, addressEntity.getCity());
-        assertEquals(STATE, addressEntity.getState());
-        assertEquals(POSTAL_CODE, addressEntity.getPostalCode());
-        assertEquals(COUNTRY, addressEntity.getCountry());
+        assertEquals(TestConstants.ID, addressEntity.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, addressEntity.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, addressEntity.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, addressEntity.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, addressEntity.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, addressEntity.getCountry());
 
 
 
@@ -104,12 +103,12 @@ class CustomerRepositoryTest extends AbstractionIntegrationTest {
 
         assertNotNull(foundedCustomer);
         assertNotNull(foundedCustomer.getId());
-        assertEquals(ID, foundedCustomer.getId());
+        assertEquals(TestConstants.ID, foundedCustomer.getId());
         assertEquals(PHONE_NUMBER, foundedCustomer.getPhoneNumber());
         assertEquals(1, foundedCustomer.getAddresses().size());
         assertEquals(EMAIL, foundedCustomer.getUser().getEmail());
-        assertEquals(USERNAME, foundedCustomer.getUser().getName());
-        assertEquals(PASSWORD, foundedCustomer.getUser().getPassword());
+        assertEquals(TestConstants.USER_USERNAME, foundedCustomer.getUser().getName());
+        assertEquals(TestConstants.USER_PASSWORD, foundedCustomer.getUser().getPassword());
         assertEquals(ROLE_NAME, foundedCustomer.getUser().getUserProfile());
 
 

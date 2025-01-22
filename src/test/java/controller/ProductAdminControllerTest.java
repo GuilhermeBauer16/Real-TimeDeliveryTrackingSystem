@@ -5,14 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
@@ -20,6 +15,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import config.TestConfigs;
+import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -36,9 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -58,55 +51,33 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
 
-    private static CustomerVO customerVO;
-    private static CustomerEntity customerEntity;
+
     private static ProductVO productVO;
 
     private static final String URL_PREFIX = "/product";
     private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
     private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
-    private static final String HOST_PREFIX = "http://localhost:";
-    private static final String BEARER_PREFIX = "Bearer ";
 
-
-    private static final String PHONE_NUMBER = "5511998765432";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
     private static final String EMAIL = "adminProduct@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_ADMIN;
     private static final boolean AUTHENTICATED = false;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
 
-    private static final String PRODUCT_NAME = "Shoes";
-    private static final String PRODUCT_DESCRIPTION = "That is the new version of the Shoes";
-    private static final Double PRODUCT_PRICE = 100D;
-
-    private static final String UPDATED_PRODUCT_NAME = "Shoes";
-    private static final Double UPDATED_PRODUCT_PRICE = 100D;
 
     @BeforeAll
-    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired CustomerRepository customerRepository, @Autowired UserRepository userRepository,
-                      @Autowired AddressRepository addressRepository) {
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired UserRepository userRepository) {
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        productVO = new ProductVO(ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_PRICE);
+        productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
 
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressRepository.save(addressEntity);
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
+                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
         userRepository.save(userEntity);
-        customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
-        customerRepository.save(customerEntity);
+
 
 
     }
@@ -115,8 +86,8 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
     @Order(1)
     void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing() {
 
-        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(customerVO.getUser().getEmail(), customerVO.getUser().getVerifyCode(),
-                customerVO.getUser().isAuthenticated(), customerVO.getUser().getCodeExpiration());
+        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(EMAIL, TestConstants.USER_VERIFY_CODE,
+                AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
 
 
         given()
@@ -141,7 +112,7 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
     @Order(2)
     void login() {
 
-        LoginRequest loginRequest = new LoginRequest(customerEntity.getUser().getEmail(), PASSWORD);
+        LoginRequest loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);
 
         LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
@@ -161,8 +132,8 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
 
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())
+                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -193,9 +164,9 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(product.getId());
         Assertions.assertTrue(product.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
 
-        assertEquals(PRODUCT_NAME, product.getName());
-        assertEquals(PRODUCT_DESCRIPTION, product.getDescription());
-        assertEquals(PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
 
         productVO.setId(product.getId());
     }
@@ -204,8 +175,8 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
     @Order(4)
     void givenProductObject_whenUpdateProduct_ShouldReturnProductObject() throws JsonProcessingException {
 
-        productVO.setPrice(UPDATED_PRODUCT_PRICE);
-        productVO.setName(UPDATED_PRODUCT_NAME);
+        productVO.setPrice(TestConstants.PRODUCT_UPDATED_PRICE);
+        productVO.setName(TestConstants.PRODUCT_UPDATED_NAME);
 
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
@@ -224,9 +195,9 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(product.getId());
         Assertions.assertTrue(product.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
 
-        assertEquals(UPDATED_PRODUCT_NAME, product.getName());
-        assertEquals(PRODUCT_DESCRIPTION, product.getDescription());
-        assertEquals(UPDATED_PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());
 
     }
 

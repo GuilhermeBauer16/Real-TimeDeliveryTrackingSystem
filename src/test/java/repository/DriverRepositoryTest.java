@@ -6,13 +6,12 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,21 +37,9 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
 
     private static final String PHONE_NUMBER = "+5511998765432";
     private static final String DRIVER_LICENSE = "12628901031";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
 
-    private static final String VEHICLE_NAME = "Voyage";
     private static final String LICENSE_PLATE = "ABE1F34";
-    private static final Type VEHICLE_TYPE = Type.CAR;
-    private static final Status VEHICLE_STATUS = Status.AVAILABLE;
-
     private static final String EMAIL = "driveruser@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
 
@@ -76,13 +63,21 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,TestConstants.USER_PASSWORD, ROLE_NAME);
+
         addressRepository.save(addressEntity);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
         userRepository.save(userEntity);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
+
+        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
         vehicleRepository.save(vehicleEntity);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), List.of(vehicleEntity), userEntity);
+
+        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), List.of(vehicleEntity), userEntity);
         repository.save(driverEntity);
 
     }
@@ -97,12 +92,12 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
         assertNotNull(foundedAddresses);
         assertNotNull(addressEntity);
         assertNotNull(addressEntity.getId());
-        assertEquals(ID, addressEntity.getId());
-        assertEquals(STREET, addressEntity.getStreet());
-        assertEquals(CITY, addressEntity.getCity());
-        assertEquals(STATE, addressEntity.getState());
-        assertEquals(POSTAL_CODE, addressEntity.getPostalCode());
-        assertEquals(COUNTRY, addressEntity.getCountry());
+        assertEquals(TestConstants.ID, addressEntity.getId());
+        assertEquals(TestConstants.ADDRESS_STREET, addressEntity.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, addressEntity.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, addressEntity.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, addressEntity.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, addressEntity.getCountry());
 
 
     }
@@ -115,12 +110,12 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
 
         assertNotNull(foundedDriver);
         assertNotNull(foundedDriver.getId());
-        assertEquals(ID, foundedDriver.getId());
+        assertEquals(TestConstants.ID, foundedDriver.getId());
         assertEquals(PHONE_NUMBER, foundedDriver.getPhoneNumber());
         assertEquals(1, foundedDriver.getAddresses().size());
         assertEquals(EMAIL, foundedDriver.getUser().getEmail());
-        assertEquals(USERNAME, foundedDriver.getUser().getName());
-        assertEquals(PASSWORD, foundedDriver.getUser().getPassword());
+        assertEquals(TestConstants.USER_USERNAME, foundedDriver.getUser().getName());
+        assertEquals(TestConstants.USER_PASSWORD, foundedDriver.getUser().getPassword());
         assertEquals(ROLE_NAME, foundedDriver.getUser().getUserProfile());
         assertEquals(1, foundedDriver.getVehicles().size());
 
@@ -135,12 +130,12 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
 
         assertNotNull(foundedDriver);
         assertNotNull(foundedDriver.getId());
-        assertEquals(ID, foundedDriver.getId());
+        assertEquals(TestConstants.ID, foundedDriver.getId());
         assertEquals(PHONE_NUMBER, foundedDriver.getPhoneNumber());
         assertEquals(1, foundedDriver.getAddresses().size());
         assertEquals(EMAIL, foundedDriver.getUser().getEmail());
-        assertEquals(USERNAME, foundedDriver.getUser().getName());
-        assertEquals(PASSWORD, foundedDriver.getUser().getPassword());
+        assertEquals(TestConstants.USER_USERNAME, foundedDriver.getUser().getName());
+        assertEquals(TestConstants.USER_PASSWORD, foundedDriver.getUser().getPassword());
         assertEquals(ROLE_NAME, foundedDriver.getUser().getUserProfile());
         assertEquals(1, foundedDriver.getVehicles().size());
 
@@ -156,11 +151,11 @@ class DriverRepositoryTest extends AbstractionIntegrationTest {
 
         assertNotNull(foundedVehicle);
         assertNotNull(foundedVehicle.getId());
-        assertEquals(ID, foundedVehicle.getId());
-        assertEquals(VEHICLE_NAME, foundedVehicle.getName());
+        assertEquals(TestConstants.ID, foundedVehicle.getId());
+        assertEquals(TestConstants.VEHICLE_NAME, foundedVehicle.getName());
         assertEquals(LICENSE_PLATE, foundedVehicle.getLicensePlate());
-        assertEquals(VEHICLE_TYPE, foundedVehicle.getType());
-        assertEquals(VEHICLE_STATUS, foundedVehicle.getStatus());
+        assertEquals(TestConstants.VEHICLE_TYPE, foundedVehicle.getType());
+        assertEquals(TestConstants.VEHICLE_STATUS, foundedVehicle.getStatus());
 
 
     }

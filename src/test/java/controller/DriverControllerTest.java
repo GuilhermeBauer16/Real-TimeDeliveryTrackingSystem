@@ -10,8 +10,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
@@ -19,6 +17,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import config.TestConfigs;
+import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -34,7 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,49 +51,40 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
     private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
-    private static final String HOST_PREFIX = "http://localhost:";
 
 
-    private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
-    private static final String NAME = "Voyage";
     private static final String LICENSE_PLATE = "AQZ1F34";
-    private static final Type TYPE = Type.CAR;
-    private static final Status STATUS = Status.AVAILABLE;
-    private static final String BEARER_PREFIX = "Bearer ";
-
     private static final String EMAIL = "driver@gmail.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
     private static final String PHONE_NUMBER = "5511995765432";
     private static final String DRIVER_LICENSE = "82101864590";
-    private static final String STREET = "123 Main State";
-    private static final String CITY = "Sample Cities";
-    private static final String STATE = "Sample Statess";
-    private static final String POSTAL_CODE = "12345111";
-    private static final String COUNTRY = "Sample Countries";
     private static final boolean AUTHENTICATED = false;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
 
     @BeforeAll
     static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired DriverRepository driverRepository, @Autowired UserRepository userRepository,
                       @Autowired AddressRepository addressRepository) {
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
+                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
         addressRepository.save(addressEntity);
         userRepository.save(userEntity);
 
-        addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressRepository.save(addressEntity);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
-        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , new ArrayList<>(List.of(vehicleEntity)), userEntity);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                , new ArrayList<>(List.of(vehicleEntity)), userEntity);
+        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
+
+        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
 
         driverRepository.save(driverEntity);
@@ -131,7 +120,7 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     @Order(2)
     void login() {
 
-        LoginRequest loginRequest = new LoginRequest(driverEntity.getUser().getEmail(), PASSWORD);
+        LoginRequest loginRequest = new LoginRequest(driverEntity.getUser().getEmail(), TestConstants.USER_PASSWORD);
 
         LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
@@ -151,8 +140,8 @@ class DriverControllerTest extends AbstractionIntegrationTest {
 
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())
+                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -164,7 +153,7 @@ class DriverControllerTest extends AbstractionIntegrationTest {
     @Order(3)
     @Test
     void givenDriverObject_when_delete_ShouldReturnNoContent() {
-        PasswordDTO passwordDTO = new PasswordDTO(PASSWORD);
+        PasswordDTO passwordDTO = new PasswordDTO(TestConstants.USER_PASSWORD);
         given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .body(passwordDTO)

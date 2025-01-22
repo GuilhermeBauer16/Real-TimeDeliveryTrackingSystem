@@ -7,8 +7,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverLicenseAllReadyRegisterException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
@@ -22,6 +20,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
+import constants.TestConstants;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,21 +55,8 @@ class DriverRegistrationTest {
 
     private static final String PHONE_NUMBER = "+5511998765432";
     private static final String DRIVER_LICENSE = "14829179653";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-
-    private static final String VEHICLE_NAME = "Voyage";
     private static final String LICENSE_PLATE = "AQE1F34";
-    private static final Type VEHICLE_TYPE = Type.CAR;
-    private static final Status VEHICLE_STATUS = Status.AVAILABLE;
-
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
     private UserVO userVO;
@@ -97,13 +83,23 @@ class DriverRegistrationTest {
     @BeforeEach
     public void setUp() {
 
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
-        vehicleVO = new VehicleVO(ID, VEHICLE_NAME, LICENSE_PLATE, VEHICLE_TYPE, VEHICLE_STATUS);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
-        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
+
+        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME
+        );
+        vehicleVO = new VehicleVO(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
+        driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
     }
 
@@ -138,12 +134,12 @@ class DriverRegistrationTest {
 
             assertNotNull(driver);
             assertNotNull(driver.getId());
-            assertEquals(ID, driver.getId());
+            assertEquals(TestConstants.ID, driver.getId());
             assertEquals(PHONE_NUMBER, driver.getPhoneNumber());
             assertEquals(1, driver.getAddresses().size());
             assertEquals(1, driver.getVehicles().size());
             assertEquals(EMAIL, driver.getUserRegistrationResponse().getEmail());
-            assertEquals(USERNAME, driver.getUserRegistrationResponse().getName());
+            assertEquals(TestConstants.USER_USERNAME, driver.getUserRegistrationResponse().getName());
 
 
         }

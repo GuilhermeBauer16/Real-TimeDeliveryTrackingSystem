@@ -3,7 +3,6 @@ package service;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
@@ -16,6 +15,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import com.google.i18n.phonenumbers.NumberParseException;
+import constants.TestConstants;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,19 +44,9 @@ class CustomerRegistrationTest {
 
 
     private static final String PHONE_NUMBER = "+5511998765432";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
 
-    private AddressVO addressVO;
     private UserVO userVO;
     private CustomerEntity customerEntity;
     private CustomerVO customerVO;
@@ -76,12 +66,19 @@ class CustomerRegistrationTest {
     @BeforeEach
     public void setUp() {
 
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
-        customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
+                TestConstants.USER_AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
+                TestConstants.USER_AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+        customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        customerVO = new CustomerVO(TestConstants.ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
 
     }
 
@@ -111,11 +108,11 @@ class CustomerRegistrationTest {
 
             assertNotNull(customer);
             assertNotNull(customer.getId());
-            assertEquals(ID, customer.getId());
+            assertEquals(TestConstants.ID, customer.getId());
             assertEquals(PHONE_NUMBER, customer.getPhoneNumber());
             assertEquals(1, customer.getAddresses().size());
             assertEquals(EMAIL, customer.getUserRegistrationResponse().getEmail());
-            assertEquals(USERNAME, customer.getUserRegistrationResponse().getName());
+            assertEquals(TestConstants.USER_USERNAME, customer.getUserRegistrationResponse().getName());
 
 
         }

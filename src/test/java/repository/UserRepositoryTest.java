@@ -5,6 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class UserRepositoryTest extends AbstractionIntegrationTest {
 
 
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
     private static final String EMAIL = "creationuser@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
 
 
@@ -46,7 +44,8 @@ class UserRepositoryTest extends AbstractionIntegrationTest {
     void setUp() {
 
 
-        userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
+        userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,TestConstants.USER_PASSWORD, ROLE_NAME);
         repository.save(userEntity);
 
 
@@ -62,8 +61,8 @@ class UserRepositoryTest extends AbstractionIntegrationTest {
         assertNotNull(foundedUser);
         assertNotNull(foundedUser.getId());
         assertEquals(EMAIL, foundedUser.getEmail());
-        assertEquals(USERNAME, foundedUser.getName());
-        assertEquals(PASSWORD, foundedUser.getPassword());
+        assertEquals(TestConstants.USER_USERNAME, foundedUser.getName());
+        assertEquals(TestConstants.USER_PASSWORD, foundedUser.getPassword());
         assertEquals(ROLE_NAME, foundedUser.getUserProfile());
 
 

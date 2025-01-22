@@ -9,6 +9,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,9 +39,6 @@ public class UserRegistrationTest {
     private static final String EMAIL_ALREADY_REGISTER_MESSAGE = "The email %s is already registered for another user!";
 
     private static final String EMAIL = "user@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
 
 
@@ -57,7 +55,6 @@ public class UserRegistrationTest {
     private EmailSenderService emailSenderService;
 
 
-
     @Mock
     private UserEntity userEntity;
 
@@ -68,8 +65,8 @@ public class UserRegistrationTest {
     @BeforeEach
     void setUp() {
 
-        userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
-        userEntity = new UserEntity(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME);
+        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME, EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
+        userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME, EMAIL, TestConstants.USER_USERNAME, ROLE_NAME);
 
     }
 
@@ -82,7 +79,7 @@ public class UserRegistrationTest {
             mockedValidatorUtils.when(() -> ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(any(), anyString(), any())).thenAnswer(invocation -> null);
 
             when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-            when(passwordEncoder.encode(anyString())).thenReturn(PASSWORD);
+            when(passwordEncoder.encode(anyString())).thenReturn(TestConstants.USER_PASSWORD);
 
 
             UserVO user = userRegistrationService.createUser(userVO);
@@ -96,8 +93,8 @@ public class UserRegistrationTest {
             assertNotNull(user);
             assertNotNull(user.getId());
             assertEquals(EMAIL, user.getEmail());
-            assertEquals(ID, user.getId());
-            assertEquals(USERNAME, user.getName());
+            assertEquals(TestConstants.ID, user.getId());
+            assertEquals(TestConstants.USER_USERNAME, user.getName());
 
 
         }
@@ -124,7 +121,6 @@ public class UserRegistrationTest {
         assertEquals(exception.getMessage(),
                 EmailAllReadyRegisterException.ERROR.formatErrorMessage(String.format(EMAIL_ALREADY_REGISTER_MESSAGE, EMAIL)));
     }
-
 
 
 }

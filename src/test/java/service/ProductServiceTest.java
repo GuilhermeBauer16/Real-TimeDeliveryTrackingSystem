@@ -7,6 +7,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,11 +40,6 @@ public class ProductServiceTest {
     private static final String PRODUCT_NOT_FOUND = "This product was not found.";
     private static final String INVALID_PRODUCT_MESSAGE = "This product is invalid, please verify the fields and try again.";
 
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String NAME = "Shoes";
-    private static final String DESCRIPTION = "That is the new version of the Shoes";
-    private static final Double PRICE = 100D;
-
     private ProductVO productVO;
     private ProductEntity productEntity;
     @Mock
@@ -55,8 +51,11 @@ public class ProductServiceTest {
     @BeforeEach
     void setUp() {
 
-        productVO = new ProductVO(ID, NAME, DESCRIPTION, PRICE);
-        productEntity = new ProductEntity(ID, NAME, DESCRIPTION, PRICE);
+        productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+
+        productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
 
     }
 
@@ -80,10 +79,10 @@ public class ProductServiceTest {
 
             assertNotNull(product);
             assertNotNull(product.getId());
-            assertEquals(ID, product.getId());
-            assertEquals(NAME, product.getName());
-            assertEquals(DESCRIPTION, product.getDescription());
-            assertEquals(PRICE, product.getPrice());
+            assertEquals(TestConstants.ID, product.getId());
+            assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+            assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+            assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
         }
     }
 
@@ -101,7 +100,11 @@ public class ProductServiceTest {
     @Test
     void testUpdateProduct_WhenSuccessful_ShouldReturnUpdatedProductObject() {
 
+
         try (MockedStatic<ValidatorUtils> mockedValidatorUtils = mockStatic(ValidatorUtils.class)) {
+
+            productEntity.setName(TestConstants.PRODUCT_UPDATED_NAME);
+            productEntity.setPrice(TestConstants.PRODUCT_UPDATED_PRICE);
 
             mockedValidatorUtils.when(() -> ValidatorUtils.updateFieldIfNotNull(any(ProductEntity.class)
                     , any(), anyString(), any())).thenAnswer(invocation -> productEntity);
@@ -124,10 +127,10 @@ public class ProductServiceTest {
 
             assertNotNull(product);
             assertNotNull(product.getId());
-            assertEquals(ID, product.getId());
-            assertEquals(NAME, product.getName());
-            assertEquals(DESCRIPTION, product.getDescription());
-            assertEquals(PRICE, product.getPrice());
+            assertEquals(TestConstants.ID, product.getId());
+            assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());
+            assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+            assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());
         }
     }
 
@@ -148,23 +151,23 @@ public class ProductServiceTest {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(productEntity));
 
-        ProductVO product = service.findProductById(ID);
+        ProductVO product = service.findProductById(TestConstants.ID);
 
         verify(repository, times(1)).findById(anyString());
 
         assertNotNull(product);
         assertNotNull(product.getId());
-        assertEquals(ID, product.getId());
-        assertEquals(NAME, product.getName());
-        assertEquals(DESCRIPTION, product.getDescription());
-        assertEquals(PRICE, product.getPrice());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
     }
 
     @Test
     void testFindProductById_WhenProductWasNotFoundById_ShouldThrowProductNotFoundException() {
 
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
-                () -> service.findProductById(ID));
+                () -> service.findProductById(TestConstants.ID));
 
         assertNotNull(exception);
         assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND)
@@ -179,7 +182,7 @@ public class ProductServiceTest {
         when(repository.findByProductName(anyString(), any(Pageable.class))).thenReturn(new PageImpl<>(products));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<ProductVO> paginatedProducts = service.findProductsByName(NAME, pageRequest);
+        Page<ProductVO> paginatedProducts = service.findProductsByName(TestConstants.PRODUCT_NAME, pageRequest);
 
         verify(repository, times(1)).findByProductName(anyString(), any(Pageable.class));
         ProductVO product = paginatedProducts.getContent().getFirst();
@@ -189,10 +192,10 @@ public class ProductServiceTest {
         assertNotNull(product.getId());
         assertEquals(1, paginatedProducts.getContent().size());
 
-        assertEquals(ID, product.getId());
-        assertEquals(NAME, product.getName());
-        assertEquals(DESCRIPTION, product.getDescription());
-        assertEquals(PRICE, product.getPrice());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
     }
 
     @Test
@@ -212,32 +215,32 @@ public class ProductServiceTest {
         assertNotNull(product.getId());
         assertEquals(1, paginatedProducts.getContent().size());
 
-        assertEquals(ID, product.getId());
-        assertEquals(NAME, product.getName());
-        assertEquals(DESCRIPTION, product.getDescription());
-        assertEquals(PRICE, product.getPrice());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
     }
 
     @Test
-    void testDeleteProduct_WhenProductWasDeleted_ShouldReturnNothing(){
+    void testDeleteProduct_WhenProductWasDeleted_ShouldReturnNothing() {
 
         when(repository.findById(anyString())).thenReturn(Optional.of(productEntity));
         doNothing().when(repository).delete(any());
 
-        service.deleteProduct(ID);
+        service.deleteProduct(TestConstants.ID);
 
-        verify(repository,times(1)).findById(anyString());
-        verify(repository,times(1)).delete(any());
+        verify(repository, times(1)).findById(anyString());
+        verify(repository, times(1)).delete(any());
     }
 
     @Test
     void TestDeleteProduct_WhenProductWasFoundById_ShouldThrowProductNotFoundException() {
 
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
-                () -> service.deleteProduct(ID));
+                () -> service.deleteProduct(TestConstants.ID));
 
         assertNotNull(exception);
-        assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND),exception.getMessage());
+        assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND), exception.getMessage());
     }
 
 }

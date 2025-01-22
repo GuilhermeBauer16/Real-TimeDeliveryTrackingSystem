@@ -2,21 +2,20 @@ package service;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.VerificationCodeRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.CodeValidatorService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,20 +45,17 @@ class CodeValidatorServiceTest {
     private VerificationCodeRequest verificationCodeRequest;
 
     private static final String EMAIL = "customer@example.com";
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(1);
-    private static final LocalDateTime EXPIRED_CODE_EXPIRATION = LocalDateTime.now().minusDays(1);
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
     private static final boolean AUTHENTICATED = false;
-    private static final String VERIFY_CODE = "574077";
-    private static final String ANOTHER_VERIFY_CODE = "574037";
+
 
     @BeforeEach
     void setUp() {
-        userVO = new UserVO(ID, USERNAME, EMAIL, PASSWORD, ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        verificationCodeRequest = new VerificationCodeRequest(EMAIL, VERIFY_CODE);
+        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
+                AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+        verificationCodeRequest = new VerificationCodeRequest(EMAIL, TestConstants.USER_VERIFY_CODE);
     }
 
     @Test
@@ -80,14 +76,14 @@ class CodeValidatorServiceTest {
     void testEvaluatedVerifyCode_WhenCodeIsInvalid_ShouldThrowInvalidVerificationCodeException() {
 
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
-        verificationCodeRequest.setCode(ANOTHER_VERIFY_CODE);
+        verificationCodeRequest.setCode(TestConstants.USER_UPDATED_VERIFY_CODE);
 
         InvalidVerificationCodeException exception = assertThrows(InvalidVerificationCodeException.class,
                 () -> codeValidatorService.evaluatedVerifyCode(verificationCodeRequest));
 
         assertNotNull(exception);
         assertEquals(String.format(InvalidVerificationCodeException.ERROR.
-                formatErrorMessage(INVALID_VERIFICATION_CODE_MESSAGE), ANOTHER_VERIFY_CODE), exception.getMessage());
+                formatErrorMessage(INVALID_VERIFICATION_CODE_MESSAGE), TestConstants.USER_UPDATED_VERIFY_CODE), exception.getMessage());
     }
 
     @Test
@@ -104,7 +100,7 @@ class CodeValidatorServiceTest {
 
     @Test
     void testEvaluatedVerifyCode_WhenExpirationCodeIsExpired_ShouldThrowExpiredVerificationCodeException() {
-        userVO.setCodeExpiration(EXPIRED_CODE_EXPIRATION);
+        userVO.setCodeExpiration(TestConstants.USER_EXPIRED_CODE_EXPIRATION);
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
 
 
