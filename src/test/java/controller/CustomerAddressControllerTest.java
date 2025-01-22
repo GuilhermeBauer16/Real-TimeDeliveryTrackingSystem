@@ -22,6 +22,7 @@ import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import config.TestConfigs;
+import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -40,7 +41,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -64,7 +64,6 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
     private static CustomerVO customerVO;
-    private static CustomerEntity customerEntity;
     private static AddressVO addressVO;
 
 
@@ -72,25 +71,12 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
     private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
-    private static final String HOST_PREFIX = "http://localhost:";
-    private static final String BEARER_PREFIX = "Bearer ";
-
-
+    
     private static final String PHONE_NUMBER = "5511998765432";
-    private static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
-    private static final String STREET = "123 Main St";
-    private static final String CITY = "Sample City";
-    private static final String STATE = "Sample State";
-    private static final String POSTAL_CODE = "12345";
-    private static final String COUNTRY = "Sample Country";
-
     private static final String EMAIL = "customerAddress@example.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
     private static final boolean AUTHENTICATED = false;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
+
 
     @BeforeAll
     static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired CustomerRepository customerRepository, @Autowired UserRepository userRepository,
@@ -98,13 +84,19 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL, passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME, TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
         addressRepository.save(addressEntity);
         userRepository.save(userEntity);
-        addressVO = new AddressVO(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        customerVO = new CustomerVO(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
-        customerEntity = new CustomerEntity(ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        addressVO = new AddressVO(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        customerVO = new CustomerVO(TestConstants.ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
+        CustomerEntity customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, List.of(addressEntity), userEntity);
         customerRepository.save(customerEntity);
 
 
@@ -115,8 +107,8 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     @Order(1)
     void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing() {
 
-        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(customerVO.getUser().getEmail(), customerVO.getUser().getVerifyCode(),
-                customerVO.getUser().isAuthenticated(), customerVO.getUser().getCodeExpiration());
+        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(customerVO.getUser().getEmail(),
+                customerVO.getUser().getVerifyCode(), customerVO.getUser().isAuthenticated(), customerVO.getUser().getCodeExpiration());
 
 
         given()
@@ -141,7 +133,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
     @Order(2)
     void login() {
 
-        LoginRequest loginRequest = new LoginRequest(customerEntity.getUser().getEmail(), PASSWORD);
+        LoginRequest loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);
 
         LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
@@ -161,8 +153,8 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
 
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())
+                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -191,11 +183,12 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(createdAddress);
         Assertions.assertNotNull(createdAddress.getId());
         assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, createdAddress.getStreet());
-        assertEquals(CITY, createdAddress.getCity());
-        assertEquals(STATE, createdAddress.getState());
-        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-        assertEquals(COUNTRY, createdAddress.getCountry());
+
+        assertEquals(TestConstants.ADDRESS_STREET, createdAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, createdAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, createdAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, createdAddress.getCountry());
 
     }
 
@@ -208,23 +201,25 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
                 .filter(new ResponseLoggingFilter(LogDetail.ALL))
-                .get("/{id}", ID)
+                .get("/{id}", TestConstants.ID)
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
                 .asString();
 
-        AddressVO createdAddress = objectMapper.readValue(content, AddressVO.class);
+        AddressVO address = objectMapper.readValue(content, AddressVO.class);
 
-        Assertions.assertNotNull(createdAddress);
-        Assertions.assertNotNull(createdAddress.getId());
-        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, createdAddress.getStreet());
-        assertEquals(CITY, createdAddress.getCity());
-        assertEquals(STATE, createdAddress.getState());
-        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-        assertEquals(COUNTRY, createdAddress.getCountry());
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getId());
+        assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
+
 
     }
 
@@ -256,11 +251,12 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(paginatedAddress);
         Assertions.assertNotNull(paginatedAddress.getId());
         assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, paginatedAddress.getStreet());
-        assertEquals(CITY, paginatedAddress.getCity());
-        assertEquals(STATE, paginatedAddress.getState());
-        assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
-        assertEquals(COUNTRY, paginatedAddress.getCountry());
+        assertEquals(TestConstants.ADDRESS_STREET, paginatedAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, paginatedAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, paginatedAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, paginatedAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, paginatedAddress.getCountry());
+
 
     }
 
@@ -285,11 +281,13 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(address);
         Assertions.assertNotNull(address.getId());
         assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, address.getStreet());
-        assertEquals(CITY, address.getCity());
-        assertEquals(STATE, address.getState());
-        assertEquals(POSTAL_CODE, address.getPostalCode());
-        assertEquals(COUNTRY, address.getCountry());
+
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
+
 
     }
 
@@ -302,7 +300,7 @@ class CustomerAddressControllerTest extends AbstractionIntegrationTest {
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
                 .filter(new ResponseLoggingFilter(LogDetail.ALL))
-                .delete("/{id}", ID)
+                .delete("/{id}", TestConstants.ID)
                 .then()
                 .statusCode(204)
                 .extract()

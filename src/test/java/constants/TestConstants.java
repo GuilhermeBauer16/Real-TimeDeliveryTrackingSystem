@@ -7,9 +7,13 @@ import java.time.LocalDateTime;
 
 public final class TestConstants {
 
-
+    // ID
     public static final String ID = "5f68880e-7356-4c86-a4a9-f8cc16e2ec87";
     public static final String INVALID_ID = "5f68880";
+
+    //URL
+    public static final String URL_HOST_PREFIX = "http://localhost:";
+    public static final String URL_BEARER_PREFIX = "Bearer ";
 
     // Address
     public static final String ADDRESS_STREET = "123 Main St";

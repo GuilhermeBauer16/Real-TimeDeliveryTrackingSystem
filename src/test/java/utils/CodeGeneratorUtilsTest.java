@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CodeGeneratorUtilsTest {
 
-    private static final String CODE_LENGTH_GREATER_ZERO = "Code length must be greater than zero";
 
     @Test
     void testGenerateCode_WhenLengthIsValid_ShouldReturnGeneratedCode() {

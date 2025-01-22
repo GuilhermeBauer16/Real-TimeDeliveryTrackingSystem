@@ -3,9 +3,8 @@ package repository;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import constants.TestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ContextConfiguration(classes = RealTimeDeliveryTrackingSystemApplication.class) // Specify your main app class here
+@ContextConfiguration(classes = RealTimeDeliveryTrackingSystemApplication.class)
 class VehicleRepositoryTest extends AbstractionIntegrationTest {
 
 
-    private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
-    private static final String NAME = "Voyage";
     private static final String LICENSE_PLATE = "AQE1F34";
-    private static final Type TYPE = Type.CAR;
-    private static final Status STATUS = Status.AVAILABLE;
 
 
     @Autowired
@@ -38,7 +33,8 @@ class VehicleRepositoryTest extends AbstractionIntegrationTest {
     @BeforeEach
     void setUp() {
 
-        vehicleRepository.save(new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS));
+        vehicleRepository.save(new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS));
 
     }
 
@@ -47,9 +43,9 @@ class VehicleRepositoryTest extends AbstractionIntegrationTest {
         VehicleEntity vehicle = vehicleRepository.findByLicensePlate(LICENSE_PLATE).orElse(null);
         assertNotNull(vehicle);
         assertNotNull(vehicle.getId());
-        assertEquals(NAME, vehicle.getName());
+        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());
         assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());
-        assertEquals(TYPE, vehicle.getType());
-        assertEquals(STATUS, vehicle.getStatus());
+        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());
+        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());
     }
 }

@@ -12,8 +12,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
@@ -22,6 +20,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
 import config.TestConfigs;
+import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -38,7 +37,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,33 +60,15 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
     private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
     private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
-    private static final String HOST_PREFIX = "http://localhost:";
 
 
-    private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
-    private static final String NAME = "Voyage";
     private static final String LICENSE_PLATE = "VQZ1F34";
-    private static final Type TYPE = Type.CAR;
-    private static final Status STATUS = Status.AVAILABLE;
-    private static final String BEARER_PREFIX = "Bearer ";
-
     private static final String EMAIL = "driveraddress@gmail.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
-
-
     private static final String PHONE_NUMBER = "5511995765432";
     private static final String DRIVER_LICENSE = "74635220400";
-    private static final String STREET = "123 Main State";
-    private static final String CITY = "Sample Cities";
-    private static final String STATE = "Sample Statess";
-    private static final String POSTAL_CODE = "12345111";
-    private static final String COUNTRY = "Sample Countries";
 
     private static final boolean AUTHENTICATED = false;
-    private static final LocalDateTime CODE_EXPIRATION = LocalDateTime.now().plusDays(5);
-    private static final String VERIFY_CODE = "574077";
 
 
     @BeforeAll
@@ -97,17 +77,24 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
 
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME, VERIFY_CODE, AUTHENTICATED, CODE_EXPIRATION);
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
+
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
+                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
         addressRepository.save(addressEntity);
         userRepository.save(userEntity);
 
-        addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        addressRepository.save(addressEntity);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, LICENSE_PLATE, TYPE, STATUS);
-        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
                 ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
-        driverEntity = new DriverEntity(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+
+        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
                 ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
 
@@ -144,7 +131,7 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
     @Order(2)
     void login() {
 
-        LoginRequest loginRequest = new LoginRequest(driverEntity.getUser().getEmail(), PASSWORD);
+        LoginRequest loginRequest = new LoginRequest(driverEntity.getUser().getEmail(), TestConstants.USER_PASSWORD);
 
         LoginResponse loginResponse = given()
                 .basePath(LOGIN_URL_PREFIX)
@@ -164,8 +151,8 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
 
 
         specification = new RequestSpecBuilder()
-                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, BEARER_PREFIX + loginResponse.getToken())
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())
+                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .disableCsrf()
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -193,11 +180,11 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(createdAddress);
         Assertions.assertNotNull(createdAddress.getId());
         Assertions.assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, createdAddress.getStreet());
-        assertEquals(CITY, createdAddress.getCity());
-        assertEquals(STATE, createdAddress.getState());
-        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-        assertEquals(COUNTRY, createdAddress.getCountry());
+        assertEquals(TestConstants.ADDRESS_STREET, createdAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, createdAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, createdAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, createdAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, createdAddress.getCountry());
 
     }
 
@@ -210,23 +197,23 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
                 .filter(new ResponseLoggingFilter(LogDetail.ALL))
-                .get("/{id}", ID)
+                .get("/{id}", TestConstants.ID)
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
                 .asString();
 
-        AddressVO createdAddress = objectMapper.readValue(content, AddressVO.class);
+        AddressVO address = objectMapper.readValue(content, AddressVO.class);
 
-        Assertions.assertNotNull(createdAddress);
-        Assertions.assertNotNull(createdAddress.getId());
-        assertTrue(createdAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, createdAddress.getStreet());
-        assertEquals(CITY, createdAddress.getCity());
-        assertEquals(STATE, createdAddress.getState());
-        assertEquals(POSTAL_CODE, createdAddress.getPostalCode());
-        assertEquals(COUNTRY, createdAddress.getCountry());
+        Assertions.assertNotNull(address);
+        Assertions.assertNotNull(address.getId());
+        assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
 
     }
 
@@ -250,18 +237,15 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
 
         AddressVO paginatedAddress = paginatedResponse.getContent().getFirst();
 
-        Assertions.assertNotNull(paginatedAddress);
-        Assertions.assertNotNull(paginatedAddress.getId());
-        Assertions.assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
 
         Assertions.assertNotNull(paginatedAddress);
         Assertions.assertNotNull(paginatedAddress.getId());
         Assertions.assertTrue(paginatedAddress.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, paginatedAddress.getStreet());
-        assertEquals(CITY, paginatedAddress.getCity());
-        assertEquals(STATE, paginatedAddress.getState());
-        assertEquals(POSTAL_CODE, paginatedAddress.getPostalCode());
-        assertEquals(COUNTRY, paginatedAddress.getCountry());
+        assertEquals(TestConstants.ADDRESS_STREET, paginatedAddress.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, paginatedAddress.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, paginatedAddress.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, paginatedAddress.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, paginatedAddress.getCountry());
 
     }
 
@@ -286,11 +270,11 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
         Assertions.assertNotNull(address);
         Assertions.assertNotNull(address.getId());
         assertTrue(address.getId().matches("[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"));
-        assertEquals(STREET, address.getStreet());
-        assertEquals(CITY, address.getCity());
-        assertEquals(STATE, address.getState());
-        assertEquals(POSTAL_CODE, address.getPostalCode());
-        assertEquals(COUNTRY, address.getCountry());
+        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());
+        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());
+        assertEquals(TestConstants.ADDRESS_STATE, address.getState());
+        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());
+        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());
 
     }
 
@@ -303,7 +287,7 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
                 .filter(new ResponseLoggingFilter(LogDetail.ALL))
-                .delete("/{id}", ID)
+                .delete("/{id}", TestConstants.ID)
                 .then()
                 .statusCode(204)
                 .extract()

@@ -7,16 +7,14 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Status;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.Type;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import config.TestConfigs;
+import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -58,40 +56,36 @@ class DriverRegistrationControllerTest extends AbstractionIntegrationTest {
 
 
     private static final String URL_PREFIX = "/signInDriver";
-    private static final String HOST_PREFIX = "http://localhost:";
-    private static final String ID = "d8e7df81-2cd4-41a2-a005-62e6d8079716";
-    private static final String NAME = "Voyage";
-    private static final String SECOND_LICENSE_PLATE = "AZX1F34";
-    private static final Type TYPE = Type.CAR;
-    private static final Status STATUS = Status.AVAILABLE;
 
+    private static final String LICENSE_PLATE = "AZX1F34";
     private static final String EMAIL = "john@gmail.com";
-    private static final String USERNAME = "user";
-    private static final String PASSWORD = "password";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;
-
     private static final String PHONE_PREFIX = "+";
     private static final String PHONE_NUMBER = "5511995765432";
     private static final String DRIVER_LICENSE = "75526634674";
-    private static final String STREET = "123 Main StTTate";
-    private static final String CITY = "Sample CitiTTes";
-    private static final String STATE = "Sample StaTTtess";
-    private static final String POSTAL_CODE = "123145111";
-    private static final String COUNTRY = "SaSSmple Countries";
+
 
     @BeforeAll
     static void setUp(@Autowired PasswordEncoder passwordEncoder) {
+
         objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        UserEntity userEntity = new UserEntity(ID, USERNAME, EMAIL, passwordEncoder.encode(PASSWORD), ROLE_NAME);
-        AddressEntity addressEntity = new AddressEntity(ID, STREET, CITY, STATE, POSTAL_CODE, COUNTRY);
-        VehicleEntity vehicleEntity = new VehicleEntity(ID, NAME, SECOND_LICENSE_PLATE, TYPE, STATUS);
-        driverVO = new DriverVO(ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
+
+        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
+                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME);
+
+        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+        driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
                 ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
         specification = new RequestSpecBuilder()
 
-                .setBaseUri(HOST_PREFIX + TestConfigs.SERVER_PORT)
+                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)
                 .setBasePath(URL_PREFIX)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
                 .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
@@ -125,7 +119,7 @@ class DriverRegistrationControllerTest extends AbstractionIntegrationTest {
         assertEquals(PHONE_PREFIX + PHONE_NUMBER, createdDriver.getPhoneNumber());
         assertEquals(1, createdDriver.getAddresses().size());
         assertEquals(EMAIL, createdDriver.getUserRegistrationResponse().getEmail());
-        assertEquals(USERNAME, createdDriver.getUserRegistrationResponse().getName());
+        assertEquals(TestConstants.USER_USERNAME, createdDriver.getUserRegistrationResponse().getName());
         assertEquals(1, createdDriver.getVehicles().size());
 
         driverVO.setId(createdDriver.getId());
