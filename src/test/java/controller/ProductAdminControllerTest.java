@@ -167,6 +167,8 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
 
         productVO.setId(product.getId());
     }
@@ -198,6 +200,8 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
         assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
 
     }
 

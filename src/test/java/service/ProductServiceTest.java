@@ -83,6 +83,7 @@ public class ProductServiceTest {
             assertEquals(TestConstants.PRODUCT_NAME, product.getName());
             assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
             assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+            assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
         }
     }
 
@@ -131,6 +132,7 @@ public class ProductServiceTest {
             assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());
             assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
             assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());
+            assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
         }
     }
 
@@ -161,6 +163,7 @@ public class ProductServiceTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
     }
 
     @Test
@@ -196,6 +199,8 @@ public class ProductServiceTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
     }
 
     @Test
@@ -219,6 +224,8 @@ public class ProductServiceTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
     }
 
     @Test

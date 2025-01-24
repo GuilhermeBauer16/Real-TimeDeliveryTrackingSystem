@@ -61,7 +61,7 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
-
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
 
     }
 
