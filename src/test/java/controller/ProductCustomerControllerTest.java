@@ -83,7 +83,7 @@ class ProductCustomerControllerTest extends AbstractionIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
 
         AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY
                 , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
@@ -100,7 +100,7 @@ class ProductCustomerControllerTest extends AbstractionIntegrationTest {
         customerRepository.save(customerEntity);
 
         ProductEntity productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
         productRepository.save(productEntity);
 
 
@@ -190,6 +190,8 @@ class ProductCustomerControllerTest extends AbstractionIntegrationTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
 
     }
 

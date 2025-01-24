@@ -41,6 +41,9 @@ public enum ExceptionDetails {
 
     //Utils
     INVALID_UUID_FORMAT_MESSAGE("The ID %s needs to be in a UUID format", HttpStatus.BAD_REQUEST),
+    QUANTITY_LOWER_THAN_ONE_MESSAGE("Occur an error into the registration of a quantity in reason of: %s", HttpStatus.BAD_REQUEST),
+    PRICE_LOWER_THAN_ZERO_MESSAGE("Occur an error into the registration of a price in reason of: %s", HttpStatus.BAD_REQUEST),
+    QUANTITY_REQUIRED_HIGHER_THAN_AVAILABLE_QUANTITY_MESSAGE("Occur an error into the registration of a quantity in reason of: %s", HttpStatus.BAD_REQUEST),
     INVALID_PHONE_NUMBER_MESSAGE("Occur an error into the registration of a phone number in reason of: %s", HttpStatus.BAD_REQUEST),
     FIELD_NOT_FOUND_MESSAGE("The field %s can not be null or empty!", HttpStatus.NOT_FOUND),
     EXCEPTION_TYPE_NOT_THROWN("Can not thrown the exception of the type: %s", HttpStatus.NOT_FOUND),
