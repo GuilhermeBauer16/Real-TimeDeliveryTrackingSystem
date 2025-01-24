@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public class ProductFactory {
 
-    public static ProductEntity create(String name, String description, Double price) {
-        return new ProductEntity(UUID.randomUUID().toString(), name, description, price);
+    public static ProductEntity create(String name, String description, Double price,Integer quantity) {
+        return new ProductEntity(UUID.randomUUID().toString(), name, description, price, quantity);
     }
 
 

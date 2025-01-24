@@ -42,7 +42,7 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
     void setUp() {
 
         productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
         repository.save(productEntity);
 
     }
@@ -61,7 +61,7 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
         assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
-
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
 
     }
 

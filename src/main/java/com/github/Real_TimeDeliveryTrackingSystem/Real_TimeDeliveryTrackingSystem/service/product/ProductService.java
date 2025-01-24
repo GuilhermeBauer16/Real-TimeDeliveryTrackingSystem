@@ -9,6 +9,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.ProductServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PriceUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.QuantityUtils;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +38,9 @@ public class ProductService implements ProductServiceContract {
     public ProductVO createProduct(ProductVO productVO) {
 
         ValidatorUtils.checkObjectIsNullOrThrowException(productVO, INVALID_PRODUCT_MESSAGE, InvalidProductException.class);
-        ProductEntity productEntity = ProductFactory.create(productVO.getName(), productVO.getDescription(), productVO.getPrice());
+        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());
+        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());
+        ProductEntity productEntity = ProductFactory.create(productVO.getName(), productVO.getDescription(), productVO.getPrice(),productVO.getQuantity());
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(productEntity, INVALID_PRODUCT_MESSAGE, FieldNotFound.class);
         ProductEntity savedProduct = repository.save(productEntity);
         return BuildMapper.parseObject(new ProductVO(), savedProduct);
@@ -50,6 +54,8 @@ public class ProductService implements ProductServiceContract {
 
         ProductEntity updatedProduct = ValidatorUtils.updateFieldIfNotNull(productEntity, productVO, PRODUCT_NOT_FOUND, FieldNotFound.class);
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(updatedProduct, PRODUCT_NOT_FOUND, FieldNotFound.class);
+        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());
+        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());
         repository.save(updatedProduct);
         
         return BuildMapper.parseObject(new ProductVO(), updatedProduct);
