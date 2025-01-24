@@ -42,7 +42,7 @@ class ProductRepositoryTest extends AbstractionIntegrationTest {
     void setUp() {
 
         productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
         repository.save(productEntity);
 
     }

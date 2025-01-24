@@ -47,6 +47,7 @@ public final class TestConstants {
     public static final String PRODUCT_NAME = "Shoes";
     public static final String PRODUCT_DESCRIPTION = "That is the new version of the Shoes";
     public static final Double PRODUCT_PRICE = 100D;
+    public static final Integer PRODUCT_QUANTITY = 12;
     public static final Double PRODUCT_UPDATED_PRICE = 100D;
     public static final String PRODUCT_UPDATED_NAME = "AirMax";
 }

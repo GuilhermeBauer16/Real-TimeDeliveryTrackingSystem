@@ -70,7 +70,7 @@ class ProductAdminControllerTest extends AbstractionIntegrationTest {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE);
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
 
         UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
                 EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
