@@ -65,14 +65,16 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
         if (shoppingCartByCustomerEmail.isPresent()) {
 
-            ShoppingCartEntity shoppingCartModel = shoppingCartByCustomerEmail.get();
-            Double totalPrice = shoppingCartModel.getTotalPrice();
+
+            ShoppingCartEntity shoppingCartEntity = shoppingCartByCustomerEmail.get();
 
 
-            List<TemporaryProductEntity> products = shoppingCartModel.getTemporaryProducts();
+            List<TemporaryProductEntity> products = shoppingCartEntity.getTemporaryProducts();
 
 
             if (verifyIfProductAlreadyAdd(productVO.getId(), products)) {
+
+                addProductIfWasNotAdd(productVO.getId(), shoppingCartEntity);
 
                 TemporaryProductEntity temporaryProductEntity = temporaryProductService.findProductById(productVO.getId());
 
@@ -80,42 +82,38 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
                     productVO.setQuantity(shoppingCartRequest.getQuantity());
                     productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                    double updatedTotalPrice = shoppingCartModel.getTotalPrice() - productVO.getPrice();
-                    TemporaryProductEntity updatedTemporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
-                    TemporaryProductEntity savedProductEntity = temporaryProductRepository.save(updatedTemporaryProductEntity);
-                    shoppingCartModel.setTotalPrice(shoppingCartModel.getTotalPrice() - updatedTotalPrice);
+                    double updatedTotalPrice = shoppingCartEntity.getTotalPrice() - productVO.getPrice();
+                    saveTemporaryProduct(productVO);
+
+                    shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() - updatedTotalPrice);
 
                 }
 
                 if (shoppingCartRequest.getQuantity() > temporaryProductEntity.getQuantity()) {
+
                     int updatedQuantity = shoppingCartRequest.getQuantity() - temporaryProductEntity.getQuantity();
                     double updatedPrice = updatedQuantity * productVO.getPrice();
                     productVO.setQuantity(shoppingCartRequest.getQuantity());
                     productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                    shoppingCartModel.setTotalPrice(shoppingCartModel.getTotalPrice() + updatedPrice);
+                    saveTemporaryProduct(productVO);
+                    shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + updatedPrice);
 
                 }
-
-
-                List<TemporaryProductEntity> updatedtempList = changeQuantityInProductAlreadyAdd(temporaryProductEntity, products);
-                shoppingCartModel.setTemporaryProducts(new ArrayList<>(updatedtempList));
 
 
             } else {
 
                 productVO.setQuantity(shoppingCartRequest.getQuantity());
                 productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                TemporaryProductEntity updatedTemporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
-                TemporaryProductEntity savedProductEntity = temporaryProductRepository.save(updatedTemporaryProductEntity);
-                products.add(savedProductEntity);
-                shoppingCartModel.setTemporaryProducts(new ArrayList<>(products));
-                shoppingCartModel.setTotalPrice(shoppingCartModel.getTotalPrice() + productVO.getPrice());
+                TemporaryProductEntity temporaryProductEntity = saveTemporaryProduct(productVO);
+                shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + productVO.getPrice());
+                shoppingCartEntity.getTemporaryProducts().add(temporaryProductEntity);
 
 
             }
 
 
-            ShoppingCartEntity savedProduct = repository.save(shoppingCartModel);
+            repository.save(shoppingCartEntity);
 
 
             return productVO;
@@ -131,16 +129,19 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
         productVO.setQuantity(shoppingCartRequest.getQuantity());
         productVO.setPrice(productVO.getPrice() * shoppingCartRequest.getQuantity());
-        Double totalPrice = productVO.getPrice();
 
-        TemporaryProductEntity temporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
-        TemporaryProductEntity savedProductEntity = temporaryProductService.createProduct(temporaryProductEntity);
+        tempProducts.add(saveTemporaryProduct(productVO));
 
-        tempProducts.add(savedProductEntity);
-        ShoppingCartEntity shoppingCartModel = ShoppingCartFactory.create(customerEntity, productEntities, totalPrice, tempProducts);
+        ShoppingCartEntity shoppingCartModel = ShoppingCartFactory.create(customerEntity, productEntities, productVO.getPrice(), tempProducts);
         repository.save(shoppingCartModel);
 
         return productVO;
+    }
+
+    private TemporaryProductEntity saveTemporaryProduct(ProductVO productVO) {
+
+        TemporaryProductEntity updatedTemporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
+        return temporaryProductRepository.save(updatedTemporaryProductEntity);
     }
 
     @Override
@@ -195,6 +196,18 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
         }
 
         return false;
+    }
+
+    private void addProductIfWasNotAdd(String productId, ShoppingCartEntity shoppingCartEntity) {
+        boolean productExists = shoppingCartEntity.getProducts()
+                .stream()
+                .anyMatch(product -> product.getId().equals(productId));
+
+        if (!productExists) {
+            ProductVO productById = productService.findProductById(productId);
+
+            shoppingCartEntity.getProducts().add(BuildMapper.parseObject(new ProductEntity(), productById));
+        }
     }
 
     private List<TemporaryProductEntity> changeQuantityInProductAlreadyAdd(TemporaryProductEntity actualProductEntity, List<TemporaryProductEntity> temporaryProductEntities) {
