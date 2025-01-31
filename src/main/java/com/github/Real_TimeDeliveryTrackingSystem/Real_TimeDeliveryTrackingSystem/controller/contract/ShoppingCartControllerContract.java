@@ -1,6 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DuplicatedLicensePlateException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +50,10 @@ public interface ShoppingCartControllerContract {
     ResponseEntity<ProductVO> addProductsToShoppingCart(@RequestBody ShoppingCartRequest shoppingCartRequest) throws InstantiationException, IllegalAccessException, NoSuchFieldException;
 
     @GetMapping
-    ResponseEntity<Page<ProductEntity>> findShoppingCartProducts(Pageable pageable);
+    ResponseEntity<Page<TemporaryProductEntity>> findShoppingCartProducts(Pageable pageable);
+
+    @DeleteMapping
+    ResponseEntity<Void> deleteShoppingCartProducts();
 
 
 

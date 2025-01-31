@@ -1,7 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract.ShoppingCartControllerContract;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.ShoppingCartService;
@@ -33,9 +33,17 @@ public class ShoppingCartController implements ShoppingCartControllerContract {
     }
 
     @Override
-    public ResponseEntity<Page<ProductEntity>> findShoppingCartProducts(Pageable pageable) {
+    public ResponseEntity<Page<TemporaryProductEntity>> findShoppingCartProducts(Pageable pageable) {
 
-        Page<ProductEntity> shoppingCartProducts = service.findShoppingCartProducts(pageable);
+        Page<TemporaryProductEntity> shoppingCartProducts = service.findShoppingCartProducts(pageable);
         return ResponseEntity.ok(shoppingCartProducts);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteShoppingCartProducts() {
+
+        service.deleteShoppingCart();
+
+        return ResponseEntity.noContent().build();
     }
 }

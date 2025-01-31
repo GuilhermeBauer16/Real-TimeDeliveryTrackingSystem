@@ -44,5 +44,5 @@ public class ShoppingCartEntity {
             joinColumns = @JoinColumn(name = "cart_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<ProductEntity> temporaryProducts;
+    private List<TemporaryProductEntity> temporaryProducts;
 }

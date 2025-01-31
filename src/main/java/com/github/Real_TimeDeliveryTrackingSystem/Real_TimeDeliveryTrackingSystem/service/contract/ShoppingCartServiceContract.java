@@ -1,6 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ShoppingCartVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
@@ -17,5 +18,7 @@ public interface ShoppingCartServiceContract {
 
     ShoppingCartVO findShoppingCartById(ShoppingCartVO shoppingCartVO);
 
-    Page<ProductEntity> findShoppingCartProducts(Pageable pageable);
+    Page<TemporaryProductEntity> findShoppingCartProducts(Pageable pageable);
+
+    void deleteShoppingCart();
 }
