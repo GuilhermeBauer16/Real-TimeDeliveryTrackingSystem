@@ -7,16 +7,19 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ShoppingCartVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ShoppingCartNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.ShoppingCartFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ShoppingCartRepository;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.TemporaryProductRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.ShoppingCartServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer.CustomerService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.QuantityUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,15 +39,15 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     private final CustomerService customerService;
     private final ProductService productService;
     private final ShoppingCartRepository repository;
-    private final TemporaryProductRepository temporaryProductRepository;
     private final TemporaryProductService temporaryProductService;
 
+    private static final String SHOPPING_CART_NOT_FOUND_MESSAGE = "The ShoppingCart was not found!";
+
     @Autowired
-    public ShoppingCartService(CustomerService customerService, ProductService productService, ShoppingCartRepository repository, TemporaryProductRepository temporaryProductRepository, TemporaryProductService temporaryProductService) {
+    public ShoppingCartService(CustomerService customerService, ProductService productService, ShoppingCartRepository repository, TemporaryProductService temporaryProductService) {
         this.customerService = customerService;
         this.productService = productService;
         this.repository = repository;
-        this.temporaryProductRepository = temporaryProductRepository;
         this.temporaryProductService = temporaryProductService;
     }
 
@@ -118,7 +121,6 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
             return productVO;
 
-
         }
 
         List<ProductEntity> productEntities = new ArrayList<>();
@@ -141,7 +143,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     private TemporaryProductEntity saveTemporaryProduct(ProductVO productVO) {
 
         TemporaryProductEntity updatedTemporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
-        return temporaryProductRepository.save(updatedTemporaryProductEntity);
+        return temporaryProductService.createProduct(updatedTemporaryProductEntity);
     }
 
     @Override
@@ -150,8 +152,14 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     }
 
     @Override
-    public ShoppingCartVO findShoppingCartById(ShoppingCartVO shoppingCartVO) {
-        return null;
+    public ShoppingCartResponse findShoppingCart() {
+
+        ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
+                .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
+
+        ShoppingCartResponse shoppingCartResponse1 = BuildMapper.parseObject(new ShoppingCartResponse(), shoppingCartEntity);
+
+        return shoppingCartResponse1;
     }
 
 
@@ -159,9 +167,10 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     public Page<TemporaryProductEntity> findShoppingCartProducts(Pageable pageable) {
 
         ShoppingCartEntity shoppingCartModel = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
-                .orElseThrow(() -> new RuntimeException("This shopping cart does not exist"));
+                .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
 
-        Page<TemporaryProductEntity> allTemporaryProductsByShoppingCart = repository.findAllTemporaryProductsByShoppingCart(shoppingCartModel.getId(), pageable);
+        Page<TemporaryProductEntity> allTemporaryProductsByShoppingCart = repository.
+                findAllTemporaryProductsByShoppingCart(shoppingCartModel.getId(), pageable);
 
         return new PageImpl<>(allTemporaryProductsByShoppingCart.getContent(), pageable, allTemporaryProductsByShoppingCart.getTotalElements());
     }
@@ -170,7 +179,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     public void deleteShoppingCart() {
 
         ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
-                .orElseThrow(() -> new RuntimeException("This shopping cart does not exist"));
+                .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
 
         repository.delete(shoppingCartEntity);
 
@@ -199,6 +208,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     }
 
     private void addProductIfWasNotAdd(String productId, ShoppingCartEntity shoppingCartEntity) {
+
         boolean productExists = shoppingCartEntity.getProducts()
                 .stream()
                 .anyMatch(product -> product.getId().equals(productId));

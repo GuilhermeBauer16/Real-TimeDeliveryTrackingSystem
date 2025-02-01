@@ -4,6 +4,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,13 @@ public class ShoppingCartController implements ShoppingCartControllerContract {
 
         Page<TemporaryProductEntity> shoppingCartProducts = service.findShoppingCartProducts(pageable);
         return ResponseEntity.ok(shoppingCartProducts);
+    }
+
+    @Override
+    public ResponseEntity<ShoppingCartResponse> findShoppingCartById() {
+
+        ShoppingCartResponse shoppingCartById = service.findShoppingCart();
+        return ResponseEntity.ok(shoppingCartById);
     }
 
     @Override
