@@ -2,6 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
 import org.springframework.data.domain.Page;
@@ -17,29 +18,29 @@ public interface TemporaryProductServiceContract {
     /**
      * Creates a new product based on the provided product details.
      *
-     * @param productVO the product details to be saved
+     * @param temporaryProductVO the product details to be saved
      * @return the created {@link ProductVO}
      * @throws InvalidProductException
      */
-    TemporaryProductEntity createProduct(TemporaryProductEntity productVO);
+    TemporaryProductVO createTemporaryProduct(TemporaryProductVO temporaryProductVO);
 
     /**
      * Updates an existing product based on the provided product details.
      *
-     * @param productVO the product details to update
+     * @param temporaryProductVO the product details to update
      * @return the updated {@link ProductVO}
      * @throws ProductNotFoundException if the product does not exist
      */
-    TemporaryProductEntity updateProduct(TemporaryProductEntity productVO);
+    TemporaryProductVO updateTemporaryProduct(TemporaryProductVO temporaryProductVO);
 
     /**
      * Retrieves a product by its ID.
      *
-     * @param productId the ID of the product to retrieve
+     * @param id the ID of the product to retrieve
      * @return the found product
      * @throws ProductNotFoundException if no product with the given ID exists
      */
-    TemporaryProductEntity findProductById(String productId);
+    TemporaryProductVO findTemporaryProductById(String id);
 
     /**
      * Retrieves a paginated list of all products.
@@ -52,9 +53,9 @@ public interface TemporaryProductServiceContract {
     /**
      * Deletes a product by its ID.
      *
-     * @param productId the ID of the product to delete
+     * @param id the ID of the product to delete
      * @throws ProductNotFoundException if no product with the given ID exists
      */
-    void deleteProduct(String productId);
+    void deleteTemporaryProduct(String id);
 
 }

@@ -2,7 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ShoppingCartVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
 import org.springframework.data.domain.Page;
@@ -12,11 +12,9 @@ public interface ShoppingCartServiceContract {
 
     ProductVO addToShoppingCart(ShoppingCartRequest shoppingCartRequest);
 
-    ShoppingCartVO updateShoppingCart(ShoppingCartVO shoppingCartVO);
+    TemporaryProductVO findShoppingCartTemporaryProductById(String id);
 
-    TemporaryProductEntity findShoppingCartTemporaryProductById(String id);
-
-    void deleteShoppingCartProductById(String id);
+    void deleteShoppingCartTemporaryProductById(String id);
 
     ShoppingCartResponse findShoppingCart();
 

@@ -1,17 +1,14 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product;
 
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.ProductFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.TemporaryProductFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.TemporaryProductRepository;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.ProductServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.TemporaryProductServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PriceUtils;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.QuantityUtils;
@@ -21,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,51 +36,43 @@ public class TemporaryProductService implements TemporaryProductServiceContract 
         this.repository = temporaryProductRepository;
     }
 
-    @Override
-    public TemporaryProductEntity createProduct(TemporaryProductEntity productVO) {
 
-        ValidatorUtils.checkObjectIsNullOrThrowException(productVO, INVALID_PRODUCT_MESSAGE, InvalidProductException.class);
-        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());
-        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());
-        TemporaryProductEntity productEntity = TemporaryProductFactory.create(productVO.getId(),productVO.getName(), productVO.getDescription(), productVO.getPrice(),productVO.getQuantity());
+    @Override
+    public TemporaryProductVO createTemporaryProduct(TemporaryProductVO temporaryProductVO) {
+
+        ValidatorUtils.checkObjectIsNullOrThrowException(temporaryProductVO, INVALID_PRODUCT_MESSAGE, InvalidProductException.class);
+        QuantityUtils.checkIfQuantityIsHigherThanOne(temporaryProductVO.getQuantity());
+        PriceUtils.checkIfPriceIsHigherThanZero(temporaryProductVO.getPrice());
+        TemporaryProductEntity productEntity = TemporaryProductFactory.create(temporaryProductVO.getId(), temporaryProductVO.getName(), temporaryProductVO.getDescription(), temporaryProductVO.getPrice(), temporaryProductVO.getQuantity());
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(productEntity, INVALID_PRODUCT_MESSAGE, FieldNotFound.class);
-        TemporaryProductEntity savedProduct = repository.save(productEntity);
-        return savedProduct;
+        TemporaryProductEntity savedTemporaryProduct = repository.save(productEntity);
+        return BuildMapper.parseObject(new TemporaryProductVO(), savedTemporaryProduct);
     }
 
     @Override
-    public TemporaryProductEntity updateProduct(TemporaryProductEntity productVO) {
+    public TemporaryProductVO updateTemporaryProduct(TemporaryProductVO temporaryProductVO) {
 
-        TemporaryProductEntity productEntity = repository.findById(productVO.getId())
+        TemporaryProductEntity temporaryProductEntity = repository.findById(temporaryProductVO.getId())
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
 
-        TemporaryProductEntity updatedProduct = ValidatorUtils.updateFieldIfNotNull(productEntity, productVO, PRODUCT_NOT_FOUND, FieldNotFound.class);
+        TemporaryProductEntity updatedProduct = ValidatorUtils.updateFieldIfNotNull(temporaryProductEntity, temporaryProductVO, PRODUCT_NOT_FOUND, FieldNotFound.class);
         ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(updatedProduct, PRODUCT_NOT_FOUND, FieldNotFound.class);
-        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());
-        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());
-        repository.save(updatedProduct);
-        
-        return updatedProduct;
+        QuantityUtils.checkIfQuantityIsHigherThanOne(temporaryProductVO.getQuantity());
+        PriceUtils.checkIfPriceIsHigherThanZero(temporaryProductVO.getPrice());
+        TemporaryProductEntity savedUpdatedProduct = repository.save(updatedProduct);
+
+        return BuildMapper.parseObject(new TemporaryProductVO(), savedUpdatedProduct);
+
     }
 
     @Override
-    public TemporaryProductEntity findProductById(String productId) {
+    public TemporaryProductVO findTemporaryProductById(String id) {
 
-        TemporaryProductEntity productEntity = repository.findById(productId).orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
-        return productEntity;
+        TemporaryProductEntity temporaryProductEntity = repository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+
+        return BuildMapper.parseObject(new TemporaryProductVO(), temporaryProductEntity);
     }
-
-//    @Override
-//    public Page<ProductVO> findProductsByName(String name,Pageable pageable) {
-//
-//        Page<ProductEntity> products = repository.findByProductName(name, pageable);
-//        List<ProductVO> productVOS = products.getContent().stream().map(productEntity ->
-//                BuildMapper.parseObject(new ProductVO(), productEntity)).toList();
-//
-//
-//
-//        return new PageImpl<>(productVOS,pageable,products.getTotalElements());
-//    }
 
     @Override
     public Page<ProductVO> findAllProducts(Pageable pageable) {
@@ -95,10 +85,24 @@ public class TemporaryProductService implements TemporaryProductServiceContract 
     }
 
     @Override
-    public void deleteProduct(String productId) {
+    public void deleteTemporaryProduct(String id) {
 
-        TemporaryProductEntity productEntity = repository.findById(productId).orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
-        repository.delete(productEntity);
+        TemporaryProductEntity temporaryProductEntity = repository
+                .findById(id).orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+        repository.delete(temporaryProductEntity);
 
     }
+
+    //    @Override
+//    public Page<ProductVO> findProductsByName(String name,Pageable pageable) {
+//
+//        Page<ProductEntity> products = repository.findByProductName(name, pageable);
+//        List<ProductVO> productVOS = products.getContent().stream().map(productEntity ->
+//                BuildMapper.parseObject(new ProductVO(), productEntity)).toList();
+//
+//
+//
+//        return new PageImpl<>(productVOS,pageable,products.getTotalElements());
+//    }
+
 }

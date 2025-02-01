@@ -6,9 +6,9 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ShoppingCartVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotAssociatedWithTheCustomerException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ShoppingCartNotFoundException;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.ShoppingCartFactory;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ShoppingCartRepository;
@@ -19,7 +19,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.QuantityUtils;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,6 +41,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     private final TemporaryProductService temporaryProductService;
 
     private static final String SHOPPING_CART_NOT_FOUND_MESSAGE = "The ShoppingCart was not found!";
+    private static final String PRODUCT_NOT_ASSOCIATED_WITH_USER_MESSAGE = "This product is not associated with this Customer!";
 
     @Autowired
     public ShoppingCartService(CustomerService customerService, ProductService productService, ShoppingCartRepository repository, TemporaryProductService temporaryProductService) {
@@ -75,42 +75,46 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
             List<TemporaryProductEntity> products = shoppingCartEntity.getTemporaryProducts();
 
 
-            if (verifyIfProductAlreadyAdd(productVO.getId(), products)) {
+            if (verifyIfProductAlreadyAddToCustomerList(productVO.getId(), products)) {
 
-                addProductIfWasNotAdd(productVO.getId(), shoppingCartEntity);
+                addProductIfWasNotAdded(productVO.getId(), shoppingCartEntity);
 
-                TemporaryProductEntity temporaryProductEntity = temporaryProductService.findProductById(productVO.getId());
+                TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(productVO.getId());
 
-                if (shoppingCartRequest.getQuantity() < temporaryProductEntity.getQuantity()) {
+                if (shoppingCartRequest.getQuantity() < temporaryProductById.getQuantity()) {
 
-                    productVO.setQuantity(shoppingCartRequest.getQuantity());
-                    productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                    double updatedTotalPrice = shoppingCartEntity.getTotalPrice() - productVO.getPrice();
-                    saveTemporaryProduct(productVO);
+                    ProductVO updatedProduct = updateProduct(shoppingCartRequest.getQuantity(), productVO);
+                    double updatedTotalPrice = shoppingCartEntity.getTotalPrice() - updatedProduct.getPrice();
+                    TemporaryProductVO temporaryProductVO = BuildMapper.parseObject(new TemporaryProductVO(), updatedProduct);
+                    temporaryProductService.updateTemporaryProduct(temporaryProductVO);
 
                     shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() - updatedTotalPrice);
 
                 }
 
-                if (shoppingCartRequest.getQuantity() > temporaryProductEntity.getQuantity()) {
+                if (shoppingCartRequest.getQuantity() > temporaryProductById.getQuantity()) {
 
-                    int updatedQuantity = shoppingCartRequest.getQuantity() - temporaryProductEntity.getQuantity();
+                    int updatedQuantity = shoppingCartRequest.getQuantity() - temporaryProductById.getQuantity();
                     double updatedPrice = updatedQuantity * productVO.getPrice();
-                    productVO.setQuantity(shoppingCartRequest.getQuantity());
-                    productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                    saveTemporaryProduct(productVO);
+                    ProductVO updatedProduct = updateProduct(shoppingCartRequest.getQuantity(), productVO);
+                    TemporaryProductVO temporaryProductVO = BuildMapper.parseObject(new TemporaryProductVO(), updatedProduct);
+                    temporaryProductService.updateTemporaryProduct(temporaryProductVO);
                     shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + updatedPrice);
+
 
                 }
 
 
             } else {
 
-                productVO.setQuantity(shoppingCartRequest.getQuantity());
-                productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
-                TemporaryProductEntity temporaryProductEntity = saveTemporaryProduct(productVO);
-                shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + productVO.getPrice());
+                ProductVO updatedProduct = updateProduct(shoppingCartRequest.getQuantity(), productVO);
+                TemporaryProductEntity temporaryProductEntity = saveTemporaryProduct(updatedProduct);
+                shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + updatedProduct.getPrice());
                 shoppingCartEntity.getTemporaryProducts().add(temporaryProductEntity);
+
+
+
+
 
 
             }
@@ -129,26 +133,51 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
         productEntities.add(BuildMapper.parseObject(new ProductEntity(), productVO));
 
-        productVO.setQuantity(shoppingCartRequest.getQuantity());
-        productVO.setPrice(productVO.getPrice() * shoppingCartRequest.getQuantity());
+        ProductVO updatedProduct = updateProduct(shoppingCartRequest.getQuantity(), productVO);
 
-        tempProducts.add(saveTemporaryProduct(productVO));
+        tempProducts.add(saveTemporaryProduct(updatedProduct));
 
         ShoppingCartEntity shoppingCartModel = ShoppingCartFactory.create(customerEntity, productEntities, productVO.getPrice(), tempProducts);
         repository.save(shoppingCartModel);
 
-        return productVO;
+        return updatedProduct;
     }
 
-    private TemporaryProductEntity saveTemporaryProduct(ProductVO productVO) {
 
-        TemporaryProductEntity updatedTemporaryProductEntity = BuildMapper.parseObject(new TemporaryProductEntity(), productVO);
-        return temporaryProductService.createProduct(updatedTemporaryProductEntity);
+
+    @Override
+    public TemporaryProductVO findShoppingCartTemporaryProductById(String id) {
+
+        ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
+                .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
+
+        if (!verifyIfProductAlreadyAddToCustomerList(id, shoppingCartEntity.getTemporaryProducts())
+        ) {
+            throw new ProductNotAssociatedWithTheCustomerException(PRODUCT_NOT_ASSOCIATED_WITH_USER_MESSAGE);
+        }
+
+        return temporaryProductService.findTemporaryProductById(id);
     }
 
     @Override
-    public ShoppingCartVO updateShoppingCart(ShoppingCartVO shoppingCartVO) {
-        return null;
+    @Transactional
+    public void deleteShoppingCartTemporaryProductById(String id) {
+
+        ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
+                .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
+
+        if (!verifyIfProductAlreadyAddToCustomerList(id, shoppingCartEntity.getTemporaryProducts())) {
+
+            throw new ProductNotAssociatedWithTheCustomerException(PRODUCT_NOT_ASSOCIATED_WITH_USER_MESSAGE);
+        }
+
+        TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(id);
+        shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() - temporaryProductById.getPrice());
+        repository.save(shoppingCartEntity);
+
+        temporaryProductService.deleteTemporaryProduct(id);
+
+
     }
 
     @Override
@@ -157,9 +186,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
         ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
                 .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
 
-        ShoppingCartResponse shoppingCartResponse1 = BuildMapper.parseObject(new ShoppingCartResponse(), shoppingCartEntity);
-
-        return shoppingCartResponse1;
+        return BuildMapper.parseObject(new ShoppingCartResponse(), shoppingCartEntity);
     }
 
 
@@ -185,6 +212,19 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
     }
 
+    private static ProductVO updateProduct(int quantity, ProductVO productVO) {
+        productVO.setQuantity(quantity);
+        productVO.setPrice(productVO.getPrice() * productVO.getQuantity());
+        return productVO;
+    }
+
+    private TemporaryProductEntity saveTemporaryProduct(ProductVO productVO) {
+
+        TemporaryProductVO temporaryProductVO = BuildMapper.parseObject(new TemporaryProductVO(), productVO);
+        TemporaryProductVO savedTemporaryProduct = temporaryProductService.createTemporaryProduct(temporaryProductVO);
+        return BuildMapper.parseObject(new TemporaryProductEntity(), savedTemporaryProduct);
+    }
+
     private String retrieveUserEmail() {
 
         UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -193,7 +233,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     }
 
 
-    private boolean verifyIfProductAlreadyAdd(String productId, List<TemporaryProductEntity> productEntities) {
+    private boolean verifyIfProductAlreadyAddToCustomerList(String productId, List<TemporaryProductEntity> productEntities) {
 
 
         for (TemporaryProductEntity productEntity : productEntities) {
@@ -207,7 +247,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
         return false;
     }
 
-    private void addProductIfWasNotAdd(String productId, ShoppingCartEntity shoppingCartEntity) {
+    private void addProductIfWasNotAdded(String productId, ShoppingCartEntity shoppingCartEntity) {
 
         boolean productExists = shoppingCartEntity.getProducts()
                 .stream()
@@ -218,21 +258,6 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
             shoppingCartEntity.getProducts().add(BuildMapper.parseObject(new ProductEntity(), productById));
         }
-    }
-
-    private List<TemporaryProductEntity> changeQuantityInProductAlreadyAdd(TemporaryProductEntity actualProductEntity, List<TemporaryProductEntity> temporaryProductEntities) {
-
-
-        for (TemporaryProductEntity productEntity : temporaryProductEntities) {
-
-            if (productEntity.getId().equals(actualProductEntity.getId())) {
-                productEntity.setQuantity(actualProductEntity.getQuantity());
-                productEntity.setPrice(actualProductEntity.getPrice());
-                return temporaryProductEntities;
-            }
-        }
-
-        return temporaryProductEntities;
     }
 
 

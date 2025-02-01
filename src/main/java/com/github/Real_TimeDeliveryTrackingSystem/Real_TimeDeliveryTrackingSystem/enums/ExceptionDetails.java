@@ -52,6 +52,7 @@ public enum ExceptionDetails {
 
     INVALID_PRODUCT_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.NOT_FOUND),
     PRODUCT_NOT_FOUND_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.NOT_FOUND),
+    PRODUCT_NOT_ASSOCIATED_WITH_CUSTOMER_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.BAD_REQUEST),
 
     // Shopping Cart
     SHOPPING_CART_NOT_FOUND_MESSAGE("Occur an error in find the product for the reason: %s", HttpStatus.NOT_FOUND);
