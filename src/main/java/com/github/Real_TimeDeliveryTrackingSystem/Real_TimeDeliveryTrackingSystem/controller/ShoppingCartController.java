@@ -41,9 +41,9 @@ public class ShoppingCartController implements ShoppingCartControllerContract {
     }
 
     @Override
-    public ResponseEntity<Page<TemporaryProductEntity>> findShoppingCartTemporaryProducts(Pageable pageable) {
+    public ResponseEntity<Page<TemporaryProductVO>> findShoppingCartTemporaryProducts(Pageable pageable) {
 
-        Page<TemporaryProductEntity> shoppingCartProducts = service.findShoppingCartProducts(pageable);
+        Page<TemporaryProductVO> shoppingCartProducts = service.findShoppingCartProducts(pageable);
         return ResponseEntity.ok(shoppingCartProducts);
     }
 

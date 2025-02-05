@@ -191,15 +191,17 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
 
     @Override
-    public Page<TemporaryProductEntity> findShoppingCartProducts(Pageable pageable) {
+    public Page<TemporaryProductVO> findShoppingCartProducts(Pageable pageable) {
 
         ShoppingCartEntity shoppingCartModel = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
                 .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
 
         Page<TemporaryProductEntity> allTemporaryProductsByShoppingCart = repository.
                 findAllTemporaryProductsByShoppingCart(shoppingCartModel.getId(), pageable);
+        List<TemporaryProductVO> temporaryProductVOS = allTemporaryProductsByShoppingCart.getContent()
+                .stream().map(temporaryProductEntity -> BuildMapper.parseObject(new TemporaryProductVO(), temporaryProductEntity)).toList();
 
-        return new PageImpl<>(allTemporaryProductsByShoppingCart.getContent(), pageable, allTemporaryProductsByShoppingCart.getTotalElements());
+        return new PageImpl<>(temporaryProductVOS, pageable, allTemporaryProductsByShoppingCart.getTotalElements());
     }
 
     @Override
