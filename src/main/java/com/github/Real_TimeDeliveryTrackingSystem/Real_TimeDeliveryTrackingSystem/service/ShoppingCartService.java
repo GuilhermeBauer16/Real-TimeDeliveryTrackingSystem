@@ -74,10 +74,9 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
 
             List<TemporaryProductEntity> products = shoppingCartEntity.getTemporaryProducts();
 
+            addProductIfWasNotAdded(productVO.getId(), shoppingCartEntity);
 
             if (verifyIfProductAlreadyAddToCustomerList(productVO.getId(), products)) {
-
-                addProductIfWasNotAdded(productVO.getId(), shoppingCartEntity);
 
                 TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(productVO.getId());
 

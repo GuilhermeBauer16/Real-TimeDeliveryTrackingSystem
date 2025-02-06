@@ -39,8 +39,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -77,18 +77,15 @@ class ShoppingCartServiceTest {
     @InjectMocks
     private ShoppingCartService service;
 
-    private CustomerEntity customerEntity;
     private CustomerVO customerVO;
 
     private ProductVO productVO;
-    private ProductEntity productEntity;
 
     private TemporaryProductVO temporaryProductVO;
     private TemporaryProductEntity temporaryProductEntity;
 
     private ShoppingCartEntity shoppingCartEntity;
     private ShoppingCartRequest shoppingCartRequest;
-    private ShoppingCartResponse shoppingCartResponse;
 
 
     private static final String SHOPPING_CART_NOT_FOUND_MESSAGE = "The ShoppingCart was not found!";
@@ -109,7 +106,7 @@ class ShoppingCartServiceTest {
         UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
                 EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
 
-        customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
+        CustomerEntity customerEntity = new CustomerEntity(TestConstants.ID, PHONE_NUMBER, new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
         customerVO = new CustomerVO(TestConstants.ID, PHONE_NUMBER, new ArrayList<>(Arrays.asList(addressEntity)), userEntity);
 
         temporaryProductVO = new TemporaryProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
@@ -121,7 +118,7 @@ class ShoppingCartServiceTest {
         productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
                 TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY + TestConstants.PRODUCT_QUANTITY);
 
-        productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
+        ProductEntity productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
                 TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY + TestConstants.PRODUCT_QUANTITY);
 
         shoppingCartEntity = new ShoppingCartEntity(TestConstants.ID, customerEntity, new ArrayList<>(Arrays.asList(productEntity)), TestConstants.SHOPPING_CART_TOTAL_PRICE,
@@ -129,16 +126,13 @@ class ShoppingCartServiceTest {
 
         shoppingCartRequest = new ShoppingCartRequest(TestConstants.ID, TestConstants.PRODUCT_QUANTITY);
 
-        shoppingCartResponse = new ShoppingCartResponse(TestConstants.ID, TestConstants.SHOPPING_CART_TOTAL_PRICE,
-                new ArrayList<>(Arrays.asList(temporaryProductEntity)));
-
         SecurityContextHolder.setContext(securityContext);
 
 
     }
 
     @Test
-    void addToShoppingCart_WhenShoppingCartIsNotCreatedYet_ShouldReturnACreatedShoppingCartWithAProductAdded(){
+    void addToShoppingCart_WhenShoppingCartIsNotCreatedYet_ShouldReturnACreatedShoppingCartWithAProductAdded() {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -171,8 +165,9 @@ class ShoppingCartServiceTest {
     }
 
     @Test
-    void addToShoppingCart_WhenShoppingCartIsCreatedAndProductWillBeAddForFirstTime_ShouldReturnAProductAdded(){
+    void addToShoppingCart_WhenShoppingCartIsCreatedAndTemporaryProductWillBeAddForFirstTime_ShouldReturnAProductAdded() {
 
+        shoppingCartEntity.getTemporaryProducts().clear();
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getUsername()).thenReturn(EMAIL);
@@ -180,7 +175,7 @@ class ShoppingCartServiceTest {
         when(customerService.findCustomerByEmail(anyString())).thenReturn(customerVO);
         when(productService.findProductById(anyString())).thenReturn(productVO);
         when(repository.findShoppingCartByCustomerEmail(anyString())).thenReturn(Optional.of(shoppingCartEntity));
-        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProductVO);
+        when(temporaryProductService.createTemporaryProduct(any(TemporaryProductVO.class))).thenReturn(temporaryProductVO);
         when(repository.save(any(ShoppingCartEntity.class))).thenReturn(shoppingCartEntity);
 
         ProductVO product = service.addToShoppingCart(shoppingCartRequest);
@@ -195,14 +190,47 @@ class ShoppingCartServiceTest {
         assertEquals(TestConstants.ID, product.getId());
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
-        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
-        assertEquals(TestConstants.PRODUCT_QUANTITY + TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+        assertEquals(TestConstants.PRODUCT_PRICE * TestConstants.PRODUCT_QUANTITY, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
 
 
     }
 
     @Test
-    void addToShoppingCart_WhenShoppingCartIsCreatedAndProductQuantityIsHigher_ShouldReturnAProductAdded(){
+    void addToShoppingCart_WhenShoppingCartIsCreatedAndProductWillBeAddForFirstTime_ShouldReturnAProductAdded() {
+
+
+        shoppingCartEntity.getProducts().clear();
+        shoppingCartEntity.getTemporaryProducts().clear();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn(EMAIL);
+        when(customerService.findCustomerByEmail(anyString())).thenReturn(customerVO);
+        when(productService.findProductById(anyString())).thenReturn(productVO);
+        when(repository.findShoppingCartByCustomerEmail(anyString())).thenReturn(Optional.of(shoppingCartEntity));
+        when(temporaryProductService.createTemporaryProduct(any(TemporaryProductVO.class))).thenReturn(temporaryProductVO);
+        when(repository.save(any(ShoppingCartEntity.class))).thenReturn(shoppingCartEntity);
+
+        ProductVO product = service.addToShoppingCart(shoppingCartRequest);
+
+        verify(customerService, times(1)).findCustomerByEmail(anyString());
+        verify(productService, times(2)).findProductById(anyString());
+        verify(repository, times(1)).save(any(ShoppingCartEntity.class));
+        verify(customerService, times(1)).findCustomerByEmail(anyString());
+
+        assertNotNull(product);
+        assertNotNull(product.getId());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE * TestConstants.PRODUCT_QUANTITY, product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
+
+
+    }
+
+    @Test
+    void addToShoppingCart_WhenShoppingCartIsCreatedAndProductQuantityIsHigher_ShouldReturnAProductAdded() {
 
         shoppingCartRequest.setQuantity(TestConstants.PRODUCT_QUANTITY + 1);
 
@@ -235,6 +263,40 @@ class ShoppingCartServiceTest {
     }
 
     @Test
+    void addToShoppingCart_WhenShoppingCartIsCreatedAndProductQuantityIsLower_ShouldReturnAProductAdded() {
+
+        shoppingCartRequest.setQuantity(TestConstants.PRODUCT_QUANTITY - 1);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUsername()).thenReturn(EMAIL);
+
+        when(customerService.findCustomerByEmail(anyString())).thenReturn(customerVO);
+        when(productService.findProductById(anyString())).thenReturn(productVO);
+        when(repository.findShoppingCartByCustomerEmail(anyString())).thenReturn(Optional.of(shoppingCartEntity));
+        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProductVO);
+        when(repository.save(any(ShoppingCartEntity.class))).thenReturn(shoppingCartEntity);
+
+        ProductVO product = service.addToShoppingCart(shoppingCartRequest);
+
+        verify(customerService, times(1)).findCustomerByEmail(anyString());
+        verify(productService, times(1)).findProductById(anyString());
+        verify(repository, times(1)).save(any(ShoppingCartEntity.class));
+        verify(customerService, times(1)).findCustomerByEmail(anyString());
+
+        assertNotNull(product);
+        assertNotNull(product.getId());
+        assertEquals(TestConstants.ID, product.getId());
+        assertEquals(TestConstants.PRODUCT_NAME, product.getName());
+        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
+        assertEquals(TestConstants.PRODUCT_PRICE * (TestConstants.PRODUCT_QUANTITY - 1), product.getPrice());
+        assertEquals(TestConstants.PRODUCT_QUANTITY - 1, product.getQuantity());
+
+
+    }
+
+
+    @Test
     void testFindShoppingCartTemporaryProductById_WhenSuccessful_ShouldReturnTemporaryProductObject() {
 
 
@@ -253,7 +315,7 @@ class ShoppingCartServiceTest {
         assertEquals(TestConstants.ID, product.getId());
         assertEquals(TestConstants.PRODUCT_NAME, product.getName());
         assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());
-        assertEquals(TestConstants.PRODUCT_PRICE , product.getPrice());
+        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());
         assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());
 
     }
@@ -432,7 +494,8 @@ class ShoppingCartServiceTest {
 
 
         ShoppingCartNotFoundException exception = assertThrows(
-                ShoppingCartNotFoundException.class, () -> service.findShoppingCartProducts(Pageable.ofSize(10)));
+                ShoppingCartNotFoundException.class,
+                () -> service.findShoppingCartProducts(Pageable.ofSize(10)));
 
         assertNotNull(exception);
         assertEquals(ShoppingCartNotFoundException.ERROR.formatErrorMessage(SHOPPING_CART_NOT_FOUND_MESSAGE), exception.getMessage());
