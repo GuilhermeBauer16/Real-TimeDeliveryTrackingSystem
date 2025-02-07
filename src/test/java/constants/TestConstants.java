@@ -53,4 +53,9 @@ public final class TestConstants {
     public static final Double PRODUCT_UPDATED_PRICE = 100D;
     public static final Double PRODUCT_INVALID_PRICE = 0D;
     public static final String PRODUCT_UPDATED_NAME = "AirMax";
+
+    // ShoppingCart
+
+    public static final Double SHOPPING_CART_TOTAL_PRICE = 1000D;
+
 }
