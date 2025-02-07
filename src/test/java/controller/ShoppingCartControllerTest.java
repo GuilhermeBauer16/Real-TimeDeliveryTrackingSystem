@@ -70,6 +70,8 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
 
 
     private static final String URL_PREFIX = "/shoppingCart";
+    private static final String FIND_SHOPPING_CART_URL_PREFIX = "/findShoppingCart";
+    private static final String FIND_PRODUCT_URL_PREFIX = "/findProduct/{id}";
     private static final String VERIFICATION_CODE_URL_PREFIX = "/verificationCode";
     private static final String VERIFY_URL_PREFIX = "/verify";
     private static final String LOGIN_URL_PREFIX = "/api/login";
@@ -219,7 +221,7 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .when()
-                .get("/findProduct/{id}", temporaryProductVO.getId())
+                .get(FIND_PRODUCT_URL_PREFIX, temporaryProductVO.getId())
                 .then()
                 .statusCode(200)
                 .extract()
@@ -263,7 +265,7 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .when()
-                .get("/findShoppingCart")
+                .get(FIND_SHOPPING_CART_URL_PREFIX)
                 .then()
                 .statusCode(200)
                 .extract()
