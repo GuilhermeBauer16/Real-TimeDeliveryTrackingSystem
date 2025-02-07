@@ -11,7 +11,9 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverLicenseException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotAssociatedWithTheCustomerException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ShoppingCartNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.PriceLowerThanZeroException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.QuantityLowerThanOneException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.QuantityRequiredHigherThanAvailableQuantityException;
@@ -51,7 +53,8 @@ public class CustomizedResponseEntityExceptionHandler {
             CustomerNotFoundException.class,
             AddressNotFoundException.class,
             DriverNotFoundException.class,
-            ProductNotFoundException.class
+            ProductNotFoundException.class,
+            ShoppingCartNotFoundException.class
 
     })
     public final ResponseEntity<ExceptionResponse> handlerNotFoundException(
@@ -85,7 +88,8 @@ public class CustomizedResponseEntityExceptionHandler {
             InvalidProductException.class,
             QuantityLowerThanOneException.class,
             QuantityRequiredHigherThanAvailableQuantityException.class,
-            PriceLowerThanZeroException.class})
+            PriceLowerThanZeroException.class,
+            ProductNotAssociatedWithTheCustomerException.class})
     public final ResponseEntity<ExceptionResponse> handlerBadRequestException(
             Exception ex,
             WebRequest webRequest
