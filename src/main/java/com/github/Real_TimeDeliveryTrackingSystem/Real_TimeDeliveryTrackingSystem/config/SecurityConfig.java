@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login", "/signInCustomer", "/customer/**",
             "/signInDriver/**", "/driver/**", "/driverAddress/**", "/customerAddress/**", "/verificationCode/**", "/product/**"
-            , "/customer/product/**", "/shoppingCart/**"};
+            , "/customer/product/**", "/shoppingCart/**","/payment/v1/checkout/**"};
     private static final String[] ADMIN_RESOURCES = {"/product/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";

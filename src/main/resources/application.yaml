@@ -1,3 +1,9 @@
+mercado-pago:
+  client-secret: ${CLIENT_SECRET}
+
+stripe:
+  stripe-secret-key: ${STRIPE_SECRET_KEY}
+  stripe-public-key: ${STRIPE_PUBLIC_KEY}
 security:
   jwt:
     token:
