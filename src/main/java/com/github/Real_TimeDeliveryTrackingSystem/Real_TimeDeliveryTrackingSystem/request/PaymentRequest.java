@@ -6,16 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentRequest {
 
-    private BigDecimal transactionAmount;
-    private String token;
-    private String description;
-    private Integer installments;
-    private String paymentMethodId;
-    private String payerEmail;
+    private String productId;
+    private String Currency = " BRL";
+
 }

@@ -254,6 +254,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>dx-java</artifactId>
+            <version>1.8.0</version> </dependency>
+
+        <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
             <version>27.1.0</version>

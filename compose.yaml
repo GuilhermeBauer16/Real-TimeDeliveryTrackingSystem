@@ -2,7 +2,7 @@ services:
   db:
     image: mysql:8.3.0
     container_name: mysql_db_Real-Time_Delivery_Tracking_System
-    command: mysqld --default_authentication_plugin=mysql_native_password
+    command: mysqld --default_authentication_plugin=caching_sha2_password
 
     restart: always
     environment:
@@ -40,10 +40,10 @@ services:
       SPRING_MAIL_PORT: 587
       SPRING_MAIL_USERNAME: ${jAVA_MAIL_EMAIL}
       SPRING_MAIL_PASSWORD: ${jAVA_MAIL_PASSWORD}
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_TRUST: smtp.gmail.com
-      SPRING_MAIL_TEST-CONNECTION: true
+      SPRING_MAIL_TEST-CONNECTION: "true"
 
 
     ports:
