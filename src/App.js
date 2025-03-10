@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import PaymentSuccess from "./main/resources/pages/PaymentSuccess";
-import PaymentFailure from "./main/resources/pages/PaymentFailure";
-import PaymentPending from "./main/resources/pages/PaymentPending";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailure from "./pages/PaymentFailure";
+import PaymentPending from "./pages/PaymentPending";
 
 function App() {
     return (
