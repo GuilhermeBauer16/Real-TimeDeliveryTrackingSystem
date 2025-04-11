@@ -1,7 +1,7 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentRequest;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.common.AddressRequest;
 import com.mercadopago.client.common.IdentificationRequest;
@@ -24,40 +24,58 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mercadopago.client.preference.PreferencePayerRequest.builder;
+
 @Service
 public class MercadoPagoService {
 
     @Value("${mercado-pago.access-token}")
     private String accessToken;
 
-    private final TemporaryProductService productService;
+    private final ShoppingCartService shoppingCartService;
 
     @Autowired
-    public MercadoPagoService(TemporaryProductService productService) {
-        this.productService = productService;
+    public MercadoPagoService(ShoppingCartService productService) {
+        this.shoppingCartService = productService;
     }
 
     public String createPreference(PaymentRequest paymentRequest) throws MPApiException {
 
+        List<TemporaryProductEntity> temporaryProducts = shoppingCartService.findShoppingCart().getTemporaryProducts();
+
         MercadoPagoConfig.setAccessToken(accessToken);
-        PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
-                .id("item-ID-1234")
-                .title("Meu produto")
-                .currencyId("BRL")
-                .pictureUrl("https://www.mercadopago.com/org-img/MP3/home/logomp3.gif")
-                .description("Descrição do Item")
-                .categoryId("art")
-                .quantity(1)
-                .unitPrice(new BigDecimal("75.76"))
-                .build();
-
         List<PreferenceItemRequest> items = new ArrayList<>();
-        items.add(itemRequest);
 
-//        PreferencePayerRequest payer = PreferencePayerRequest.builder()
+        for(TemporaryProductEntity product : temporaryProducts) {
+
+            System.out.println(product);
+
+            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+                    .id(product.getId())
+                    .title(product.getName())
+                    .currencyId("BRL")
+                    .pictureUrl("https://www.mercadopago.com/org-img/MP3/home/logomp3.gif")
+                    .description(product.getDescription())
+                    .categoryId("art")
+                    .quantity(product.getQuantity())
+                    .unitPrice(BigDecimal.valueOf(product.getPrice() / product.getQuantity()))
+                    .build();
+
+            System.out.println(itemRequest.toString());
+
+            items.add(itemRequest);
+
+        }
+
+
+
+
+
+
+//        PreferencePayerRequest payer = builder()
 //                .name("João")
 //                .surname("Silva")
-//                .email("TESTUSER1255791243@testuser.com")
+//                .email("test_user_1255791243@testuser.com")
 //                .identification(IdentificationRequest.builder()
 //                        .type("CPF")
 //                        .number("12345678909")
@@ -72,11 +90,8 @@ public class MercadoPagoService {
 //                        .zipCode("06233200")
 //                        .build())
 //                .build();
-
-//        BackUrls backUrls = new BackUrls();
-//        backUrls.setSuccess("https://www.success.com");
-//        backUrls.setFailure("http://www.failure.com");
-//        backUrls.setPending("http://www.pending.com");
+//
+//        test_user_1255791243@testuser.com
 
         List<PreferencePaymentMethodRequest> excludedPaymentMethods = new ArrayList<>();
         excludedPaymentMethods.add(PreferencePaymentMethodRequest.builder().id("pec").build());
@@ -98,7 +113,7 @@ public class MercadoPagoService {
                         .pending("http://localhost:3000/payment/pending").build())
                 .autoReturn("approved")
                 .paymentMethods(paymentMethods)
-                .notificationUrl("https://www.your-site.com/ipn")
+                .notificationUrl("https://4723-138-185-186-93.ngrok-free.app/ipn")
                 .statementDescriptor("MEUNEGOCIO")
                 .externalReference("Reference_1234")
                 .expires(true)

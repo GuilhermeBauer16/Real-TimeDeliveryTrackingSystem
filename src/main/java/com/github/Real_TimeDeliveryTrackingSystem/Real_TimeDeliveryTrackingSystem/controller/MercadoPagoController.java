@@ -19,7 +19,7 @@ import java.util.Map;
 public class MercadoPagoController {
 
     @Autowired
-    private MercadoPagoService paymentService; // Inject the service
+    private MercadoPagoService paymentService;
 
     @PostMapping("/payment")
     public ResponseEntity<String> processPayment(@RequestBody PaymentRequest paymentRequest) {
