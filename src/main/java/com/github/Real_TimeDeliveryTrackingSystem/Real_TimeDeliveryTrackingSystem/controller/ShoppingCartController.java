@@ -63,9 +63,9 @@ public class ShoppingCartController implements ShoppingCartControllerContract {
     }
 
     @Override
-    public ResponseEntity<Void> deleteShoppingCart() {
+    public ResponseEntity<Void> deleteShoppingCart(String email) {
 
-        service.deleteShoppingCart();
+        service.deleteShoppingCart(email);
         return ResponseEntity.noContent().build();
     }
 

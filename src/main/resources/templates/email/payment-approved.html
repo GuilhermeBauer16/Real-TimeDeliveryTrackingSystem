@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Approved</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+<div style="max-width: 600px; margin: auto; background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+  <h1 style="color: #2e6da4;">Pagamento aprovado!</h1>
+  <p th:text="'Olá ' + ${buyerName} + ','"></p>
+
+  <p>Seu pagamento foi aprovado com sucesso! Aqui está o resumo da sua compra:</p>
+
+  <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+    <tr style="background-color: #2e6da4; color: white;">
+      <th style="padding: 10px; text-align: left;">Item</th>
+      <th style="padding: 10px; text-align: center;">Quantidade</th>
+      <th style="padding: 10px; text-align: right;">Preço</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${items}">
+      <td style="padding: 8px; border-bottom: 1px solid #ddd;" th:text="${item.name}"></td>
+      <td style="padding: 8px; text-align: center; border-bottom: 1px solid #ddd;" th:text="${item.quantity}"></td>
+      <td style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;" th:text="${item.price} + ' R$'"></td>
+    </tr>
+    </tbody>
+  </table>
+
+  <p style="font-weight: bold; margin-top: 20px; font-size: 1.1em;">
+    Total: 'R$ ' <span th:text="${total} + "></span>
+  </p>
+
+  <p style="margin-top: 30px;">Agradecemos por comprar conosco!</p>
+  <p>Atenciosamente,<br><strong>Sua Equipe</strong></p>
+</div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
@@ -16,6 +17,7 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmailSenderService implements EmailSendServiceContract {
@@ -76,6 +78,30 @@ public class EmailSenderService implements EmailSendServiceContract {
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
         userService.updateUser(userUpdateRequest);
 
+
+    }
+
+    public void sendMailToApprovedPayment(String to, List<TemporaryProductVO> temporaryProductVOS, Double totalPrice) throws MessagingException {
+
+        UserVO userByEmail = userService.findUserByEmail(to);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper =
+                new MimeMessageHelper(mimeMessage,
+                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                        CHARSET);
+
+        Context context = new Context();
+        context.setVariable("buyerName", userByEmail.getName());
+        context.setVariable("items", temporaryProductVOS);
+        context.setVariable("total", totalPrice);
+
+
+        String html = templateEngine.process("email/payment-approved", context);
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setText(html, true);
+        mimeMessageHelper.setSubject(SUBJECT);
+        mailSender.send(mimeMessage);
 
     }
 

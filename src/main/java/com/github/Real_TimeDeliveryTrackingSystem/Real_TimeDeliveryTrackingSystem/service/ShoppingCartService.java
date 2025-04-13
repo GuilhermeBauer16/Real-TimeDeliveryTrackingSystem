@@ -204,9 +204,9 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
     }
 
     @Override
-    public void deleteShoppingCart() {
+    public void deleteShoppingCart(String email) {
 
-        ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(retrieveUserEmail())
+        ShoppingCartEntity shoppingCartEntity = repository.findShoppingCartByCustomerEmail(email)
                 .orElseThrow(() -> new ShoppingCartNotFoundException(SHOPPING_CART_NOT_FOUND_MESSAGE));
 
         repository.delete(shoppingCartEntity);
