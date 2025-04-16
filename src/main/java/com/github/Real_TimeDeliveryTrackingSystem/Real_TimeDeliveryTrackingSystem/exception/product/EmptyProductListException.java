@@ -6,12 +6,12 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class ShoppingCartNotFoundException extends RuntimeException {
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class EmptyProductListException extends RuntimeException {
 
-    public static final ExceptionDetails ERROR = ExceptionDetails.SHOPPING_CART_NOT_FOUND_MESSAGE;
+    public static final ExceptionDetails ERROR = ExceptionDetails.EMPTY_PRODUCT_LIST_MESSAGE;
 
-    public ShoppingCartNotFoundException(String message) {
+    public EmptyProductListException(String message) {
         super(ERROR.formatErrorMessage(message));
     }
 }

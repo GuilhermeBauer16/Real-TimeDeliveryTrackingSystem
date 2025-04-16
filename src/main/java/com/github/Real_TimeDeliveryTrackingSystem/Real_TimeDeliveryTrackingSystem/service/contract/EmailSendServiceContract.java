@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -7,6 +8,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Contract for sending emails with validation codes to users.
@@ -44,4 +48,6 @@ public interface EmailSendServiceContract {
      */
 
     void sendEmailWithValidatorCodeToUser(String email) throws MessagingException;
+
+    void sendMailToApprovedPayment(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice) throws MessagingException;
 }
