@@ -3,6 +3,7 @@ mercado-pago:
   mercado-pago-access-token: ${MERCADO_PAGO_ACCESS_TOKEN}
   mercado-pago-webhook-secret: ${MERCADO_PAGO_WEBHOOK_SECRET}
   test-mail: ${TEST_MAIL}
+  nrok-url: ${NROK_URL}
 
 stripe:
   stripe-secret-key: ${STRIPE_SECRET_KEY}
@@ -14,7 +15,6 @@ security:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://db:${DB_PORT}/${DB_NAME}?allowPublicKeyRetrieval=true&useSSL=false&useTimezone=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2
     url: jdbc:mysql://localhost:${DB_EXPOSE_PORT}/${DB_NAME}?useTimezone=true&serverTimezone=UTC
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}

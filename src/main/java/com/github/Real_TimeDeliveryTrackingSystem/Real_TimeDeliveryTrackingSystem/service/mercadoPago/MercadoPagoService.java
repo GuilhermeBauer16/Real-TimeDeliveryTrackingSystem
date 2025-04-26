@@ -17,7 +17,6 @@ import com.mercadopago.client.preference.PreferenceClient;
 import com.mercadopago.client.preference.PreferenceItemRequest;
 import com.mercadopago.client.preference.PreferencePaymentMethodRequest;
 import com.mercadopago.client.preference.PreferencePaymentMethodsRequest;
-import com.mercadopago.client.preference.PreferencePaymentTypeRequest;
 import com.mercadopago.client.preference.PreferenceRequest;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
@@ -50,15 +49,16 @@ public class MercadoPagoService implements MercadoPagoServiceInterface {
      * <h4>Put the <pre>{@code payment.getPayer().getEmail(); } </pre> in the place of the variable testMail</h4>
      */
     private final String testMail;
+    private final String nrokUrl;
 
     private static final String CURRENCY = "BRL";
     private static final String PAYMENT_STATUS = "approved";
     private static final String PAYMENT_TOPIC = "payment";
     private static final String IMAGE_URL = "static/images/headphone";
-    private static final String NOTIFICATION_URL = "https://745c-45-224-243-190.ngrok-free.app/ipn";
-    private static final String SUCCESS_URL = "http://localhost:3000/payment/success";
-    private static final String PENDING_URL = "http://localhost:3000/payment/failure";
-    private static final String FAILURE_URL = "http://localhost:3000/payment/pending";
+    private static final String NOTIFICATION_URL = "/ipn";
+    private static final String SUCCESS_URL = "/payment/success";
+    private static final String PENDING_URL = "/payment/failure";
+    private static final String FAILURE_URL = "/payment/pending";
     private static final String MERCADO_PAGO_EXCEPTION_MESSAGE = "Was not be possible to process the process with" +
             " Mercado Pago payment API";
 
@@ -71,9 +71,11 @@ public class MercadoPagoService implements MercadoPagoServiceInterface {
 
     @Autowired
     public MercadoPagoService(@Value("${mercado-pago.access-token}") String accessToken, @Value("${mercado-pago.test-mail}") String testMail,
+                              @Value("${mercado-pago.nrok-url}") String nrokUrl,
                               ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService) {
         this.accessToken = accessToken;
         this.testMail = testMail;
+        this.nrokUrl = nrokUrl;
         this.shoppingCartService = productService;
         this.temporaryProductService = temporaryProductService;
         this.productService = productService1;
@@ -110,24 +112,22 @@ public class MercadoPagoService implements MercadoPagoServiceInterface {
         List<PreferencePaymentMethodRequest> excludedPaymentMethods = new ArrayList<>();
         excludedPaymentMethods.add(PreferencePaymentMethodRequest.builder().id("pec").build());
 
-        List<PreferencePaymentTypeRequest> excludedPaymentTypes = new ArrayList<>();
-
 
         PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()
                 .excludedPaymentMethods(excludedPaymentMethods)
-                .excludedPaymentTypes(excludedPaymentTypes)
                 .installments(12)
                 .build();
+
 
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
                 .backUrls(PreferenceBackUrlsRequest.builder()
-                        .success(SUCCESS_URL)
-                        .failure(FAILURE_URL)
-                        .pending(PENDING_URL).build())
+                        .success(nrokUrl + SUCCESS_URL)
+                        .failure(nrokUrl + FAILURE_URL)
+                        .pending(nrokUrl + PENDING_URL).build())
                 .autoReturn(PAYMENT_STATUS)
                 .paymentMethods(paymentMethods)
-                .notificationUrl(NOTIFICATION_URL)
+                .notificationUrl(nrokUrl + NOTIFICATION_URL)
                 .expires(true)
                 .build();
 
