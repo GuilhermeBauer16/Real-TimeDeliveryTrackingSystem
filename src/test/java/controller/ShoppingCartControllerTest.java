@@ -22,6 +22,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
 import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetupTest;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
@@ -54,6 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ShoppingCartControllerTest extends AbstractionIntegrationTest {
 
+    @MockBean
+    private MercadoPagoService mercadoPagoService;
 
     @RegisterExtension
     static GreenMailExtension greenMail =
@@ -304,7 +308,21 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(8)
-    void givenShoppingCartObject_whenDeleteShoppingCart_ShouldDoNothing() {
+    void givenShoppingCartObject_whenDeleteShoppingCart_ShouldDoNothing() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_JSON)
+                .when()
+                .get(FIND_SHOPPING_CART_URL_PREFIX)
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        ShoppingCartResponse shoppingCart = objectMapper.readValue(content, ShoppingCartResponse.class);
+
+        System.out.println(shoppingCart.getId());
 
         given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)

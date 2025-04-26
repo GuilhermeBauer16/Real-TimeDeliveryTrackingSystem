@@ -18,6 +18,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
 import config.TestConfigs;
 import constants.TestConstants;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import testContainers.AbstractionIntegrationTest;
 
@@ -48,6 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class DriverAddressControllerTest extends AbstractionIntegrationTest {
+
+    @MockBean
+    private MercadoPagoService mercadoPagoService;
 
 
     private static RequestSpecification specification;
@@ -82,8 +87,8 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
                 , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
 
         UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,
-                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
-                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+                EMAIL, passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,
+                TestConstants.USER_VERIFY_CODE, AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
 
         addressRepository.save(addressEntity);
         userRepository.save(userEntity);
@@ -92,10 +97,10 @@ class DriverAddressControllerTest extends AbstractionIntegrationTest {
                 LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
 
         driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
+                , new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
         driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList<>(List.of(addressEntity))
-                ,new ArrayList<>(List.of(vehicleEntity)), userEntity);
+                , new ArrayList<>(List.of(vehicleEntity)), userEntity);
 
 
         driverRepository.save(driverEntity);

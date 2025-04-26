@@ -5,7 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.EmptyProductListException;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceInterface;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class MercadoPagoService implements MercadoPagoServiceInterface {
+public class MercadoPagoService implements MercadoPagoServiceContract {
 
 
     private final String accessToken;
@@ -49,6 +49,11 @@ public class MercadoPagoService implements MercadoPagoServiceInterface {
      * <h4>Put the <pre>{@code payment.getPayer().getEmail(); } </pre> in the place of the variable testMail</h4>
      */
     private final String testMail;
+
+    /**
+     * <p>This variable is used to start an Ngrok server and is intended only for testing purposes.
+     * In production, a better approach should be used.</p>
+     */
     private final String nrokUrl;
 
     private static final String CURRENCY = "BRL";
