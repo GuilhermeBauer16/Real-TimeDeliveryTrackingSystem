@@ -286,7 +286,6 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
         assertEquals(1, shoppingCart.getTemporaryProducts().size());
 
 
-
     }
 
     @Test
@@ -308,33 +307,19 @@ class ShoppingCartControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(8)
-    void givenShoppingCartObject_whenDeleteShoppingCart_ShouldDoNothing() throws JsonProcessingException {
+    void givenShoppingCartObject_whenDeleteShoppingCart_ShouldDoNothing() {
 
-        var content = given().spec(specification)
+
+        given()
+                .spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .when()
-                .get(FIND_SHOPPING_CART_URL_PREFIX)
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .asString();
-
-        ShoppingCartResponse shoppingCart = objectMapper.readValue(content, ShoppingCartResponse.class);
-
-        System.out.println(shoppingCart.getId());
-
-        given().spec(specification)
-                .contentType(TestConfigs.CONTENT_TYPE_JSON)
-                .when()
+                .body(EMAIL)
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
                 .filter(new ResponseLoggingFilter(LogDetail.ALL))
+                .when()
                 .delete()
                 .then()
-                .statusCode(204)
-                .extract()
-                .body()
-                .asString();
+                .statusCode(204);
     }
 
 
