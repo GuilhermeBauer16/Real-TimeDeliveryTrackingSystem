@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtDetailsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user</a> &gt; <span class="el_source">JwtDetailsService.java</span></div><h1>JwtDetailsService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user;
+
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+
+@Service
+public class JwtDetailsService implements UserDetailsService {
+
+    private static final String USER_NOT_FOUND_MESSAGE = &quot;An User with that email %s was not found!&quot;;
+    private static final String ROLE_PREFIX = &quot;ROLE_&quot;;
+
+    private final UserRepository userRepository;
+
+    @Autowired
+<span class="fc" id="L24">    public JwtDetailsService(UserRepository userRepository) {</span>
+<span class="fc" id="L25">        this.userRepository = userRepository;</span>
+<span class="fc" id="L26">    }</span>
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+<span class="fc" id="L31">        return this.userRepository.findUserByEmail(username).map( user-&gt;</span>
+        {
+<span class="fc" id="L33">            SimpleGrantedAuthority authorities = new SimpleGrantedAuthority(ROLE_PREFIX + user.getUserProfile().getProfile());</span>
+
+<span class="fc" id="L35">            return new User(user.getEmail(), user.getPassword(), Collections.singleton(authorities));</span>
+
+<span class="fc" id="L37">        }).orElseThrow(() -&gt; new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, username)));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

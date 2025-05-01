@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">LoginTest.java</span></div><h1>LoginTest.java</h1><pre class="source lang-java linenums">package service;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserCredentialsNotMatchedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.CodeValidatorService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.JwtDetailsService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.JwtTokenService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.LoginService;
+import constants.TestConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+
+@ExtendWith(MockitoExtension.class)
+<span class="fc" id="L34">public class LoginTest {</span>
+
+    private static final String BAD_CREDENTIALS_MESSAGE = &quot;An user with that email: %s was not matched&quot;;
+
+    private static final String EMAIL = &quot;test@gmail.com&quot;;
+    private static final String JWT_TOKEN = &quot;eyJhbGciOiJIUzI1NiJ9.eyJST0xFUyI6IltST0xFX1VTRVJdIiwic3ViIjoiam9obmRv&quot; +
+            &quot;ZUBleGFtcGxlMTIuY29tIiwiaWF0IjoxNzI5MTk0MzQ1LCJleHAiOjE3MjkxOTYxNDV9.dMP8-0uQ2K67qogZVTdf4KO2YGwMnER_YkGzOV7Xstc&quot;;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private JwtTokenService jwtTokenService;
+
+    @Mock
+    private JwtDetailsService jwtDetailsService;
+
+    @Mock
+    private UserDetails userDetails;
+
+    @Mock
+    private LoginRequest loginRequest;
+
+    @Mock
+    private CodeValidatorService codeValidatorService;
+
+    @InjectMocks
+    private LoginService loginService;
+
+    @BeforeEach
+    void setUp() {
+<span class="fc" id="L65">        loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    void testLogin_WhenSuccess_ShouldReturnLoginResponse() {
+
+<span class="fc" id="L71">        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);</span>
+<span class="fc" id="L72">        when(jwtDetailsService.loadUserByUsername(EMAIL)).thenReturn(userDetails);</span>
+<span class="fc" id="L73">        when(jwtTokenService.generateToken(userDetails)).thenReturn(JWT_TOKEN);</span>
+
+<span class="fc" id="L75">        LoginResponse login = loginService.login(loginRequest);</span>
+
+<span class="fc" id="L77">        verify(authenticationManager, times(1))</span>
+<span class="fc" id="L78">                .authenticate(any(UsernamePasswordAuthenticationToken.class));</span>
+<span class="fc" id="L79">        verify(jwtDetailsService, times(1)).loadUserByUsername(EMAIL);</span>
+<span class="fc" id="L80">        verify(jwtTokenService, times(1)).generateToken(userDetails);</span>
+
+<span class="fc" id="L82">        assertNotNull(login);</span>
+<span class="fc" id="L83">        assertEquals(EMAIL, login.getEmail());</span>
+<span class="fc" id="L84">        assertEquals(JWT_TOKEN, login.getToken());</span>
+<span class="fc" id="L85">    }</span>
+
+    @Test
+    void testLogin_WhenCredentialsNotMatch_ShouldThrowBadCredentialsException() {
+
+<span class="fc" id="L90">        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))</span>
+<span class="fc" id="L91">                .thenThrow(new BadCredentialsException(String.format(BAD_CREDENTIALS_MESSAGE, EMAIL)));</span>
+
+<span class="pc" id="L93">        UserCredentialsNotMatchedException exception = assertThrows(UserCredentialsNotMatchedException.class, () -&gt; loginService.login(loginRequest));</span>
+
+<span class="fc" id="L95">        assertNotNull(exception);</span>
+<span class="fc" id="L96">        assertEquals(exception.getMessage(), UserCredentialsNotMatchedException</span>
+<span class="fc" id="L97">                .ERROR.formatErrorMessage(String.format(BAD_CREDENTIALS_MESSAGE, EMAIL)));</span>
+
+<span class="fc" id="L99">        verify(jwtDetailsService, never()).loadUserByUsername(anyString());</span>
+<span class="fc" id="L100">        verify(jwtTokenService, never()).generateToken(any(UserDetails.class));</span>
+<span class="fc" id="L101">    }</span>
+
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

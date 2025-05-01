@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DriverRegistrationService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver</a>
+</div>
+
+<h1>Coverage Summary for Class: DriverRegistrationService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DriverRegistrationService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (31/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DriverRegistrationService$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (31/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverLicenseAllReadyRegisterException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.DriverFactory;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.DriverRegistrationServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.DriverLicenseValidatorUtils;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+&nbsp;import com.google.i18n.phonenumbers.NumberParseException;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class DriverRegistrationService implements DriverRegistrationServiceContract {
+&nbsp;
+&nbsp;
+&nbsp;    private static final String INVALID_DRIVER_MESSAGE = &quot;This Driver is invalid, please verify the fields and try again.&quot;;
+&nbsp;    private static final String DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE = &quot;This driver license is already registered, &quot; +
+&nbsp;            &quot;please verify the fields and try again.&quot;;
+&nbsp;
+&nbsp;    private static final String PHONE_PREFIX = &quot;+&quot;;
+&nbsp;
+&nbsp;
+&nbsp;    private final UserRegistrationService userRegistrationService;
+&nbsp;
+&nbsp;    private final DriverRepository repository;
+&nbsp;
+&nbsp;    private final AddressService addressService;
+&nbsp;
+&nbsp;    private final VehicleService vehicleService;
+&nbsp;
+&nbsp;    private final DriverRepository driverRepository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public DriverRegistrationService(UserRegistrationService userRegistrationService, DriverRepository repository, AddressService addressService, VehicleService vehicleService, DriverRepository driverRepository) {</b>
+<b class="fc">&nbsp;        this.userRegistrationService = userRegistrationService;</b>
+<b class="fc">&nbsp;        this.repository = repository;</b>
+<b class="fc">&nbsp;        this.addressService = addressService;</b>
+<b class="fc">&nbsp;        this.vehicleService = vehicleService;</b>
+<b class="fc">&nbsp;        this.driverRepository = driverRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException, MessagingException {
+&nbsp;
+<b class="fc">&nbsp;        ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_DRIVER_MESSAGE, InvalidDriverException.class);</b>
+<b class="fc">&nbsp;        driverVO.getUser().setUserProfile(UserProfile.ROLE_DRIVER);</b>
+&nbsp;
+<b class="fc">&nbsp;        driverVO.setPhoneNumber(PHONE_PREFIX + driverVO.getPhoneNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        PhoneNumberValidator.validatePhoneNumber(driverVO.getPhoneNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        DriverLicenseValidatorUtils.validateDriverLicense(driverVO.getDriverLicense());</b>
+<b class="fc">&nbsp;        validIfDriverLicenseAlreadyRegistered(driverVO.getDriverLicense());</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;AddressEntity&gt; savedAddresses = addressService.createAddresses(driverVO.getAddresses());</b>
+<b class="fc">&nbsp;        List&lt;VehicleEntity&gt; savedVehicles = saveVehicles(driverVO.getVehicles());</b>
+<b class="fc">&nbsp;        UserVO userVO = BuildMapper.parseObject(new UserVO(), driverVO.getUser());</b>
+&nbsp;
+<b class="fc">&nbsp;        UserVO user = userRegistrationService.createUser(userVO);</b>
+<b class="fc">&nbsp;        UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);</b>
+&nbsp;
+<b class="fc">&nbsp;        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, savedVehicles, userEntity);</b>
+<b class="fc">&nbsp;        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_DRIVER_MESSAGE, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        DriverEntity savedDriver = repository.save(driverEntity);</b>
+<b class="fc">&nbsp;        DriverRegistrationResponse driverRegistrationResponse = BuildMapper.parseObject(new DriverRegistrationResponse(), savedDriver);</b>
+&nbsp;
+<b class="fc">&nbsp;        driverRegistrationResponse.setUserRegistrationResponse(</b>
+<b class="fc">&nbsp;                BuildMapper.parseObject(new UserRegistrationResponse(), savedDriver.getUser()));</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return driverRegistrationResponse;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;VehicleEntity&gt; saveVehicles(List&lt;VehicleEntity&gt; vehicleEntities) {
+<b class="fc">&nbsp;        List&lt;VehicleEntity&gt; savedVehicles = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (VehicleEntity vehicle : vehicleEntities) {</b>
+&nbsp;
+<b class="fc">&nbsp;            VehicleVO vehicleVO = BuildMapper.parseObject(new VehicleVO(), vehicle);</b>
+<b class="fc">&nbsp;            savedVehicles.add(BuildMapper.parseObject(new VehicleEntity(), vehicleService.create(vehicleVO)));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return savedVehicles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void validIfDriverLicenseAlreadyRegistered(String driverLicense) {
+&nbsp;
+<b class="fc">&nbsp;        if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()) {</b>
+<b class="fc">&nbsp;            throw new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

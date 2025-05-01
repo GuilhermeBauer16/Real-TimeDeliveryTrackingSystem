@@ -1,0 +1,107 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserRegistrationServiceContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: UserRegistrationServiceContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserRegistrationServiceContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
+&nbsp;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.EmailAllReadyRegisterException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotFoundException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service interface for managing user registration within the application.
+&nbsp; *
+&nbsp; * &lt;p&gt;This service provides methods to create user based on specific
+&nbsp; * criteria.
+&nbsp; */
+&nbsp;
+&nbsp;public interface UserRegistrationServiceContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers a new user in the system.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method processes the user registration details provided in the {@link UserVO} object
+&nbsp;     * and creates a new user account. It returns a response containing information about the
+&nbsp;     * newly created user.
+&nbsp;     *
+&nbsp;     * @param userVO The {@link UserVO} object containing the user&#39;s registration details,
+&nbsp;     *               such as username, email, password, and any other relevant information.
+&nbsp;     * @return {@link UserRegistrationResponse} object with details of the newly created user,
+&nbsp;     * including a unique user ID and other registration-related information.
+&nbsp;     * @throws UserNotFoundException          if the {@link UserVO} object was empty or null .
+&nbsp;     * @throws FieldNotFound                  if there is an issue with the registration values, such as empty or null field.
+&nbsp;     * @throws EmailAllReadyRegisterException if the email passed is all ready register into the database preventing duplicated values.
+&nbsp;     * @see UserRegistrationResponse
+&nbsp;     * @see UserVO
+&nbsp;     */
+&nbsp;
+&nbsp;    UserVO createUser(UserVO userVO) throws MessagingException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomizedResponseEntityExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.handler</a> &gt; <span class="el_source">CustomizedResponseEntityExceptionHandler.java</span></div><h1>CustomizedResponseEntityExceptionHandler.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.handler;
+
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.ExceptionResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.address.AddressNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.customer.CustomerNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.customer.InvalidCustomerException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverLicenseAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DuplicatedLicensePlateException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverLicenseException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.EmptyProductListException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotAssociatedWithTheCustomerException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.shoppingCart.ShoppingCartNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.PriceLowerThanZeroException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.QuantityLowerThanOneException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.QuantityRequiredHigherThanAvailableQuantityException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.EmailAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.InvalidEmailPatternException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.InvalidPasswordException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserCredentialsNotMatchedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidPhoneNumberException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ValidationUtilsException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.InvalidLicensePlateException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.LicensePlateNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.VehicleNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+
+import java.util.Date;
+
+@ControllerAdvice
+@RestController
+<span class="fc" id="L48">public class CustomizedResponseEntityExceptionHandler {</span>
+
+    @ExceptionHandler({
+            FieldNotFound.class,
+            VehicleNotFoundException.class,
+            LicensePlateNotFoundException.class,
+            UserNotFoundException.class,
+            CustomerNotFoundException.class,
+            AddressNotFoundException.class,
+            DriverNotFoundException.class,
+            ProductNotFoundException.class,
+            ShoppingCartNotFoundException.class
+
+    })
+    public final ResponseEntity&lt;ExceptionResponse&gt; handlerNotFoundException(
+            Exception ex,
+            WebRequest webRequest
+    ) {
+<span class="nc" id="L66">        ExceptionResponse exceptionResponse = new ExceptionResponse(</span>
+<span class="nc" id="L67">                ex.getMessage(),</span>
+<span class="nc" id="L68">                webRequest.getDescription(false),</span>
+                new Date()
+        );
+<span class="nc" id="L71">        return new ResponseEntity&lt;&gt;(exceptionResponse, HttpStatus.NOT_FOUND);</span>
+
+    }
+
+
+    @ExceptionHandler({ValidationUtilsException.class,
+            InvalidLicensePlateException.class,
+            DuplicatedLicensePlateException.class,
+            EmailAllReadyRegisterException.class,
+            DriverLicenseAllReadyRegisterException.class,
+            InvalidEmailPatternException.class,
+            InvalidCustomerException.class,
+            InvalidPasswordException.class,
+            InvalidPhoneNumberException.class,
+            InvalidDriverLicenseException.class,
+            InvalidDriverException.class,
+            UserAlreadyAuthenticatedException.class,
+            ExpiredVerificationCodeException.class,
+            InvalidVerificationCodeException.class,
+            InvalidProductException.class,
+            QuantityLowerThanOneException.class,
+            QuantityRequiredHigherThanAvailableQuantityException.class,
+            PriceLowerThanZeroException.class,
+            ProductNotAssociatedWithTheCustomerException.class,
+            MercadoPagoException.class,
+            EmptyProductListException.class})
+    public final ResponseEntity&lt;ExceptionResponse&gt; handlerBadRequestException(
+            Exception ex,
+            WebRequest webRequest
+    ) {
+<span class="nc" id="L101">        ExceptionResponse exceptionResponse = new ExceptionResponse(</span>
+<span class="nc" id="L102">                ex.getMessage(),</span>
+<span class="nc" id="L103">                webRequest.getDescription(false),</span>
+                new Date()
+        );
+<span class="nc" id="L106">        return new ResponseEntity&lt;&gt;(exceptionResponse, HttpStatus.BAD_REQUEST);</span>
+
+    }
+
+    @ExceptionHandler({UserCredentialsNotMatchedException.class,})
+    public final ResponseEntity&lt;ExceptionResponse&gt; handlerForbiddenException(
+            Exception ex,
+            WebRequest webRequest
+    ) {
+<span class="nc" id="L115">        ExceptionResponse exceptionResponse = new ExceptionResponse(</span>
+<span class="nc" id="L116">                ex.getMessage(),</span>
+<span class="nc" id="L117">                webRequest.getDescription(false),</span>
+                new Date()
+        );
+<span class="nc" id="L120">        return new ResponseEntity&lt;&gt;(exceptionResponse, HttpStatus.FORBIDDEN);</span>
+
+
+    }
+
+    @ExceptionHandler({UserNotAuthenticatedException.class,})
+    public final ResponseEntity&lt;ExceptionResponse&gt; handlerUnauthorizedException(
+            Exception ex,
+            WebRequest webRequest
+    ) {
+<span class="nc" id="L130">        ExceptionResponse exceptionResponse = new ExceptionResponse(</span>
+<span class="nc" id="L131">                ex.getMessage(),</span>
+<span class="nc" id="L132">                webRequest.getDescription(false),</span>
+                new Date()
+        );
+<span class="nc" id="L135">        return new ResponseEntity&lt;&gt;(exceptionResponse, HttpStatus.UNAUTHORIZED);</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

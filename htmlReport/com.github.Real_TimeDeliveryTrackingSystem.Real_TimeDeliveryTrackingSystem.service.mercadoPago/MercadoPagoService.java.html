@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MercadoPagoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago</a> &gt; <span class="el_source">MercadoPagoService.java</span></div><h1>MercadoPagoService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.EmptyProductListException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.shoppingCart.ShoppingCartService;
+import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.payment.PaymentClient;
+import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
+import com.mercadopago.client.preference.PreferenceClient;
+import com.mercadopago.client.preference.PreferenceItemRequest;
+import com.mercadopago.client.preference.PreferencePaymentMethodRequest;
+import com.mercadopago.client.preference.PreferencePaymentMethodsRequest;
+import com.mercadopago.client.preference.PreferenceRequest;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.payment.Payment;
+import com.mercadopago.resources.payment.PaymentItem;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class MercadoPagoService implements MercadoPagoServiceContract {
+
+
+    private final String accessToken;
+
+
+    /**
+     * &lt;p&gt;This variable is only used in test environment,
+     * in production environment change the use for the method&lt;/p&gt;
+     * &lt;h3&gt;Production Example:&lt;/h3&gt;
+     * &lt;pre&gt; {@code
+     *  PaymentClient paymentClient = new PaymentClient();
+     *  Payment payment = paymentClient.get(Long.parseLong(id));
+     *  payment.getPayer().getEmail();}&lt;/pre&gt;
+     * &lt;h4&gt;Put the &lt;pre&gt;{@code payment.getPayer().getEmail(); } &lt;/pre&gt; in the place of the variable testMail&lt;/h4&gt;
+     */
+    private final String testMail;
+
+    /**
+     * &lt;p&gt;This variable is used to start an Ngrok server and is intended only for testing purposes.
+     * In production, a better approach should be used.&lt;/p&gt;
+     */
+    private final String nrokUrl;
+
+    private static final String CURRENCY = &quot;BRL&quot;;
+    private static final String PAYMENT_STATUS = &quot;approved&quot;;
+    private static final String PAYMENT_TOPIC = &quot;payment&quot;;
+    private static final String IMAGE_URL = &quot;static/images/headphone&quot;;
+    private static final String NOTIFICATION_URL = &quot;/ipn&quot;;
+    private static final String SUCCESS_URL = &quot;/payment/success&quot;;
+    private static final String PENDING_URL = &quot;/payment/failure&quot;;
+    private static final String FAILURE_URL = &quot;/payment/pending&quot;;
+    private static final String MERCADO_PAGO_EXCEPTION_MESSAGE = &quot;Was not be possible to process the process with&quot; +
+            &quot; Mercado Pago payment API&quot;;
+
+    private static final String EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE = &quot;The product list is empty&quot;;
+
+    private final ShoppingCartService shoppingCartService;
+    private final TemporaryProductService temporaryProductService;
+    private final ProductService productService;
+    private final EmailSenderService emailSenderService;
+
+    @Autowired
+    public MercadoPagoService(@Value(&quot;${mercado-pago.access-token}&quot;) String accessToken, @Value(&quot;${mercado-pago.test-mail}&quot;) String testMail,
+                              @Value(&quot;${mercado-pago.nrok-url}&quot;) String nrokUrl,
+<span class="fc" id="L80">                              ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService) {</span>
+<span class="fc" id="L81">        this.accessToken = accessToken;</span>
+<span class="fc" id="L82">        this.testMail = testMail;</span>
+<span class="fc" id="L83">        this.nrokUrl = nrokUrl;</span>
+<span class="fc" id="L84">        this.shoppingCartService = productService;</span>
+<span class="fc" id="L85">        this.temporaryProductService = temporaryProductService;</span>
+<span class="fc" id="L86">        this.productService = productService1;</span>
+<span class="fc" id="L87">        this.emailSenderService = emailSenderService;</span>
+<span class="fc" id="L88">    }</span>
+
+    @Override
+    public String createPreference() throws MPException {
+
+<span class="fc" id="L93">        List&lt;TemporaryProductEntity&gt; temporaryProducts = shoppingCartService.findShoppingCart().getTemporaryProducts();</span>
+
+<span class="fc" id="L95">        MercadoPagoConfig.setAccessToken(accessToken);</span>
+<span class="fc" id="L96">        List&lt;PreferenceItemRequest&gt; items = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (TemporaryProductEntity product : temporaryProducts) {</span>
+
+
+<span class="fc" id="L101">            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()</span>
+<span class="fc" id="L102">                    .id(product.getId())</span>
+<span class="fc" id="L103">                    .title(product.getName())</span>
+<span class="fc" id="L104">                    .currencyId(CURRENCY)</span>
+<span class="fc" id="L105">                    .pictureUrl(IMAGE_URL)</span>
+<span class="fc" id="L106">                    .description(product.getDescription())</span>
+<span class="fc" id="L107">                    .quantity(product.getQuantity())</span>
+<span class="fc" id="L108">                    .unitPrice(BigDecimal.valueOf(product.getPrice() / product.getQuantity()))</span>
+<span class="fc" id="L109">                    .build();</span>
+
+
+<span class="fc" id="L112">            items.add(itemRequest);</span>
+
+<span class="fc" id="L114">        }</span>
+
+
+<span class="fc" id="L117">        List&lt;PreferencePaymentMethodRequest&gt; excludedPaymentMethods = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L118">        excludedPaymentMethods.add(PreferencePaymentMethodRequest.builder().id(&quot;pec&quot;).build());</span>
+
+
+<span class="fc" id="L121">        PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()</span>
+<span class="fc" id="L122">                .excludedPaymentMethods(excludedPaymentMethods)</span>
+<span class="fc" id="L123">                .installments(12)</span>
+<span class="fc" id="L124">                .build();</span>
+
+
+<span class="fc" id="L127">        PreferenceRequest preferenceRequest = PreferenceRequest.builder()</span>
+<span class="fc" id="L128">                .items(items)</span>
+<span class="fc" id="L129">                .backUrls(PreferenceBackUrlsRequest.builder()</span>
+<span class="fc" id="L130">                        .success(nrokUrl + SUCCESS_URL)</span>
+<span class="fc" id="L131">                        .failure(nrokUrl + FAILURE_URL)</span>
+<span class="fc" id="L132">                        .pending(nrokUrl + PENDING_URL).build())</span>
+<span class="fc" id="L133">                .autoReturn(PAYMENT_STATUS)</span>
+<span class="fc" id="L134">                .paymentMethods(paymentMethods)</span>
+<span class="fc" id="L135">                .notificationUrl(nrokUrl + NOTIFICATION_URL)</span>
+<span class="fc" id="L136">                .expires(true)</span>
+<span class="fc" id="L137">                .build();</span>
+
+<span class="fc" id="L139">        PreferenceClient client = new PreferenceClient();</span>
+
+
+        try {
+
+<span class="fc" id="L144">            return client.create(preferenceRequest).getInitPoint();</span>
+
+<span class="fc" id="L146">        } catch (MPApiException ex) {</span>
+
+<span class="fc" id="L148">            throw new MercadoPagoException(MERCADO_PAGO_EXCEPTION_MESSAGE);</span>
+        }
+    }
+
+    @Override
+    public void handlerWithApprovedPayment(String id, String topic) {
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">        if (PAYMENT_TOPIC.equals(topic)) {</span>
+
+<span class="nc" id="L157">            MercadoPagoConfig.setAccessToken(accessToken);</span>
+            try {
+
+<span class="nc" id="L160">                PaymentClient paymentClient = new PaymentClient();</span>
+<span class="nc" id="L161">                Payment payment = paymentClient.get(Long.parseLong(id));</span>
+
+
+<span class="nc bnc" id="L164" title="All 2 branches missed.">                if (payment.getStatus().equals(PAYMENT_STATUS)) {</span>
+<span class="nc" id="L165">                    handlerWithProductProcess(payment);</span>
+                }
+
+
+<span class="nc" id="L169">            } catch (Exception e) {</span>
+<span class="nc" id="L170">                throw new MercadoPagoException(MERCADO_PAGO_EXCEPTION_MESSAGE);</span>
+
+<span class="nc" id="L172">            }</span>
+        }
+
+
+<span class="nc" id="L176">    }</span>
+
+    private void handlerWithProductProcess(Payment payment) throws MessagingException {
+<span class="nc" id="L179">        List&lt;PaymentItem&gt; items = payment.getAdditionalInfo().getItems();</span>
+
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (!items.isEmpty()) {</span>
+
+<span class="nc" id="L183">            List&lt;TemporaryProductVO&gt; temporaryProductVOS = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            for (PaymentItem paymentItem : items) {</span>
+
+
+<span class="nc" id="L187">                TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());</span>
+<span class="nc" id="L188">                ProductVO productById = productService.findProductById(paymentItem.getId());</span>
+<span class="nc" id="L189">                productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());</span>
+<span class="nc" id="L190">                productService.updateProduct(productById);</span>
+<span class="nc" id="L191">                temporaryProductVOS.add(temporaryProductById);</span>
+
+<span class="nc" id="L193">            }</span>
+
+<span class="nc" id="L195">            shoppingCartService.deleteShoppingCart(testMail);</span>
+<span class="nc" id="L196">            emailSenderService.sendMailToApprovedPayment(testMail, temporaryProductVOS, payment.getTransactionAmount());</span>
+
+<span class="nc" id="L198">        } else {</span>
+
+<span class="nc" id="L200">            throw new EmptyProductListException(EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE);</span>
+
+        }
+<span class="nc" id="L203">    }</span>
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

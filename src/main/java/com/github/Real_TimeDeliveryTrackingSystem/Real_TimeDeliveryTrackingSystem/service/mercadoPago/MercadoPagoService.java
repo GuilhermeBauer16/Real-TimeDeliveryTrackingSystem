@@ -4,7 +4,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.EmptyProductListException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
@@ -66,8 +65,6 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
     private static final String FAILURE_URL = "/payment/pending";
     private static final String MERCADO_PAGO_EXCEPTION_MESSAGE = "Was not be possible to process the process with" +
             " Mercado Pago payment API";
-
-    private static final String EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE = "The product list is empty";
 
     private final ShoppingCartService shoppingCartService;
     private final TemporaryProductService temporaryProductService;
@@ -178,28 +175,23 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
     private void handlerWithProductProcess(Payment payment) throws MessagingException {
         List<PaymentItem> items = payment.getAdditionalInfo().getItems();
 
-        if (!items.isEmpty()) {
 
-            List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
-            for (PaymentItem paymentItem : items) {
+        List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
+        for (PaymentItem paymentItem : items) {
 
 
-                TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
-                ProductVO productById = productService.findProductById(paymentItem.getId());
-                productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
-                productService.updateProduct(productById);
-                temporaryProductVOS.add(temporaryProductById);
-
-            }
-
-            shoppingCartService.deleteShoppingCart(testMail);
-            emailSenderService.sendMailToApprovedPayment(testMail, temporaryProductVOS, payment.getTransactionAmount());
-
-        } else {
-
-            throw new EmptyProductListException(EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE);
+            TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
+            ProductVO productById = productService.findProductById(paymentItem.getId());
+            productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
+            productService.updateProduct(productById);
+            temporaryProductVOS.add(temporaryProductById);
 
         }
+
+        shoppingCartService.deleteShoppingCart(testMail);
+        emailSenderService.sendMailToApprovedPayment(testMail, temporaryProductVOS, payment.getTransactionAmount());
+
+
     }
 
 }

@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SecurityConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.config</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfig (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.config;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.filters.CsrfCookieFilter;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.filters.JwtValidationFilter;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+&nbsp;import org.springframework.security.config.http.SessionCreationPolicy;
+&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.security.web.SecurityFilterChain;
+&nbsp;import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+&nbsp;import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+&nbsp;import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+&nbsp;import org.springframework.web.cors.CorsConfiguration;
+&nbsp;import org.springframework.web.cors.CorsConfigurationSource;
+&nbsp;import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Configuration
+<b class="fc">&nbsp;public class SecurityConfig {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final String[] DRIVER_RESOURCES = {&quot;/vehicle/**&quot;, &quot;/driver/**&quot;, &quot;/driverAddress/**&quot;};</b>
+<b class="fc">&nbsp;    private static final String[] CUSTOMER_RESOURCES = {&quot;/customer/**&quot;, &quot;/customer/product/**&quot;, &quot;/shoppingCart/**&quot;,</b>
+&nbsp;            &quot;/payment/v1/checkout/**&quot;, &quot;index/**&quot;, &quot;/mercadoPago/**&quot;};
+&nbsp;
+<b class="fc">&nbsp;    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {&quot;/vehicle/**&quot;, &quot;/api/login&quot;, &quot;/signInCustomer&quot;, &quot;/customer/**&quot;,</b>
+&nbsp;            &quot;/signInDriver/**&quot;, &quot;/driver/**&quot;, &quot;/driverAddress/**&quot;, &quot;/customerAddress/**&quot;, &quot;/verificationCode/**&quot;, &quot;/product/**&quot;
+&nbsp;            , &quot;/customer/product/**&quot;, &quot;/shoppingCart/**&quot;, &quot;/payment/v1/checkout/**&quot;, &quot;index/**&quot;, &quot;/mercadoPago/**&quot;,&quot;/ipn/**&quot;};
+<b class="fc">&nbsp;    private static final String[] ADMIN_RESOURCES = {&quot;/product/**&quot;};</b>
+&nbsp;    private static final String ROLE_ADMIN = &quot;ADMIN&quot;;
+&nbsp;    private static final String ROLE_CUSTOMER = &quot;CUSTOMER&quot;;
+&nbsp;    private static final String ROLE_DRIVER = &quot;DRIVER&quot;;
+&nbsp;
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    @Autowired
+&nbsp;    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtValidationFilter jwtValidationFilter) throws Exception {
+<b class="fc">&nbsp;        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();</b>
+<b class="fc">&nbsp;        requestHandler.setCsrfRequestAttributeName(&quot;_csrf&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        return http</b>
+<b class="fc">&nbsp;                .httpBasic(AbstractHttpConfigurer::disable)</b>
+<b class="fc">&nbsp;                .csrf(csrf -&gt; csrf.csrfTokenRequestHandler(requestHandler)</b>
+<b class="fc">&nbsp;                        .ignoringRequestMatchers(CSRF_IGNORE_REQUEST_MATCHER)</b>
+<b class="fc">&nbsp;                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))</b>
+<b class="fc">&nbsp;                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</b>
+<b class="fc">&nbsp;                .cors(cors -&gt; cors.configurationSource(corsConfigurationSource()))</b>
+<b class="fc">&nbsp;                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)</b>
+<b class="fc">&nbsp;                .addFilterAfter(jwtValidationFilter, BasicAuthenticationFilter.class)</b>
+<b class="fc">&nbsp;                .sessionManagement(</b>
+<b class="fc">&nbsp;                        session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</b>
+<b class="fc">&nbsp;                .authorizeHttpRequests(</b>
+&nbsp;                        authorizeHttpRequests -&gt; authorizeHttpRequests
+&nbsp;//
+<b class="fc">&nbsp;                                .requestMatchers(DRIVER_RESOURCES).hasRole(ROLE_DRIVER)</b>
+<b class="fc">&nbsp;                                .requestMatchers(CUSTOMER_RESOURCES).hasRole(ROLE_CUSTOMER)</b>
+<b class="fc">&nbsp;                                .requestMatchers(ADMIN_RESOURCES).hasRole(ROLE_ADMIN)</b>
+<b class="fc">&nbsp;                                .anyRequest().permitAll()</b>
+&nbsp;
+&nbsp;
+&nbsp;                )
+&nbsp;//                .headers(headers -&gt; headers
+&nbsp;//                        .contentSecurityPolicy(csp -&gt; csp.policyDirectives(
+&nbsp;//                                &quot;default-src &#39;self&#39;; &quot; +
+&nbsp;//                                        &quot;script-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39; blob: &quot; +
+&nbsp;//                                        &quot;*.mercadopago.com mercadopago.com.br *.mercadopago.com.br &quot; +
+&nbsp;//                                        &quot;hotjar.com *.hotjar.com static.hotjar.com *.static.hotjar.com script.hotjar.com *.script.hotjar.com; &quot; +
+&nbsp;//                                        &quot;connect-src &#39;self&#39; &quot; +
+&nbsp;//                                        &quot;*.mercadopago.com mercadopago.com.br *.mercadopago.com.br &quot; +
+&nbsp;//                                        &quot;*.hotjar.com static.hotjar.com script.hotjar.com;&quot; // 🔹 Permite conexões
+&nbsp;//                        )))
+&nbsp;
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public PasswordEncoder passwordEncoder() {
+<b class="fc">&nbsp;        return new BCryptPasswordEncoder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    CorsConfigurationSource corsConfigurationSource() {
+<b class="fc">&nbsp;        CorsConfiguration configuration = new CorsConfiguration();</b>
+<b class="fc">&nbsp;        configuration.setAllowedOrigins(List.of(&quot;*&quot;));</b>
+<b class="fc">&nbsp;        configuration.setAllowedMethods(List.of(&quot;*&quot;));</b>
+<b class="fc">&nbsp;        configuration.setAllowedHeaders(List.of(&quot;*&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource =</b>
+&nbsp;                new UrlBasedCorsConfigurationSource();
+&nbsp;
+<b class="fc">&nbsp;        urlBasedCorsConfigurationSource.registerCorsConfiguration(&quot;/**&quot;, configuration);</b>
+<b class="fc">&nbsp;        return urlBasedCorsConfigurationSource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+<b class="fc">&nbsp;        return configuration.getAuthenticationManager();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

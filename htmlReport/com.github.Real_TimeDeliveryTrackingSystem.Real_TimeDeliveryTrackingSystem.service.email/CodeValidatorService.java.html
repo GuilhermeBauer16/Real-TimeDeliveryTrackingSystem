@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeValidatorService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email</a> &gt; <span class="el_source">CodeValidatorService.java</span></div><h1>CodeValidatorService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.VerificationCodeRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CodeValidatorServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+public class CodeValidatorService implements CodeValidatorServiceContract {
+
+    private final UserService userService;
+
+    private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = &quot;This user is already authenticated.&quot;;
+    private static final String USER_NOT_AUTHENTICATED_MESSAGE = &quot;This user is not authenticated, please authenticate the user and try again.&quot;;
+    private static final String EXPIRED_VERIFICATION_CODE_MESSAGE = &quot;This verification code is expired.&quot;;
+    private static final String INVALID_VERIFICATION_CODE_MESSAGE = &quot;This verification code %s is not valid.&quot;;
+
+    @Autowired
+<span class="fc" id="L30">    public CodeValidatorService(UserService userService) {</span>
+<span class="fc" id="L31">        this.userService = userService;</span>
+<span class="fc" id="L32">    }</span>
+    @Override
+    @Transactional
+    public void evaluatedVerifyCode(VerificationCodeRequest verifyCodeRequest) {
+
+<span class="fc" id="L37">        UserVO userVO = userService.findUserByEmail(verifyCodeRequest.getEmail());</span>
+<span class="fc" id="L38">        System.out.println(userVO.getCodeExpiration());</span>
+
+
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (userVO.isAuthenticated()) {</span>
+<span class="fc" id="L42">            throw new UserAlreadyAuthenticatedException(USER_ALREADY_AUTHENTICATED_MESSAGE);</span>
+        }
+
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (LocalDateTime.now().isAfter(userVO.getCodeExpiration())) {</span>
+<span class="fc" id="L47">            throw new ExpiredVerificationCodeException(EXPIRED_VERIFICATION_CODE_MESSAGE);</span>
+        }
+
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (!userVO.getVerifyCode().strip().equals(verifyCodeRequest.getCode())) {</span>
+<span class="fc" id="L52">            throw new InvalidVerificationCodeException(String.format(INVALID_VERIFICATION_CODE_MESSAGE, verifyCodeRequest.getCode()));</span>
+        }
+
+
+<span class="fc" id="L56">        userVO.setAuthenticated(true);</span>
+<span class="fc" id="L57">        UserUpdateRequest userUpdateRequest = BuildMapper.parseObject(new UserUpdateRequest(), userVO);</span>
+<span class="fc" id="L58">        userService.updateUser(userUpdateRequest);</span>
+<span class="fc" id="L59">    }</span>
+    @Override
+    public void verifyIfUserIsAuthenticated(String email) {
+
+<span class="fc" id="L63">        UserVO userVO = userService.findUserByEmail(email);</span>
+
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (!userVO.isAuthenticated()) {</span>
+<span class="fc" id="L67">            throw new UserNotAuthenticatedException(USER_NOT_AUTHENTICATED_MESSAGE);</span>
+        }
+<span class="fc" id="L69">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

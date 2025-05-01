@@ -1,0 +1,810 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverServiceTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">DriverServiceTest.java</span></div><h1>DriverServiceTest.java</h1><pre class="source lang-java linenums">package service;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.InvalidPasswordException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.VehicleNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver.DriverService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
+import constants.TestConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+<span class="fc" id="L53">class DriverServiceTest {</span>
+
+
+    private static final String DRIVER_NOT_FOUND_MESSAGE = &quot;This driver was not found, please verify the fields and try again.&quot;;
+    private static final String INVALID_PASSWORD_MESSAGE = &quot;The password typed is incorrect,&quot; +
+            &quot; please verify and try again.&quot;;
+
+    private static final String VEHICLE_NOT_ASSOCIATED_MESSAGE = &quot;That vehicle was not associated with this user,&quot; +
+            &quot; please verify the fields and try again.&quot;;
+
+
+    private static final String PHONE_NUMBER = &quot;+5511998765432&quot;;
+    private static final String DRIVER_LICENSE = &quot;14829179653&quot;;
+    private static final String LICENSE_PLATE = &quot;AQE1F34&quot;;
+    private static final String UPDATE_LICENSE_PLATE = &quot;AQE1F34&quot;;
+    private static final String INVALID_LICENSE_PLATE = &quot;AQEF34&quot;;
+    private static final String EMAIL = &quot;user@example.com&quot;;
+<span class="fc" id="L70">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;</span>
+
+    private AddressVO addressVO;
+    private DriverEntity driverEntity;
+    private VehicleVO vehicleVO;
+    private AddressEntity addressEntity;
+    private VehicleEntity vehicleEntity;
+
+    private PasswordDTO passwordDTO;
+
+    @Mock
+    private VehicleRepository vehicleRepository;
+
+    @Mock
+    private DriverRepository repository;
+
+    @Mock
+    private AddressService addressService;
+
+    @Mock
+    private VehicleService vehicleService;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private UserDetails userDetails;
+
+    @InjectMocks
+    private DriverService service;
+
+    @BeforeEach
+    public void setUp() {
+
+<span class="fc" id="L110">        addressVO = new AddressVO(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY</span>
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+<span class="fc" id="L113">        addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY</span>
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+<span class="fc" id="L116">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
+
+<span class="fc" id="L119">        vehicleVO = new VehicleVO(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L122">        vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L125">        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList&lt;&gt;(Arrays.asList(addressEntity))</span>
+<span class="fc" id="L126">                , new ArrayList&lt;&gt;(List.of(vehicleEntity)), userEntity);</span>
+<span class="fc" id="L127">        passwordDTO = new PasswordDTO(TestConstants.USER_PASSWORD);</span>
+
+
+<span class="fc" id="L130">    }</span>
+
+    @Test
+    void testDeleteDriver_WhenDriverIsDeleted_ShouldDoNothing() {
+
+<span class="fc" id="L135">        List&lt;AddressEntity&gt; addresses = List.of(addressEntity);</span>
+
+<span class="fc" id="L137">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L138">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L139">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L140">        SecurityContextHolder.setContext(securityContext);</span>
+
+
+<span class="fc" id="L143">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+
+<span class="fc" id="L146">        when(passwordEncoder.matches(passwordDTO.getPassword(), driverEntity.getUser().getPassword())).thenReturn(true);</span>
+
+<span class="fc" id="L148">        PageRequest pageRequest = PageRequest.of(0, 10);</span>
+
+<span class="fc" id="L150">        when(repository.findAddressesByDriverEmail(eq(EMAIL), eq(pageRequest)))</span>
+<span class="fc" id="L151">                .thenReturn(new PageImpl&lt;&gt;(addresses));</span>
+
+
+<span class="fc" id="L154">        doNothing().when(addressService).deleteAllAddresses(anyList());</span>
+
+<span class="fc" id="L156">        List&lt;VehicleEntity&gt; vehiclesEntities = List.of(vehicleEntity);</span>
+
+<span class="fc" id="L158">        when(repository.findVehiclesByDriverEmail(eq(EMAIL), eq(pageRequest))).thenReturn(new PageImpl&lt;&gt;(vehiclesEntities));</span>
+
+
+<span class="fc" id="L161">        doNothing().when(vehicleService).deleteAllVehicles(anyList());</span>
+
+
+<span class="fc" id="L164">        service.delete(passwordDTO);</span>
+
+
+<span class="fc" id="L167">        verify(addressService, times(1)).deleteAllAddresses(anyList());</span>
+<span class="fc" id="L168">        verify(vehicleService, times(1)).deleteAllVehicles(anyList());</span>
+
+
+<span class="fc" id="L171">        verify(repository, times(1)).delete(driverEntity);</span>
+
+<span class="fc" id="L173">        SecurityContextHolder.clearContext();</span>
+<span class="fc" id="L174">    }</span>
+
+    @Test
+    void testDeleteDriver_WhenPasswordDontMatchers_ShouldThrowInvalidPasswordException() {
+
+<span class="fc" id="L179">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L180">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L181">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L182">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L184">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+<span class="fc" id="L186">        when(passwordEncoder.matches(passwordDTO.getPassword(), driverEntity.getUser().getPassword())).thenReturn(false);</span>
+
+<span class="pc" id="L188">        InvalidPasswordException exception = assertThrows(InvalidPasswordException.class, () -&gt; service.delete(passwordDTO));</span>
+
+<span class="fc" id="L190">        assertNotNull(exception);</span>
+<span class="fc" id="L191">        assertEquals(InvalidPasswordException.ERROR.formatErrorMessage(INVALID_PASSWORD_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L194">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L196">    }</span>
+
+    @Test
+    void testDeleteDriver_WhenDriverIsNotFound_ShouldDriverNotFoundException() {
+
+<span class="fc" id="L201">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L202">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L203">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L204">        SecurityContextHolder.setContext(securityContext);</span>
+
+
+<span class="pc" id="L207">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.delete(passwordDTO));</span>
+
+
+<span class="fc" id="L210">        assertNotNull(exception);</span>
+<span class="fc" id="L211">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L214">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L216">    }</span>
+
+
+    @Test
+    void testAddAddressToDriver_WhenSuccessful_ShouldReturnAddressObject() {
+
+
+<span class="fc" id="L223">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L224">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L225">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L226">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L228">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L229">        when(addressService.create(any(AddressVO.class))).thenReturn(addressVO);</span>
+<span class="fc" id="L230">        when(repository.save(any(DriverEntity.class))).thenReturn(driverEntity);</span>
+
+
+<span class="fc" id="L233">        AddressVO createdAddress = service.addAddressToDriver(addressVO);</span>
+
+<span class="fc" id="L235">        verify(repository, times(1)).save(any(DriverEntity.class));</span>
+<span class="fc" id="L236">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L237">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L238">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L239">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L241">        assertNotNull(createdAddress);</span>
+<span class="fc" id="L242">        assertNotNull(createdAddress.getId());</span>
+<span class="fc" id="L243">        assertEquals(TestConstants.ID, createdAddress.getId());</span>
+<span class="fc" id="L244">        assertEquals(TestConstants.ADDRESS_STREET, createdAddress.getStreet());</span>
+<span class="fc" id="L245">        assertEquals(TestConstants.ADDRESS_CITY, createdAddress.getCity());</span>
+<span class="fc" id="L246">        assertEquals(TestConstants.ADDRESS_STATE, createdAddress.getState());</span>
+<span class="fc" id="L247">        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, createdAddress.getPostalCode());</span>
+<span class="fc" id="L248">        assertEquals(TestConstants.ADDRESS_COUNTRY, createdAddress.getCountry());</span>
+
+<span class="fc" id="L250">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L252">    }</span>
+
+
+    @Test
+    void testAddAddressToDriver_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L258">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L259">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L260">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L262">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L264">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.addAddressToDriver(null));</span>
+
+<span class="fc" id="L266">        assertNotNull(exception);</span>
+<span class="fc" id="L267">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+<span class="fc" id="L269">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L271">    }</span>
+
+    @Test
+    void testUpdateAddressOfDriver_WhenSuccessful_ShouldReturnUpdatedAddressObject() {
+<span class="fc" id="L275">        addressVO.setState(TestConstants.ADDRESS_UPDATED_STATE);</span>
+<span class="fc" id="L276">        addressVO.setCountry(TestConstants.ADDRESS_UPDATED_COUNTRY);</span>
+
+<span class="fc" id="L278">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L279">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L280">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L281">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L283">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L284">        when(addressService.update(any(AddressVO.class))).thenReturn(addressVO);</span>
+
+
+<span class="fc" id="L287">        AddressVO updatedAddress = service.updateAddressOfADriver(addressVO);</span>
+
+
+<span class="fc" id="L290">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L291">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L292">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L293">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L295">        assertNotNull(updatedAddress);</span>
+<span class="fc" id="L296">        assertNotNull(updatedAddress.getId());</span>
+<span class="fc" id="L297">        assertEquals(TestConstants.ID, updatedAddress.getId());</span>
+<span class="fc" id="L298">        assertEquals(TestConstants.ADDRESS_STREET, updatedAddress.getStreet());</span>
+<span class="fc" id="L299">        assertEquals(TestConstants.ADDRESS_CITY, updatedAddress.getCity());</span>
+<span class="fc" id="L300">        assertEquals(TestConstants.ADDRESS_UPDATED_STATE, updatedAddress.getState());</span>
+<span class="fc" id="L301">        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, updatedAddress.getPostalCode());</span>
+<span class="fc" id="L302">        assertEquals(TestConstants.ADDRESS_UPDATED_COUNTRY, updatedAddress.getCountry());</span>
+
+<span class="fc" id="L304">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L306">    }</span>
+
+    @Test
+    void testUpdateAddressOfDriver_WhenDriverIsNotFound_ShouldThrowCustomerNotFoundException() {
+
+<span class="fc" id="L311">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L312">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L313">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L315">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L317">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.updateAddressOfADriver(null));</span>
+
+<span class="fc" id="L319">        assertNotNull(exception);</span>
+<span class="fc" id="L320">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+<span class="fc" id="L322">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L324">    }</span>
+
+    @Test
+    void testFindAddressOfADriverByItsId_WhenSuccessful_ShouldReturnAddressObject() {
+
+
+<span class="fc" id="L330">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L331">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L332">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L333">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L335">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L336">        when(addressService.findById(anyString())).thenReturn(addressVO);</span>
+
+
+<span class="fc" id="L339">        AddressVO addressFounded = service.findAddressOfADriverByItsId(TestConstants.ID);</span>
+
+
+<span class="fc" id="L342">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L343">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L344">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L345">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L347">        assertNotNull(addressFounded);</span>
+<span class="fc" id="L348">        assertNotNull(addressFounded.getId());</span>
+<span class="fc" id="L349">        assertEquals(TestConstants.ID, addressFounded.getId());</span>
+<span class="fc" id="L350">        assertEquals(TestConstants.ADDRESS_STREET, addressFounded.getStreet());</span>
+<span class="fc" id="L351">        assertEquals(TestConstants.ADDRESS_CITY, addressFounded.getCity());</span>
+<span class="fc" id="L352">        assertEquals(TestConstants.ADDRESS_STATE, addressFounded.getState());</span>
+<span class="fc" id="L353">        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, addressFounded.getPostalCode());</span>
+<span class="fc" id="L354">        assertEquals(TestConstants.ADDRESS_COUNTRY, addressFounded.getCountry());</span>
+
+<span class="fc" id="L356">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L358">    }</span>
+
+    @Test
+    void testFindAddressOfADriverByItsId_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L363">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L364">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L365">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L367">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L369">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.findAddressOfADriverByItsId(null));</span>
+
+<span class="fc" id="L371">        assertNotNull(exception);</span>
+<span class="fc" id="L372">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+<span class="fc" id="L374">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L376">    }</span>
+
+    @Test
+    void testFindAllAddressesOfADriver_WhenSuccessful_ShouldReturnDriverAddresses() {
+
+
+<span class="fc" id="L382">        List&lt;AddressEntity&gt; addresses = List.of(addressEntity);</span>
+
+<span class="fc" id="L384">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L385">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L386">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L387">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L389">        PageRequest pageRequest = PageRequest.of(0, 10);</span>
+
+<span class="fc" id="L391">        when(repository.findAddressesByDriverEmail(eq(EMAIL), eq(pageRequest)))</span>
+<span class="fc" id="L392">                .thenReturn(new PageImpl&lt;&gt;(addresses));</span>
+
+<span class="fc" id="L394">        Page&lt;AddressVO&gt; allAddressesOfDriver = service.findAllAddressesOfADriver(pageRequest);</span>
+<span class="fc" id="L395">        AddressVO address = allAddressesOfDriver.getContent().getFirst();</span>
+
+
+<span class="fc" id="L398">        verify(repository, times(1)).findAddressesByDriverEmail(anyString(), any(PageRequest.class));</span>
+<span class="fc" id="L399">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L400">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L401">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L403">        assertNotNull(address);</span>
+<span class="fc" id="L404">        assertNotNull(address.getId());</span>
+<span class="fc" id="L405">        assertEquals(TestConstants.ID, address.getId());</span>
+<span class="fc" id="L406">        assertEquals(TestConstants.ADDRESS_STREET, address.getStreet());</span>
+<span class="fc" id="L407">        assertEquals(TestConstants.ADDRESS_CITY, address.getCity());</span>
+<span class="fc" id="L408">        assertEquals(TestConstants.ADDRESS_STATE, address.getState());</span>
+<span class="fc" id="L409">        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, address.getPostalCode());</span>
+<span class="fc" id="L410">        assertEquals(TestConstants.ADDRESS_COUNTRY, address.getCountry());</span>
+
+<span class="fc" id="L412">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L414">    }</span>
+
+    @Test
+    void testDeleteAddressOfADriver_WhenAddressWasDeleted_ShouldDoNothing() {
+
+
+<span class="fc" id="L420">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L421">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L422">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L423">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L425">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L426">        doNothing().when(addressService).delete(anyString());</span>
+
+
+<span class="fc" id="L429">        service.deleteAddressOfADriver(TestConstants.ID);</span>
+
+
+<span class="fc" id="L432">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L433">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L434">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L435">        verify(userDetails).getUsername();</span>
+
+
+<span class="fc" id="L438">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L440">    }</span>
+
+    @Test
+    void testDeleteAddressOfADriver_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L445">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L446">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L447">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L449">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L451">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.deleteAddressOfADriver(null));</span>
+
+<span class="fc" id="L453">        assertNotNull(exception);</span>
+<span class="fc" id="L454">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+<span class="fc" id="L456">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L458">    }</span>
+
+    @Test
+    void testCreateVehicleToDriver_WhenSuccessful_ShouldReturnVehicleObject() {
+
+
+<span class="fc" id="L464">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L465">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L466">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L467">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L469">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L470">        when(vehicleService.create(any(VehicleVO.class))).thenReturn(vehicleVO);</span>
+<span class="fc" id="L471">        when(repository.save(any(DriverEntity.class))).thenReturn(driverEntity);</span>
+
+
+<span class="fc" id="L474">        VehicleVO vehicle = service.createVehicle(vehicleVO);</span>
+
+<span class="fc" id="L476">        verify(repository, times(1)).save(any(DriverEntity.class));</span>
+<span class="fc" id="L477">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L478">        verify(vehicleService, times(1)).create(any(VehicleVO.class));</span>
+<span class="fc" id="L479">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L480">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L481">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L483">        assertNotNull(vehicle);</span>
+<span class="fc" id="L484">        assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L485">        assertEquals(TestConstants.ID, vehicle.getId());</span>
+<span class="fc" id="L486">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L487">        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L488">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L489">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+
+<span class="fc" id="L492">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L494">    }</span>
+
+    @Test
+    void testCreateVehicleToDriver_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L499">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L500">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L501">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L503">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L505">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.createVehicle(null));</span>
+
+<span class="fc" id="L507">        assertNotNull(exception);</span>
+<span class="fc" id="L508">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+<span class="fc" id="L510">        SecurityContextHolder.clearContext();</span>
+
+<span class="fc" id="L512">    }</span>
+
+    @Test
+    void testUpdateVehicle_WhenSuccessful_ShouldReturnVehicleObject() {
+
+<span class="fc" id="L517">        vehicleVO.setLicensePlate(UPDATE_LICENSE_PLATE);</span>
+<span class="fc" id="L518">        vehicleVO.setName(TestConstants.VEHICLE_UPDATED_NAME);</span>
+
+<span class="fc" id="L520">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L521">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L522">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L524">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L526">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L527">        when(vehicleService.update(any(VehicleVO.class))).thenReturn(vehicleVO);</span>
+
+<span class="fc" id="L529">        VehicleVO vehicle = service.updateVehicle(vehicleVO);</span>
+
+<span class="fc" id="L531">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L532">        verify(vehicleService, times(1)).update(any(VehicleVO.class));</span>
+<span class="fc" id="L533">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L534">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L535">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L537">        assertNotNull(vehicle);</span>
+<span class="fc" id="L538">        assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L539">        assertEquals(TestConstants.ID, vehicle.getId());</span>
+<span class="fc" id="L540">        assertEquals(TestConstants.VEHICLE_UPDATED_NAME, vehicle.getName());</span>
+<span class="fc" id="L541">        assertEquals(UPDATE_LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L542">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L543">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+<span class="fc" id="L545">    }</span>
+
+
+    @Test
+    void testUpdateVehicle_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
+
+
+<span class="fc" id="L552">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L553">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L554">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L555">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L557">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+<span class="fc" id="L559">        vehicleVO.setId(TestConstants.INVALID_ID);</span>
+<span class="fc" id="L560">        VehicleNotFoundException exception = assertThrows(</span>
+<span class="nc" id="L561">                VehicleNotFoundException.class, () -&gt; service.updateVehicle(vehicleVO));</span>
+
+<span class="fc" id="L563">        assertNotNull(exception);</span>
+<span class="fc" id="L564">        assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_ASSOCIATED_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L567">    }</span>
+
+    @Test
+    void testUpdateVehicleToDriver_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L572">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L573">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L574">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+
+<span class="fc" id="L577">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L579">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.updateVehicle(null));</span>
+
+<span class="fc" id="L581">        assertNotNull(exception);</span>
+<span class="fc" id="L582">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L585">    }</span>
+
+    @Test
+    void testFindVehicleById_WhenSuccessful_ShouldReturnVehicleObject() {
+
+<span class="fc" id="L590">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L591">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L592">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L594">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L596">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L597">        when(vehicleService.findById(anyString())).thenReturn(vehicleVO);</span>
+
+<span class="fc" id="L599">        VehicleVO vehicle = service.findVehicleById(TestConstants.ID);</span>
+
+<span class="fc" id="L601">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L602">        verify(vehicleService, times(1)).findById(anyString());</span>
+<span class="fc" id="L603">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L604">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L605">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L607">        assertNotNull(vehicle);</span>
+<span class="fc" id="L608">        assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L609">        assertEquals(TestConstants.ID, vehicle.getId());</span>
+<span class="fc" id="L610">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L611">        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L612">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L613">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+
+<span class="fc" id="L616">    }</span>
+
+    @Test
+    void testFindVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
+<span class="fc" id="L620">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L621">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L622">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L623">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L625">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+<span class="fc" id="L627">        VehicleNotFoundException exception = assertThrows(</span>
+<span class="nc" id="L628">                VehicleNotFoundException.class, () -&gt; service.findVehicleById(TestConstants.INVALID_ID));</span>
+
+<span class="fc" id="L630">        assertNotNull(exception);</span>
+<span class="fc" id="L631">        assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_ASSOCIATED_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L634">    }</span>
+
+    @Test
+    void testFindVehicleById_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L639">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L640">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L641">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L643">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L645">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.findVehicleById(null));</span>
+
+<span class="fc" id="L647">        assertNotNull(exception);</span>
+<span class="fc" id="L648">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L651">    }</span>
+
+    @Test
+    void testFindVehicleByLicensePlate_WhenSuccessful_ShouldReturnVehicleObject() {
+
+<span class="fc" id="L656">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L657">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L658">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L660">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L662">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L663">        when(vehicleService.findByLicensePlate(anyString())).thenReturn(vehicleVO);</span>
+
+<span class="fc" id="L665">        VehicleVO vehicle = service.findVehicleByLicensePlate(LICENSE_PLATE);</span>
+
+<span class="fc" id="L667">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+<span class="fc" id="L668">        verify(vehicleService, times(1)).findByLicensePlate(anyString());</span>
+<span class="fc" id="L669">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L670">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L671">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L673">        assertNotNull(vehicle);</span>
+<span class="fc" id="L674">        assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L675">        assertEquals(TestConstants.ID, vehicle.getId());</span>
+<span class="fc" id="L676">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L677">        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L678">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L679">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+<span class="fc" id="L681">    }</span>
+
+    @Test
+    void testFindVehicleByLicensePlate_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
+<span class="fc" id="L685">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L686">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L687">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L688">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L690">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+<span class="fc" id="L692">        VehicleNotFoundException exception = assertThrows(</span>
+<span class="nc" id="L693">                VehicleNotFoundException.class, () -&gt; service.findVehicleByLicensePlate(INVALID_LICENSE_PLATE));</span>
+
+<span class="fc" id="L695">        assertNotNull(exception);</span>
+<span class="fc" id="L696">        assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_ASSOCIATED_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L699">    }</span>
+
+    @Test
+    void testFindVehicleByLicensePlate_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L704">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L705">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L706">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L708">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L710">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.findVehicleByLicensePlate(null));</span>
+
+<span class="fc" id="L712">        assertNotNull(exception);</span>
+<span class="fc" id="L713">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L716">    }</span>
+
+    @Test
+    void testFindAllVehiclesOfADriver_WhenSuccessful_ShouldReturnDriverVehicles() {
+
+
+<span class="fc" id="L722">        List&lt;VehicleEntity&gt; vehicles = List.of(vehicleEntity);</span>
+
+<span class="fc" id="L724">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L725">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L726">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L727">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L729">        PageRequest pageRequest = PageRequest.of(0, 10);</span>
+
+<span class="fc" id="L731">        when(repository.findVehiclesByDriverEmail(eq(EMAIL), eq(pageRequest)))</span>
+<span class="fc" id="L732">                .thenReturn(new PageImpl&lt;&gt;(vehicles));</span>
+
+<span class="fc" id="L734">        Page&lt;VehicleVO&gt; allVehiclesOfADriver = service.findAllVehicles(pageRequest);</span>
+<span class="fc" id="L735">        VehicleVO vehicle = allVehiclesOfADriver.getContent().getFirst();</span>
+
+
+<span class="fc" id="L738">        verify(repository, times(1)).findVehiclesByDriverEmail(anyString(), any(PageRequest.class));</span>
+<span class="fc" id="L739">        verify(securityContext).getAuthentication();</span>
+<span class="fc" id="L740">        verify(authentication).getPrincipal();</span>
+<span class="fc" id="L741">        verify(userDetails).getUsername();</span>
+
+<span class="fc" id="L743">        assertNotNull(vehicle);</span>
+<span class="fc" id="L744">        assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L745">        assertEquals(TestConstants.ID, vehicle.getId());</span>
+<span class="fc" id="L746">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L747">        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L748">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L749">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+
+<span class="fc" id="L752">    }</span>
+
+    @Test
+    void testDeleteVehicleById_WhenSuccessful_ShouldDoNothing() {
+
+<span class="fc" id="L757">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L758">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L759">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L760">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L762">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+<span class="fc" id="L763">        doNothing().when(vehicleService).delete(anyString());</span>
+
+
+<span class="fc" id="L766">        service.deleteVehicle(TestConstants.ID);</span>
+
+<span class="fc" id="L768">        verify(vehicleService, times(1)).delete(anyString());</span>
+<span class="fc" id="L769">        verify(repository, times(1)).findDriverByUserEmail(anyString());</span>
+
+<span class="fc" id="L771">    }</span>
+
+    @Test
+    void testDeleteVehicleById_WhenVehicleIsNotAssociatedWithDriver_ShouldThrowVehicleNotFoundException() {
+
+<span class="fc" id="L776">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L777">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L778">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+<span class="fc" id="L779">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="fc" id="L781">        when(repository.findDriverByUserEmail(anyString())).thenReturn(Optional.of(driverEntity));</span>
+
+<span class="fc" id="L783">        VehicleNotFoundException exception = assertThrows(</span>
+<span class="nc" id="L784">                VehicleNotFoundException.class, () -&gt; service.deleteVehicle(TestConstants.INVALID_ID));</span>
+
+<span class="fc" id="L786">        assertNotNull(exception);</span>
+<span class="fc" id="L787">        assertEquals(VehicleNotFoundException.ERROR.formatErrorMessage(VEHICLE_NOT_ASSOCIATED_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L790">    }</span>
+
+    @Test
+    void testDeleteVehicleById_WhenDriverIsNotFound_ShouldThrowDriverNotFoundException() {
+
+<span class="fc" id="L795">        when(securityContext.getAuthentication()).thenReturn(authentication);</span>
+<span class="fc" id="L796">        when(authentication.getPrincipal()).thenReturn(userDetails);</span>
+<span class="fc" id="L797">        when(userDetails.getUsername()).thenReturn(EMAIL);</span>
+
+<span class="fc" id="L799">        SecurityContextHolder.setContext(securityContext);</span>
+
+<span class="pc" id="L801">        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -&gt; service.deleteVehicle(null));</span>
+
+<span class="fc" id="L803">        assertNotNull(exception);</span>
+<span class="fc" id="L804">        assertEquals(DriverNotFoundException.ERROR.formatErrorMessage(DRIVER_NOT_FOUND_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L807">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

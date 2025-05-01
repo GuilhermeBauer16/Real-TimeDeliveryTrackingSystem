@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MercadoPagoService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago</a>
+</div>
+
+<h1>Coverage Summary for Class: MercadoPagoService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MercadoPagoService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.EmptyProductListException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.shoppingCart.ShoppingCartService;
+&nbsp;import com.mercadopago.MercadoPagoConfig;
+&nbsp;import com.mercadopago.client.payment.PaymentClient;
+&nbsp;import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
+&nbsp;import com.mercadopago.client.preference.PreferenceClient;
+&nbsp;import com.mercadopago.client.preference.PreferenceItemRequest;
+&nbsp;import com.mercadopago.client.preference.PreferencePaymentMethodRequest;
+&nbsp;import com.mercadopago.client.preference.PreferencePaymentMethodsRequest;
+&nbsp;import com.mercadopago.client.preference.PreferenceRequest;
+&nbsp;import com.mercadopago.exceptions.MPApiException;
+&nbsp;import com.mercadopago.exceptions.MPException;
+&nbsp;import com.mercadopago.resources.payment.Payment;
+&nbsp;import com.mercadopago.resources.payment.PaymentItem;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class MercadoPagoService implements MercadoPagoServiceContract {
+&nbsp;
+&nbsp;
+&nbsp;    private final String accessToken;
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * &lt;p&gt;This variable is only used in test environment,
+&nbsp;     * in production environment change the use for the method&lt;/p&gt;
+&nbsp;     * &lt;h3&gt;Production Example:&lt;/h3&gt;
+&nbsp;     * &lt;pre&gt; {@code
+&nbsp;     *  PaymentClient paymentClient = new PaymentClient();
+&nbsp;     *  Payment payment = paymentClient.get(Long.parseLong(id));
+&nbsp;     *  payment.getPayer().getEmail();}&lt;/pre&gt;
+&nbsp;     * &lt;h4&gt;Put the &lt;pre&gt;{@code payment.getPayer().getEmail(); } &lt;/pre&gt; in the place of the variable testMail&lt;/h4&gt;
+&nbsp;     */
+&nbsp;    private final String testMail;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * &lt;p&gt;This variable is used to start an Ngrok server and is intended only for testing purposes.
+&nbsp;     * In production, a better approach should be used.&lt;/p&gt;
+&nbsp;     */
+&nbsp;    private final String nrokUrl;
+&nbsp;
+&nbsp;    private static final String CURRENCY = &quot;BRL&quot;;
+&nbsp;    private static final String PAYMENT_STATUS = &quot;approved&quot;;
+&nbsp;    private static final String PAYMENT_TOPIC = &quot;payment&quot;;
+&nbsp;    private static final String IMAGE_URL = &quot;static/images/headphone&quot;;
+&nbsp;    private static final String NOTIFICATION_URL = &quot;/ipn&quot;;
+&nbsp;    private static final String SUCCESS_URL = &quot;/payment/success&quot;;
+&nbsp;    private static final String PENDING_URL = &quot;/payment/failure&quot;;
+&nbsp;    private static final String FAILURE_URL = &quot;/payment/pending&quot;;
+&nbsp;    private static final String MERCADO_PAGO_EXCEPTION_MESSAGE = &quot;Was not be possible to process the process with&quot; +
+&nbsp;            &quot; Mercado Pago payment API&quot;;
+&nbsp;
+&nbsp;    private static final String EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE = &quot;The product list is empty&quot;;
+&nbsp;
+&nbsp;    private final ShoppingCartService shoppingCartService;
+&nbsp;    private final TemporaryProductService temporaryProductService;
+&nbsp;    private final ProductService productService;
+&nbsp;    private final EmailSenderService emailSenderService;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public MercadoPagoService(@Value(&quot;${mercado-pago.access-token}&quot;) String accessToken, @Value(&quot;${mercado-pago.test-mail}&quot;) String testMail,
+&nbsp;                              @Value(&quot;${mercado-pago.nrok-url}&quot;) String nrokUrl,
+<b class="nc">&nbsp;                              ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService) {</b>
+<b class="nc">&nbsp;        this.accessToken = accessToken;</b>
+<b class="nc">&nbsp;        this.testMail = testMail;</b>
+<b class="nc">&nbsp;        this.nrokUrl = nrokUrl;</b>
+<b class="nc">&nbsp;        this.shoppingCartService = productService;</b>
+<b class="nc">&nbsp;        this.temporaryProductService = temporaryProductService;</b>
+<b class="nc">&nbsp;        this.productService = productService1;</b>
+<b class="nc">&nbsp;        this.emailSenderService = emailSenderService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String createPreference() throws MPException {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;TemporaryProductEntity&gt; temporaryProducts = shoppingCartService.findShoppingCart().getTemporaryProducts();</b>
+&nbsp;
+<b class="nc">&nbsp;        MercadoPagoConfig.setAccessToken(accessToken);</b>
+<b class="nc">&nbsp;        List&lt;PreferenceItemRequest&gt; items = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (TemporaryProductEntity product : temporaryProducts) {</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()</b>
+<b class="nc">&nbsp;                    .id(product.getId())</b>
+<b class="nc">&nbsp;                    .title(product.getName())</b>
+<b class="nc">&nbsp;                    .currencyId(CURRENCY)</b>
+<b class="nc">&nbsp;                    .pictureUrl(IMAGE_URL)</b>
+<b class="nc">&nbsp;                    .description(product.getDescription())</b>
+<b class="nc">&nbsp;                    .quantity(product.getQuantity())</b>
+<b class="nc">&nbsp;                    .unitPrice(BigDecimal.valueOf(product.getPrice() / product.getQuantity()))</b>
+<b class="nc">&nbsp;                    .build();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            items.add(itemRequest);</b>
+&nbsp;
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        List&lt;PreferencePaymentMethodRequest&gt; excludedPaymentMethods = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        excludedPaymentMethods.add(PreferencePaymentMethodRequest.builder().id(&quot;pec&quot;).build());</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        PreferencePaymentMethodsRequest paymentMethods = PreferencePaymentMethodsRequest.builder()</b>
+<b class="nc">&nbsp;                .excludedPaymentMethods(excludedPaymentMethods)</b>
+<b class="nc">&nbsp;                .installments(12)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        PreferenceRequest preferenceRequest = PreferenceRequest.builder()</b>
+<b class="nc">&nbsp;                .items(items)</b>
+<b class="nc">&nbsp;                .backUrls(PreferenceBackUrlsRequest.builder()</b>
+<b class="nc">&nbsp;                        .success(nrokUrl + SUCCESS_URL)</b>
+<b class="nc">&nbsp;                        .failure(nrokUrl + FAILURE_URL)</b>
+<b class="nc">&nbsp;                        .pending(nrokUrl + PENDING_URL).build())</b>
+<b class="nc">&nbsp;                .autoReturn(PAYMENT_STATUS)</b>
+<b class="nc">&nbsp;                .paymentMethods(paymentMethods)</b>
+<b class="nc">&nbsp;                .notificationUrl(nrokUrl + NOTIFICATION_URL)</b>
+<b class="nc">&nbsp;                .expires(true)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        PreferenceClient client = new PreferenceClient();</b>
+&nbsp;
+&nbsp;
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            return client.create(preferenceRequest).getInitPoint();</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (MPApiException ex) {</b>
+&nbsp;
+<b class="nc">&nbsp;            throw new MercadoPagoException(MERCADO_PAGO_EXCEPTION_MESSAGE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void handlerWithApprovedPayment(String id, String topic) {
+&nbsp;
+<b class="nc">&nbsp;        if (PAYMENT_TOPIC.equals(topic)) {</b>
+&nbsp;
+<b class="nc">&nbsp;            MercadoPagoConfig.setAccessToken(accessToken);</b>
+&nbsp;            try {
+&nbsp;
+<b class="nc">&nbsp;                PaymentClient paymentClient = new PaymentClient();</b>
+<b class="nc">&nbsp;                Payment payment = paymentClient.get(Long.parseLong(id));</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;                if (payment.getStatus().equals(PAYMENT_STATUS)) {</b>
+<b class="nc">&nbsp;                    handlerWithProductProcess(payment);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                throw new MercadoPagoException(MERCADO_PAGO_EXCEPTION_MESSAGE);</b>
+&nbsp;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handlerWithProductProcess(Payment payment) throws MessagingException {
+<b class="nc">&nbsp;        List&lt;PaymentItem&gt; items = payment.getAdditionalInfo().getItems();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!items.isEmpty()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;TemporaryProductVO&gt; temporaryProductVOS = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (PaymentItem paymentItem : items) {</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;                TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());</b>
+<b class="nc">&nbsp;                ProductVO productById = productService.findProductById(paymentItem.getId());</b>
+<b class="nc">&nbsp;                productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());</b>
+<b class="nc">&nbsp;                productService.updateProduct(productById);</b>
+<b class="nc">&nbsp;                temporaryProductVOS.add(temporaryProductById);</b>
+&nbsp;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            shoppingCartService.deleteShoppingCart(testMail);</b>
+<b class="nc">&nbsp;            emailSenderService.sendMailToApprovedPayment(testMail, temporaryProductVOS, payment.getTransactionAmount());</b>
+&nbsp;
+&nbsp;        } else {
+&nbsp;
+<b class="nc">&nbsp;            throw new EmptyProductListException(EMPTY_PRODUCT_LIST_EXCEPTION_MESSAGE);</b>
+&nbsp;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+&nbsp;
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

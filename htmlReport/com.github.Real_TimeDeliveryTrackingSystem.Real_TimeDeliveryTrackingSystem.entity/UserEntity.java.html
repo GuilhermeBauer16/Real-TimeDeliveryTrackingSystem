@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserEntity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity</a> &gt; <span class="el_source">UserEntity.java</span></div><h1>UserEntity.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+
+@Entity
+@Table(name=&quot;users&quot;)
+@Getter
+<span class="fc" id="L21">@Setter</span>
+<span class="fc" id="L22">@NoArgsConstructor</span>
+<span class="fc" id="L23">@AllArgsConstructor</span>
+public class UserEntity {
+
+    @Id
+<span class="fc" id="L27">    private String id;</span>
+<span class="fc" id="L28">    private String name;</span>
+<span class="fc" id="L29">    private String email;</span>
+<span class="fc" id="L30">    private String password;</span>
+
+    @Column(name = &quot;user_profile&quot;)
+    @Enumerated(EnumType.STRING)
+<span class="fc" id="L34">    private UserProfile userProfile;</span>
+
+    @Column(name = &quot;verify_code&quot;)
+<span class="fc" id="L37">    private String verifyCode;</span>
+
+<span class="fc" id="L39">    private boolean authenticated;</span>
+
+    @Column(name = &quot;code_expiration&quot;)
+<span class="fc" id="L42">    private LocalDateTime codeExpiration;</span>
+
+<span class="fc" id="L44">    public UserEntity(String id, String name, String email, String password, UserProfile userProfile) {</span>
+<span class="fc" id="L45">        this.id = id;</span>
+<span class="fc" id="L46">        this.name = name;</span>
+<span class="fc" id="L47">        this.email = email;</span>
+<span class="fc" id="L48">        this.password = password;</span>
+<span class="fc" id="L49">        this.userProfile = userProfile;</span>
+<span class="fc" id="L50">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

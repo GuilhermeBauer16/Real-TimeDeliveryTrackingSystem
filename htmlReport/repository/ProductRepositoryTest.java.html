@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductRepositoryTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">repository</a> &gt; <span class="el_source">ProductRepositoryTest.java</span></div><h1>ProductRepositoryTest.java</h1><pre class="source lang-java linenums">package repository;
+
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
+import constants.TestConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
+import testContainers.AbstractionIntegrationTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(classes = RealTimeDeliveryTrackingSystemApplication.class)
+class ProductRepositoryTest extends AbstractionIntegrationTest {
+
+
+    private ProductEntity productEntity;
+
+    private final ProductRepository repository;
+
+
+    @Autowired
+<span class="fc" id="L35">    ProductRepositoryTest(ProductRepository repository) {</span>
+<span class="fc" id="L36">        this.repository = repository;</span>
+
+<span class="fc" id="L38">    }</span>
+
+
+    @BeforeEach
+    void setUp() {
+
+<span class="fc" id="L44">        productEntity = new ProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,</span>
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
+<span class="fc" id="L46">        repository.save(productEntity);</span>
+
+<span class="fc" id="L48">    }</span>
+
+
+    @Test
+    void testFindByProductName_WhenTheProductsWasFound_ShouldReturnProductsPageableList() {
+
+<span class="fc" id="L54">        Pageable pageable = PageRequest.of(0, 10);</span>
+<span class="fc" id="L55">        Page&lt;ProductEntity&gt; products = repository.findByProductName(productEntity.getName(), pageable);</span>
+
+<span class="fc" id="L57">        ProductEntity product = products.getContent().getFirst();</span>
+<span class="fc" id="L58">        assertNotNull(product);</span>
+<span class="fc" id="L59">        assertNotNull(product.getId());</span>
+<span class="fc" id="L60">        assertEquals(TestConstants.ID, product.getId());</span>
+<span class="fc" id="L61">        assertEquals(TestConstants.PRODUCT_NAME, product.getName());</span>
+<span class="fc" id="L62">        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L63">        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());</span>
+<span class="fc" id="L64">        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+
+<span class="fc" id="L66">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

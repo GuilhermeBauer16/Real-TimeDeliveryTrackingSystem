@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractionIntegrationTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">testContainers</a> &gt; <span class="el_source">AbstractionIntegrationTest.java</span></div><h1>AbstractionIntegrationTest.java</h1><pre class="source lang-java linenums">package testContainers;
+
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.MapPropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.lifecycle.Startables;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
+@ContextConfiguration(initializers = AbstractionIntegrationTest.Initializer.class)
+<span class="fc" id="L18">public class AbstractionIntegrationTest {</span>
+
+<span class="fc" id="L20">    static class Initializer implements ApplicationContextInitializer&lt;ConfigurableApplicationContext&gt; {</span>
+
+
+<span class="fc" id="L23">        static MySQLContainer&lt;?&gt; mySQL = new MySQLContainer&lt;&gt;(&quot;mysql:8.0.28&quot;);</span>
+
+
+        private static void startContainers() {
+<span class="fc" id="L27">            Startables.deepStart(Stream.of(mySQL)).join();</span>
+
+
+<span class="fc" id="L30">        }</span>
+
+
+        private static DataSource createDataSource() {
+<span class="nc" id="L34">            DriverManagerDataSource dataSource = new DriverManagerDataSource();</span>
+<span class="nc" id="L35">            dataSource.setDriverClassName(&quot;com.mysql.cj.jdbc.Driver&quot;);</span>
+<span class="nc" id="L36">            dataSource.setUrl(mySQL.getJdbcUrl());</span>
+<span class="nc" id="L37">            dataSource.setUsername(mySQL.getUsername());</span>
+<span class="nc" id="L38">            dataSource.setPassword(mySQL.getPassword());</span>
+<span class="nc" id="L39">            return dataSource;</span>
+        }
+
+
+        private Map&lt;String, Object&gt; createConnectionConfiguration() {
+<span class="fc" id="L44">            Map&lt;String, Object&gt; config = new HashMap&lt;&gt;();</span>
+
+            // Database properties
+<span class="fc" id="L47">            config.put(&quot;spring.datasource.url&quot;, mySQL.getJdbcUrl());</span>
+<span class="fc" id="L48">            config.put(&quot;spring.datasource.username&quot;, mySQL.getUsername());</span>
+<span class="fc" id="L49">            config.put(&quot;spring.datasource.password&quot;, mySQL.getPassword());</span>
+<span class="fc" id="L50">            config.put(&quot;spring.datasource.driver-class-name&quot;, &quot;com.mysql.cj.jdbc.Driver&quot;);</span>
+
+            // JWT properties
+<span class="fc" id="L53">            config.put(&quot;SECRET_KEY&quot;, &quot;jxgEQe.XHuPq8VdbyYFNkAN.dudQ0903YUn4&quot;);</span>
+<span class="fc" id="L54">            config.put(&quot;EXPIRE_LENGTH&quot;, &quot;3600000&quot;);</span>
+
+            // Mercado Pago properties (fill in mock/test values)
+<span class="fc" id="L57">            config.put(&quot;MERCADO_PAGO_PUBLIC_KEY&quot;, &quot;test_public_key&quot;);</span>
+<span class="fc" id="L58">            config.put(&quot;MERCADO_PAGO_ACCESS_TOKEN&quot;, &quot;test_access_token&quot;);</span>
+<span class="fc" id="L59">            config.put(&quot;MERCADO_PAGO_WEBHOOK_SECRET&quot;, &quot;test_webhook_secret&quot;);</span>
+<span class="fc" id="L60">            config.put(&quot;TEST_MAIL&quot;, &quot;test@example.com&quot;);</span>
+<span class="fc" id="L61">            config.put(&quot;NROK_URL&quot;, &quot;https://test-tunnel.ngrok.io&quot;);</span>
+
+            // Mail properties (if needed)
+<span class="fc" id="L64">            config.put(&quot;spring.mail.host&quot;, &quot;127.0.0.1&quot;);</span>
+<span class="fc" id="L65">            config.put(&quot;spring.mail.port&quot;, &quot;3025&quot;);</span>
+<span class="fc" id="L66">            config.put(&quot;spring.mail.username&quot;, &quot;duke&quot;);</span>
+<span class="fc" id="L67">            config.put(&quot;spring.mail.password&quot;, &quot;springboot&quot;);</span>
+<span class="fc" id="L68">            config.put(&quot;spring.mail.protocol&quot;, &quot;smtp&quot;);</span>
+<span class="fc" id="L69">            config.put(&quot;spring.mail.test-connection&quot;, &quot;false&quot;);</span>
+
+<span class="fc" id="L71">            return config;</span>
+        }
+
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+
+<span class="fc" id="L77">            startContainers();</span>
+
+
+<span class="fc" id="L80">            ConfigurableEnvironment environment = applicationContext.getEnvironment();</span>
+<span class="fc" id="L81">            MapPropertySource testContainers = new MapPropertySource(</span>
+                    &quot;testcontainers&quot;,
+<span class="fc" id="L83">                    (Map) createConnectionConfiguration());</span>
+
+<span class="fc" id="L85">            environment.getPropertySources().addFirst(testContainers);</span>
+<span class="fc" id="L86">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

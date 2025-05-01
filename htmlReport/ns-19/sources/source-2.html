@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomerService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomerService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (36/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CustomerService$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (36/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.dto.PasswordDTO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.customer.CustomerNotFoundException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.InvalidPasswordException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CustomerServiceContract;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;import org.springframework.security.core.userdetails.UserDetails;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class CustomerService implements CustomerServiceContract {
+&nbsp;
+&nbsp;    private static final String CUSTOMER_NOT_FOUND_MESSAGE = &quot;This customer was not found, please verify the fields and try again.&quot;;
+&nbsp;
+&nbsp;    private static final String INVALID_PASSWORD_MESSAGE = &quot;The password typed is incorrect,&quot; +
+&nbsp;            &quot; please verify and try again.&quot;;
+&nbsp;
+&nbsp;    private final CustomerRepository customerRepository;
+&nbsp;    private final AddressService addressService;
+&nbsp;    private final PasswordEncoder passwordEncoder;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public CustomerService(CustomerRepository customerRepository, AddressService addressService, PasswordEncoder passwordEncoder) {</b>
+<b class="fc">&nbsp;        this.customerRepository = customerRepository;</b>
+<b class="fc">&nbsp;        this.addressService = addressService;</b>
+<b class="fc">&nbsp;        this.passwordEncoder = passwordEncoder;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CustomerVO findCustomerByEmail(String email) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(email)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new CustomerVO(), customerEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void delete(PasswordDTO passwordDTO) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!passwordEncoder.matches(passwordDTO.getPassword(), customerEntity.getUser().getPassword())) {</b>
+<b class="fc">&nbsp;            throw new InvalidPasswordException(INVALID_PASSWORD_MESSAGE);</b>
+&nbsp;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Page&lt;AddressVO&gt; allAddressesOfACustomer = findAllAddressesOfACustomer(Pageable.ofSize(10));</b>
+<b class="fc">&nbsp;        addressService.deleteAllAddresses(allAddressesOfACustomer.getContent());</b>
+&nbsp;
+<b class="fc">&nbsp;        customerRepository.delete(customerEntity);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AddressVO addAddressToCustomer(AddressVO addressVO) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+<b class="fc">&nbsp;        AddressVO createdAddress = addressService.create(addressVO);</b>
+<b class="fc">&nbsp;        customerEntity.getAddresses().add(BuildMapper.parseObject(new AddressEntity(), createdAddress));</b>
+<b class="fc">&nbsp;        customerRepository.save(customerEntity);</b>
+&nbsp;
+<b class="fc">&nbsp;        return createdAddress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AddressVO updateAddressOfACustomer(AddressVO addressVO) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+<b class="fc">&nbsp;        addressService.verifyIfAddressIdIsAssociatedWithUser(addressVO.getId(), customerEntity.getAddresses());</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return addressService.update(addressVO);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AddressVO findAddressOfACustomerByItsId(String addressId) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+<b class="fc">&nbsp;        addressService.verifyIfAddressIdIsAssociatedWithUser(addressId, customerEntity.getAddresses());</b>
+&nbsp;
+<b class="fc">&nbsp;        return addressService.findById(addressId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;AddressVO&gt; findAllAddressesOfACustomer(Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        Page&lt;AddressEntity&gt; addressEntities = customerRepository.findAddressesByCustomerEmail(retrieveUserEmail(), pageable);</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return addressEntities.map(addressEntity -&gt; BuildMapper.parseObject(new AddressVO(), addressEntity));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void deleteAddressOfACustomer(String addressId) {
+&nbsp;
+<b class="fc">&nbsp;        CustomerEntity customerEntity = customerRepository.findCustomerByUserEmail(retrieveUserEmail())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MESSAGE));</b>
+&nbsp;
+<b class="fc">&nbsp;        addressService.verifyIfAddressIdIsAssociatedWithUser(addressId, customerEntity.getAddresses());</b>
+&nbsp;
+<b class="fc">&nbsp;        addressService.delete(addressId);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private String retrieveUserEmail() {
+&nbsp;
+<b class="fc">&nbsp;        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();</b>
+<b class="fc">&nbsp;        return principal.getUsername();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

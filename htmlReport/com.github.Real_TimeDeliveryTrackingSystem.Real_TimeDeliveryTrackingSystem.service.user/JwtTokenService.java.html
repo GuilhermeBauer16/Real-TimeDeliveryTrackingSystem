@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtTokenService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user</a> &gt; <span class="el_source">JwtTokenService.java</span></div><h1>JwtTokenService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.function.Function;
+
+@Service
+public class JwtTokenService {
+
+    public static final long JWT_TOKEN_VALIDITY = 180000L;
+
+
+    private final String secret;
+
+<span class="fc" id="L25">    public JwtTokenService(@Value(&quot;${SECRET_KEY}&quot;) String jwtSecret) {</span>
+<span class="fc" id="L26">        secret = jwtSecret;</span>
+<span class="fc" id="L27">    }</span>
+
+    private Claims getAllClaimsFromToken(String token) {
+<span class="fc" id="L30">        final SecretKey secretKey = Keys.hmacShaKeyFor(</span>
+<span class="fc" id="L31">                secret.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L32">        return Jwts.parser()</span>
+<span class="fc" id="L33">                .verifyWith(secretKey)</span>
+<span class="fc" id="L34">                .build()</span>
+<span class="fc" id="L35">                .parseSignedClaims(token).getPayload();</span>
+    }
+
+    public &lt;T&gt; T getClaimFromToken(String token, Function&lt;Claims, T&gt; claimsResolver) {
+<span class="fc" id="L39">        final Claims claims = this.getAllClaimsFromToken(token);</span>
+<span class="fc" id="L40">        return claimsResolver.apply(claims);</span>
+    }
+
+    private Date getExpirationDateFromToken(String token) {
+<span class="fc" id="L44">        return this.getClaimFromToken(token, Claims::getExpiration);</span>
+    }
+
+    private Boolean isTokenExpired(String token) {
+<span class="fc" id="L48">        final Date expiration = this.getExpirationDateFromToken(token);</span>
+<span class="fc" id="L49">        return expiration.before(new Date());</span>
+    }
+
+    public String getUsernameFromToken(String token) {
+<span class="fc" id="L53">        return this.getClaimFromToken(token, Claims::getSubject);</span>
+    }
+
+    public String generateToken(UserDetails userDetails) {
+<span class="fc" id="L57">        Map&lt;String, String&gt; claims = Collections.singletonMap(&quot;ROLES&quot;, userDetails.getAuthorities().toString());</span>
+<span class="fc" id="L58">        return this.getToken(claims, userDetails.getUsername());</span>
+    }
+
+    private String getToken(Map&lt;String, String&gt; claims, String subject) {
+<span class="fc" id="L62">        final SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));</span>
+
+<span class="fc" id="L64">        return Jwts.builder()</span>
+<span class="fc" id="L65">                .claims(claims)</span>
+<span class="fc" id="L66">                .subject(subject)</span>
+<span class="fc" id="L67">                .issuedAt(new Date())</span>
+<span class="fc" id="L68">                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 100))</span>
+<span class="fc" id="L69">                .signWith(secretKey)</span>
+<span class="fc" id="L70">                .compact();</span>
+
+
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+<span class="fc" id="L76">        final String usernameFromUserDetails = userDetails.getUsername();</span>
+<span class="fc" id="L77">        final String userFromJWT = this.getUsernameFromToken(token);</span>
+
+<span class="pc bpc" id="L79" title="2 of 4 branches missed.">        return (userFromJWT.equals(usernameFromUserDetails) &amp;&amp; !this.isTokenExpired(token));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

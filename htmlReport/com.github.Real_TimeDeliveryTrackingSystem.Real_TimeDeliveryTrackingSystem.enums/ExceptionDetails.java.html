@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionDetails.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums</a> &gt; <span class="el_source">ExceptionDetails.java</span></div><h1>ExceptionDetails.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums;
+
+import org.springframework.http.HttpStatus;
+
+
+<span class="fc" id="L6">public enum ExceptionDetails {</span>
+
+    //Address
+<span class="fc" id="L9">    ADDRESS_NOT_FOUND_MESSAGE(&quot;Occur an error in find an address for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L10">    INVALID_ADDRESS_MESSAGE(&quot;Occur an error into the registration of an address in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+
+    //Customer
+<span class="fc" id="L13">    CUSTOMER_NOT_FOUND_MESSAGE(&quot;Occur an error in find the Customer for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L14">    INVALID_CUSTOMER_MESSAGE(&quot;Occur an error into the registration of a customer in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+
+    //Vehicle
+<span class="fc" id="L17">    VEHICLE_NOT_FOUND_MESSAGE(&quot;Occur an error in find the vehicle for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L18">    LICENSE_PLATE_NOT_FOUND_MESSAGE(&quot;Occur an error in find the license plate for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L19">    INVALID_LICENSE_PLATE_MESSAGE(&quot;These license plate is invalid for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L20">    DUPLICATED_LICENSE_PLATE_MESSAGE(&quot;These license plate is invalid for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+
+    //User
+<span class="fc" id="L23">    USER_NOT_FOUND_MESSAGE(&quot;Occur an error in user for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L24">    ROLE_NOT_FOUND_MESSAGE(&quot;Occur an error in find the role for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L25">    EMAIL_ALREADY_REGISTER_MESSAGE(&quot;Occur an error into the registration of the email in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L26">    ROLE_ALREADY_REGISTER_MESSAGE(&quot;Occur an error into the registration of the role in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L27">    INVALID_TOKEN_MESSAGE(&quot;Occur an error to generate the token for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L28">    INVALID_USER_CREDENTIALS_MESSAGE(&quot;Occur an error to registry the user for the reason: %s&quot;, HttpStatus.FORBIDDEN),</span>
+<span class="fc" id="L29">    INVALID_PASSWORD_MESSAGE(&quot;These password is invalid for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L30">    INVALID_EMAIL_PATTERN_MESSAGE(&quot;Occur an error into the registration of the email in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L31">    USER_ALREADY_AUTHENTICATED_MESSAGE(&quot;Occur an error into the authenticate the user in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L32">    USER_NOT_AUTHENTICATED_MESSAGE(&quot;Occur an error into the authenticate the user in reason of: %s&quot;, HttpStatus.UNAUTHORIZED),</span>
+<span class="fc" id="L33">    INVALID_VERIFICATION_CODE_MESSAGE(&quot;Occur an error into evaluated the verification code in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L34">    EXPIRED_VERIFICATION_CODE_MESSAGE(&quot;Occur an error into evaluated the verification code in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+
+    //Driver
+<span class="fc" id="L37">    INVALID_DRIVER_MESSAGE(&quot;Occur an error into the registration of a driver in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L38">    INVALID_DRIVER_LICENSE_MESSAGE(&quot;Occur an error into the registration of a driver license in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L39">    DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE(&quot;Occur an error into the registration of the driver license in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L40">    DRIVER_NOT_FOUND_MESSAGE(&quot;Occur an error in find the Driver for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+
+    //Utils
+<span class="fc" id="L43">    INVALID_UUID_FORMAT_MESSAGE(&quot;The ID %s needs to be in a UUID format&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L44">    QUANTITY_LOWER_THAN_ONE_MESSAGE(&quot;Occur an error into the registration of a quantity in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L45">    PRICE_LOWER_THAN_ZERO_MESSAGE(&quot;Occur an error into the registration of a price in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L46">    QUANTITY_REQUIRED_HIGHER_THAN_AVAILABLE_QUANTITY_MESSAGE(&quot;Occur an error into the registration of a quantity in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L47">    INVALID_PHONE_NUMBER_MESSAGE(&quot;Occur an error into the registration of a phone number in reason of: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L48">    FIELD_NOT_FOUND_MESSAGE(&quot;The field %s can not be null or empty!&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L49">    EXCEPTION_TYPE_NOT_THROWN(&quot;Can not thrown the exception of the type: %s&quot;, HttpStatus.NOT_FOUND),</span>
+
+    // Product
+
+<span class="fc" id="L53">    INVALID_PRODUCT_MESSAGE(&quot;Occur an error into find the product for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L54">    EMPTY_PRODUCT_LIST_MESSAGE(&quot;Occur an error in find the product list for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+<span class="fc" id="L55">    PRODUCT_NOT_FOUND_MESSAGE(&quot;Have an error in find the product for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+<span class="fc" id="L56">    PRODUCT_NOT_ASSOCIATED_WITH_CUSTOMER_MESSAGE(&quot;Occur an error in find the product for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+
+    // Shopping Cart
+<span class="fc" id="L59">    SHOPPING_CART_NOT_FOUND_MESSAGE(&quot;Occur an error in find the product for the reason: %s&quot;, HttpStatus.NOT_FOUND),</span>
+
+    // Mercado Pago
+<span class="fc" id="L62">    MERCADO_PAGO_EXCEPTION_MESSAGE(&quot;Occur an error into connected with mercado pago for the reason: %s&quot;, HttpStatus.BAD_REQUEST),</span>
+    ;
+
+    private final String message;
+    private final HttpStatus httpStatus;
+
+<span class="fc" id="L68">    ExceptionDetails(String message, HttpStatus httpStatus) {</span>
+<span class="fc" id="L69">        this.message = message;</span>
+<span class="fc" id="L70">        this.httpStatus = httpStatus;</span>
+<span class="fc" id="L71">    }</span>
+
+    public String formatErrorMessage(String message) {
+<span class="fc" id="L74">        return String.format(this.message, message);</span>
+    }
+
+    public HttpStatus getHttpStatus() {
+<span class="nc" id="L78">        return httpStatus;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

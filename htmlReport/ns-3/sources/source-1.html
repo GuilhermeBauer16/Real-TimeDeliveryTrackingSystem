@@ -1,0 +1,163 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomerAddressController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerAddressController (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomerAddressController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract.CustomerAddressControllerContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer.CustomerService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/customerAddress&quot;)
+&nbsp;public class CustomerAddressController implements CustomerAddressControllerContract {
+&nbsp;
+&nbsp;    private final CustomerService service;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public CustomerAddressController(CustomerService service) {</b>
+<b class="fc">&nbsp;        this.service = service;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseEntity&lt;AddressVO&gt; addAddressToCustomer(AddressVO addressVO) {
+&nbsp;
+<b class="fc">&nbsp;        AddressVO createdAddress = service.addAddressToCustomer(addressVO);</b>
+<b class="fc">&nbsp;        return new ResponseEntity&lt;&gt;(createdAddress, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseEntity&lt;AddressVO&gt; updateAddressOfACustomer(AddressVO addressVO) {
+&nbsp;
+<b class="fc">&nbsp;        AddressVO updateAddress = service.updateAddressOfACustomer(addressVO);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(updateAddress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseEntity&lt;AddressVO&gt; findAddressOfACustomerByItsId(String addressId) {
+<b class="fc">&nbsp;        AddressVO addressOfACustomerByItsId = service.findAddressOfACustomerByItsId(addressId);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(addressOfACustomerByItsId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseEntity&lt;Page&lt;AddressVO&gt;&gt; findAllAddressesOfACustomer(Pageable pageable) {
+<b class="fc">&nbsp;        Page&lt;AddressVO&gt; allAddressesOfACustomer = service.findAllAddressesOfACustomer(pageable);</b>
+<b class="fc">&nbsp;        return ResponseEntity.ok(allAddressesOfACustomer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteAddressOfACustomer(String addressId) {
+&nbsp;
+<b class="fc">&nbsp;        service.deleteAddressOfACustomer(addressId);</b>
+&nbsp;
+<b class="fc">&nbsp;        return ResponseEntity.noContent().build();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

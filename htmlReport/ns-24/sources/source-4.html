@@ -1,0 +1,122 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MercadoPagoNotificationControllerContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: MercadoPagoNotificationControllerContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MercadoPagoNotificationControllerContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
+&nbsp;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.media.Content;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contract interface for handling Mercado Pago payment notifications.
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface defines the endpoint that will be triggered when Mercado Pago sends a notification
+&nbsp; * about a payment event. Upon receiving the notification, it processes the event and may trigger
+&nbsp; * an email to the payer.
+&nbsp; */
+&nbsp;public interface MercadoPagoNotificationControllerContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handles incoming payment notifications from Mercado Pago.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is invoked when Mercado Pago sends a webhook notification. It receives the notification
+&nbsp;     * parameters such as the payment ID and topic, processes the event accordingly (e.g., verifying the payment),
+&nbsp;     * and may trigger additional actions such as sending a confirmation email to the payer.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Possible responses:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;200 OK:&lt;/b&gt; The notification was successfully handled.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;400 Bad Request:&lt;/b&gt; Thrown if there is a problem with the request, such as missing data
+&nbsp;     *         or an empty product list.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;500 Internal Server Error:&lt;/b&gt; Thrown in case of an unexpected server error.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param id    the identifier of the payment or resource related to the notification
+&nbsp;     * @param topic the topic of the notification (e.g., &quot;payment&quot;, &quot;merchant_order&quot;)
+&nbsp;     * @return a {@link ResponseEntity} with no content indicating the result of processing
+&nbsp;     */
+&nbsp;    @PostMapping
+&nbsp;    @Operation(summary = &quot;handler with Payment Notification&quot;,
+&nbsp;            description = &quot;handler with Payment Notification using the Mercado Pago API, and &quot; +
+&nbsp;                    &quot;a mail to the payer&quot;,
+&nbsp;            tags = &quot;MercadoPago&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;),
+&nbsp;            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Will throw Mercado Pago Exception or&quot; +
+&nbsp;                    &quot;Empty Product List Exception&quot;,
+&nbsp;                    content = @Content),
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;Void&gt; handleWithNotificationPayment(@RequestParam(&quot;id&quot;) String id,
+&nbsp;                                                       @RequestParam(&quot;topic&quot;) String topic);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

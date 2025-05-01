@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverRegistrationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver</a> &gt; <span class="el_source">DriverRegistrationService.java</span></div><h1>DriverRegistrationService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverLicenseAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.DriverFactory;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.DriverRegistrationServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.DriverLicenseValidatorUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class DriverRegistrationService implements DriverRegistrationServiceContract {
+
+
+    private static final String INVALID_DRIVER_MESSAGE = &quot;This Driver is invalid, please verify the fields and try again.&quot;;
+    private static final String DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE = &quot;This driver license is already registered, &quot; +
+            &quot;please verify the fields and try again.&quot;;
+
+    private static final String PHONE_PREFIX = &quot;+&quot;;
+
+
+    private final UserRegistrationService userRegistrationService;
+
+    private final DriverRepository repository;
+
+    private final AddressService addressService;
+
+    private final VehicleService vehicleService;
+
+    private final DriverRepository driverRepository;
+
+    @Autowired
+<span class="fc" id="L57">    public DriverRegistrationService(UserRegistrationService userRegistrationService, DriverRepository repository, AddressService addressService, VehicleService vehicleService, DriverRepository driverRepository) {</span>
+<span class="fc" id="L58">        this.userRegistrationService = userRegistrationService;</span>
+<span class="fc" id="L59">        this.repository = repository;</span>
+<span class="fc" id="L60">        this.addressService = addressService;</span>
+<span class="fc" id="L61">        this.vehicleService = vehicleService;</span>
+<span class="fc" id="L62">        this.driverRepository = driverRepository;</span>
+<span class="fc" id="L63">    }</span>
+
+
+    @Override
+    @Transactional
+    public DriverRegistrationResponse create(DriverVO driverVO) throws NumberParseException, MessagingException {
+
+<span class="fc" id="L70">        ValidatorUtils.checkObjectIsNullOrThrowException(driverVO, INVALID_DRIVER_MESSAGE, InvalidDriverException.class);</span>
+<span class="fc" id="L71">        driverVO.getUser().setUserProfile(UserProfile.ROLE_DRIVER);</span>
+
+<span class="fc" id="L73">        driverVO.setPhoneNumber(PHONE_PREFIX + driverVO.getPhoneNumber());</span>
+
+<span class="fc" id="L75">        PhoneNumberValidator.validatePhoneNumber(driverVO.getPhoneNumber());</span>
+
+<span class="fc" id="L77">        DriverLicenseValidatorUtils.validateDriverLicense(driverVO.getDriverLicense());</span>
+<span class="fc" id="L78">        validIfDriverLicenseAlreadyRegistered(driverVO.getDriverLicense());</span>
+
+<span class="fc" id="L80">        List&lt;AddressEntity&gt; savedAddresses = addressService.createAddresses(driverVO.getAddresses());</span>
+<span class="fc" id="L81">        List&lt;VehicleEntity&gt; savedVehicles = saveVehicles(driverVO.getVehicles());</span>
+<span class="fc" id="L82">        UserVO userVO = BuildMapper.parseObject(new UserVO(), driverVO.getUser());</span>
+
+<span class="fc" id="L84">        UserVO user = userRegistrationService.createUser(userVO);</span>
+<span class="fc" id="L85">        UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);</span>
+
+<span class="fc" id="L87">        DriverEntity driverEntity = DriverFactory.create(driverVO.getPhoneNumber(), driverVO.getDriverLicense(), savedAddresses, savedVehicles, userEntity);</span>
+<span class="fc" id="L88">        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(driverEntity, INVALID_DRIVER_MESSAGE, FieldNotFound.class);</span>
+<span class="fc" id="L89">        DriverEntity savedDriver = repository.save(driverEntity);</span>
+<span class="fc" id="L90">        DriverRegistrationResponse driverRegistrationResponse = BuildMapper.parseObject(new DriverRegistrationResponse(), savedDriver);</span>
+
+<span class="fc" id="L92">        driverRegistrationResponse.setUserRegistrationResponse(</span>
+<span class="fc" id="L93">                BuildMapper.parseObject(new UserRegistrationResponse(), savedDriver.getUser()));</span>
+
+
+<span class="fc" id="L96">        return driverRegistrationResponse;</span>
+
+    }
+
+    private List&lt;VehicleEntity&gt; saveVehicles(List&lt;VehicleEntity&gt; vehicleEntities) {
+<span class="fc" id="L101">        List&lt;VehicleEntity&gt; savedVehicles = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (VehicleEntity vehicle : vehicleEntities) {</span>
+
+<span class="fc" id="L104">            VehicleVO vehicleVO = BuildMapper.parseObject(new VehicleVO(), vehicle);</span>
+<span class="fc" id="L105">            savedVehicles.add(BuildMapper.parseObject(new VehicleEntity(), vehicleService.create(vehicleVO)));</span>
+<span class="fc" id="L106">        }</span>
+
+<span class="fc" id="L108">        return savedVehicles;</span>
+    }
+
+    private void validIfDriverLicenseAlreadyRegistered(String driverLicense) {
+
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (driverRepository.findDriverByDriverLicense(driverLicense).isPresent()) {</span>
+<span class="fc" id="L114">            throw new DriverLicenseAllReadyRegisterException(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE);</span>
+        }
+<span class="fc" id="L116">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

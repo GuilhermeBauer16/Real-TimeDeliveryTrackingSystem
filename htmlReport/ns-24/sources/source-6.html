@@ -1,0 +1,123 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MercadoPagoPaymentControllerContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: MercadoPagoPaymentControllerContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">MercadoPagoPaymentControllerContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentRequest;
+&nbsp;import com.mercadopago.exceptions.MPApiException;
+&nbsp;import com.mercadopago.exceptions.MPException;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.media.Content;
+&nbsp;import io.swagger.v3.oas.annotations.media.Schema;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contract interface for handling Mercado Pago payment operations.
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface defines the endpoint for creating a payment preference using the Mercado Pago API.
+&nbsp; * Implementations of this interface should handle the creation of a payment preference and return
+&nbsp; * a URL that the client can use to complete the payment.
+&nbsp; */
+&nbsp;public interface MercadoPagoPaymentControllerContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a payment preference using the Mercado Pago API.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This endpoint receives a {@link PaymentRequest} containing the necessary payment details,
+&nbsp;     * processes the request with the Mercado Pago API, and returns a payment link.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Possible responses:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;200 OK:&lt;/b&gt; Returns a string with the payment link.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;400 Bad Request:&lt;/b&gt; Thrown if there is an issue with the Mercado Pago API or the input data.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;500 Internal Server Error:&lt;/b&gt; Thrown in case of an unexpected server error.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param paymentRequest the payment request containing product details and payer information
+&nbsp;     * @return a {@link ResponseEntity} containing a string with the payment link
+&nbsp;     * @throws MPException if an error occurs when communicating with Mercado Pago
+&nbsp;     * @throws MPApiException if an API-level error occurs during the Mercado Pago operation
+&nbsp;     */
+&nbsp;    @PostMapping(&quot;/create&quot;)
+&nbsp;    @Operation(summary = &quot;Do a Payment&quot;,
+&nbsp;            description = &quot;Do a Payment using the mercado Pago API and return an String with the payment link!&quot;,
+&nbsp;            tags = &quot;MercadoPago&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;,
+&nbsp;                    content = @Content(schema = @Schema(implementation = String.class))),
+&nbsp;            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Will throw Mercado Pago Exception&quot;,
+&nbsp;                    content = @Content),
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;String&gt; createPreference(@RequestBody PaymentRequest paymentRequest) throws MPException, MPApiException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

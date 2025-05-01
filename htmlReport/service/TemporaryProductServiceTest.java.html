@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TemporaryProductServiceTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">TemporaryProductServiceTest.java</span></div><h1>TemporaryProductServiceTest.java</h1><pre class="source lang-java linenums">package service;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.TemporaryProductRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import constants.TestConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+<span class="fc" id="L39">class TemporaryProductServiceTest {</span>
+
+    private static final String PRODUCT_NOT_FOUND = &quot;This product was not found.&quot;;
+    private static final String INVALID_PRODUCT_MESSAGE = &quot;This product is invalid, please verify the fields and try again.&quot;;
+
+    private TemporaryProductVO temporaryProductVO;
+    private TemporaryProductEntity temporaryProductEntity;
+    @Mock
+    private TemporaryProductRepository repository;
+
+    @InjectMocks
+    private TemporaryProductService service;
+
+    @BeforeEach
+    void setUp() {
+
+<span class="fc" id="L55">        temporaryProductVO = new TemporaryProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,</span>
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
+
+<span class="fc" id="L58">        temporaryProductEntity = new TemporaryProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,</span>
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
+
+<span class="fc" id="L61">    }</span>
+
+    @Test
+    void testCreateTemporaryProduct_WhenSuccessful_ShouldReturnTemporaryProductObject() {
+
+<span class="fc" id="L66">        try (MockedStatic&lt;ValidatorUtils&gt; mockedValidatorUtils = mockStatic(ValidatorUtils.class)) {</span>
+
+<span class="fc" id="L68">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.checkObjectIsNullOrThrowException(any(),</span>
+<span class="fc" id="L69">                    anyString(), any())).thenAnswer(invocation -&gt; null);</span>
+<span class="fc" id="L70">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(</span>
+<span class="fc" id="L71">                    any(), anyString(), any())).thenAnswer(invocation -&gt; null);</span>
+
+<span class="fc" id="L73">            when(repository.save(any(TemporaryProductEntity.class))).thenReturn(temporaryProductEntity);</span>
+
+<span class="fc" id="L75">            TemporaryProductVO temporaryProduct = service.createTemporaryProduct(temporaryProductVO);</span>
+
+<span class="fc" id="L77">            verify(repository, times(1)).save(any(TemporaryProductEntity.class));</span>
+<span class="fc" id="L78">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.checkObjectIsNullOrThrowException(any(), anyString(), any()));</span>
+<span class="fc" id="L79">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(any(), anyString(), any()));</span>
+
+<span class="fc" id="L81">            assertNotNull(temporaryProduct);</span>
+<span class="fc" id="L82">            assertNotNull(temporaryProduct.getId());</span>
+<span class="fc" id="L83">            assertEquals(TestConstants.ID, temporaryProduct.getId());</span>
+<span class="fc" id="L84">            assertEquals(TestConstants.PRODUCT_NAME, temporaryProduct.getName());</span>
+<span class="fc" id="L85">            assertEquals(TestConstants.PRODUCT_DESCRIPTION, temporaryProduct.getDescription());</span>
+<span class="fc" id="L86">            assertEquals(TestConstants.PRODUCT_PRICE, temporaryProduct.getPrice());</span>
+<span class="fc" id="L87">            assertEquals(TestConstants.PRODUCT_QUANTITY, temporaryProduct.getQuantity());</span>
+        }
+<span class="fc" id="L89">    }</span>
+
+    @Test
+    void testCreateProduct_WhenProductIsNull_ShouldThrowInvalidProductException() {
+
+<span class="fc" id="L94">        InvalidProductException exception = assertThrows(InvalidProductException.class,</span>
+<span class="nc" id="L95">                () -&gt; service.createTemporaryProduct(null));</span>
+
+<span class="fc" id="L97">        assertNotNull(exception);</span>
+<span class="fc" id="L98">        assertEquals(InvalidProductException.ERROR.formatErrorMessage(INVALID_PRODUCT_MESSAGE)</span>
+<span class="fc" id="L99">                , exception.getMessage());</span>
+<span class="fc" id="L100">    }</span>
+
+    @Test
+    void testUpdateTemporaryProduct_WhenSuccessful_ShouldReturnUpdatedTemporaryProductObject() {
+
+
+<span class="fc" id="L106">        try (MockedStatic&lt;ValidatorUtils&gt; mockedValidatorUtils = mockStatic(ValidatorUtils.class)) {</span>
+
+<span class="fc" id="L108">            temporaryProductEntity.setName(TestConstants.PRODUCT_UPDATED_NAME);</span>
+<span class="fc" id="L109">            temporaryProductEntity.setPrice(TestConstants.PRODUCT_UPDATED_PRICE);</span>
+
+<span class="fc" id="L111">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.updateFieldIfNotNull(any(TemporaryProductEntity.class)</span>
+<span class="fc" id="L112">                    , any(), anyString(), any())).thenAnswer(invocation -&gt; temporaryProductEntity);</span>
+
+<span class="fc" id="L114">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(</span>
+<span class="fc" id="L115">                    any(), anyString(), any())).thenAnswer(invocation -&gt; temporaryProductEntity);</span>
+
+<span class="fc" id="L117">            when(repository.findById(anyString())).thenReturn(Optional.of(temporaryProductEntity));</span>
+<span class="fc" id="L118">            when(repository.save(any(TemporaryProductEntity.class))).thenReturn(temporaryProductEntity);</span>
+
+<span class="fc" id="L120">            TemporaryProductVO product = service.updateTemporaryProduct(temporaryProductVO);</span>
+
+<span class="fc" id="L122">            verify(repository, times(1)).save(any(TemporaryProductEntity.class));</span>
+<span class="fc" id="L123">            verify(repository, times(1)).findById(anyString());</span>
+
+<span class="fc" id="L125">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.updateFieldIfNotNull(any()</span>
+<span class="fc" id="L126">                    , any(), anyString(), any()));</span>
+
+<span class="fc" id="L128">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(any(), anyString(), any()));</span>
+
+<span class="fc" id="L130">            assertNotNull(product);</span>
+<span class="fc" id="L131">            assertNotNull(product.getId());</span>
+<span class="fc" id="L132">            assertEquals(TestConstants.ID, product.getId());</span>
+<span class="fc" id="L133">            assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());</span>
+<span class="fc" id="L134">            assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L135">            assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());</span>
+<span class="fc" id="L136">            assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+
+        }
+<span class="fc" id="L139">    }</span>
+
+
+    @Test
+    void testUpdateTemporaryProduct_WhenProductIsNotFound_ShouldThrowTemporaryProductNotFoundException() {
+
+<span class="fc" id="L145">        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,</span>
+<span class="nc" id="L146">                () -&gt; service.updateTemporaryProduct(temporaryProductVO));</span>
+
+<span class="fc" id="L148">        assertNotNull(exception);</span>
+<span class="fc" id="L149">        assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND)</span>
+<span class="fc" id="L150">                , exception.getMessage());</span>
+<span class="fc" id="L151">    }</span>
+
+    @Test
+    void testFindProductById_WhenProductWasFoundById_ShouldReturnProductObject() {
+
+<span class="fc" id="L156">        when(repository.findById(anyString())).thenReturn(Optional.of(temporaryProductEntity));</span>
+
+<span class="fc" id="L158">        TemporaryProductVO product = service.findTemporaryProductById(TestConstants.ID);</span>
+
+<span class="fc" id="L160">        verify(repository, times(1)).findById(anyString());</span>
+
+<span class="fc" id="L162">        assertNotNull(product);</span>
+<span class="fc" id="L163">        assertNotNull(product.getId());</span>
+<span class="fc" id="L164">        assertEquals(TestConstants.ID, product.getId());</span>
+<span class="fc" id="L165">        assertEquals(TestConstants.PRODUCT_NAME, product.getName());</span>
+<span class="fc" id="L166">        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L167">        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());</span>
+<span class="fc" id="L168">        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+<span class="fc" id="L169">    }</span>
+
+    @Test
+    void testFindProductById_WhenProductWasNotFoundById_ShouldThrowProductNotFoundException() {
+
+<span class="fc" id="L174">        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,</span>
+<span class="nc" id="L175">                () -&gt; service.findTemporaryProductById(TestConstants.ID));</span>
+
+<span class="fc" id="L177">        assertNotNull(exception);</span>
+<span class="fc" id="L178">        assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND)</span>
+<span class="fc" id="L179">                , exception.getMessage());</span>
+
+<span class="fc" id="L181">    }</span>
+
+
+    @Test
+    void testFindAllProducts_WhenProductsAreFounded_ShouldReturnPaginatedProducts() {
+
+<span class="fc" id="L187">        List&lt;TemporaryProductEntity&gt; products = List.of(temporaryProductEntity);</span>
+<span class="fc" id="L188">        when(repository.findAll(any(Pageable.class))).thenReturn(new PageImpl&lt;&gt;(products));</span>
+
+<span class="fc" id="L190">        PageRequest pageRequest = PageRequest.of(0, 10);</span>
+<span class="fc" id="L191">        Page&lt;ProductVO&gt; paginatedProducts = service.findAllProducts(pageRequest);</span>
+
+<span class="fc" id="L193">        verify(repository, times(1)).findAll(any(Pageable.class));</span>
+<span class="fc" id="L194">        ProductVO product = paginatedProducts.getContent().getFirst();</span>
+
+<span class="fc" id="L196">        assertNotNull(paginatedProducts);</span>
+<span class="fc" id="L197">        assertNotNull(product);</span>
+<span class="fc" id="L198">        assertNotNull(product.getId());</span>
+<span class="fc" id="L199">        assertEquals(1, paginatedProducts.getContent().size());</span>
+
+<span class="fc" id="L201">        assertEquals(TestConstants.ID, product.getId());</span>
+<span class="fc" id="L202">        assertEquals(TestConstants.PRODUCT_NAME, product.getName());</span>
+<span class="fc" id="L203">        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L204">        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());</span>
+<span class="fc" id="L205">        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+
+<span class="fc" id="L207">    }</span>
+
+    @Test
+    void testDeleteProduct_WhenProductWasDeleted_ShouldReturnNothing() {
+
+<span class="fc" id="L212">        when(repository.findById(anyString())).thenReturn(Optional.of(temporaryProductEntity));</span>
+<span class="fc" id="L213">        doNothing().when(repository).delete(any());</span>
+
+<span class="fc" id="L215">        service.deleteTemporaryProduct(TestConstants.ID);</span>
+
+<span class="fc" id="L217">        verify(repository, times(1)).findById(anyString());</span>
+<span class="fc" id="L218">        verify(repository, times(1)).delete(any());</span>
+<span class="fc" id="L219">    }</span>
+
+    @Test
+    void TestDeleteProduct_WhenProductWasFoundById_ShouldThrowProductNotFoundException() {
+
+<span class="fc" id="L224">        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,</span>
+<span class="nc" id="L225">                () -&gt; service.deleteTemporaryProduct(TestConstants.ID));</span>
+
+<span class="fc" id="L227">        assertNotNull(exception);</span>
+<span class="fc" id="L228">        assertEquals(ProductNotFoundException.ERROR.formatErrorMessage(PRODUCT_NOT_FOUND), exception.getMessage());</span>
+<span class="fc" id="L229">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

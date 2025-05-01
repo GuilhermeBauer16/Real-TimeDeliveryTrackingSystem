@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AddressServiceContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: AddressServiceContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">AddressServiceContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.AddressVO;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service contract for managing addresses.
+&nbsp; *
+&nbsp; * &lt;p&gt;This interface defines the operations for managing address entities,
+&nbsp; * including creating, updating, finding, listing, and deleting addresses.&lt;/p&gt;
+&nbsp; *
+&nbsp; * @see AddressVO
+&nbsp; * @see Page
+&nbsp; * @see Pageable
+&nbsp; */
+&nbsp;public interface AddressServiceContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new address.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method takes an {@link AddressVO} object containing the address details
+&nbsp;     * and creates a new address record in the system.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param addressVO the address details encapsulated in an {@link AddressVO} object
+&nbsp;     * @return the created {@link AddressVO} object
+&nbsp;     */
+&nbsp;    AddressVO create(AddressVO addressVO);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates multiple addresses.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method takes a list of {@link AddressEntity} objects and creates multiple address records in the system.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param addresses a list of {@link AddressEntity} objects representing the addresses to create
+&nbsp;     * @return the list of created {@link AddressEntity} objects
+&nbsp;     */
+&nbsp;
+&nbsp;    List&lt;AddressEntity&gt; createAddresses(List&lt;AddressEntity&gt; addresses);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates an existing address.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method updates the details of an existing address using the provided
+&nbsp;     * {@link AddressVO} object.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param addressVO the updated address details encapsulated in an {@link AddressVO} object
+&nbsp;     * @return the updated {@link AddressVO} object
+&nbsp;     */
+&nbsp;    AddressVO update(AddressVO addressVO);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds an address by its unique identifier.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method retrieves an address record based on the provided unique ID.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param id the unique identifier of the address
+&nbsp;     * @return the {@link AddressVO} object representing the address, or {@code null} if not found
+&nbsp;     */
+&nbsp;    AddressVO findById(String id);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes an address by its unique identifier.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method deletes an address record from the system based on the provided unique ID.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param id the unique identifier of the address to delete
+&nbsp;     */
+&nbsp;    void delete(String id);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verifies if the given address ID is associated with any user.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method checks whether the specified address ID exists in the provided list of
+&nbsp;     * {@link AddressEntity} objects.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param addressId       the unique identifier of the address
+&nbsp;     * @param addressEntities a list of {@link AddressEntity} objects to verify against
+&nbsp;     */
+&nbsp;    void verifyIfAddressIdIsAssociatedWithUser(String addressId, List&lt;AddressEntity&gt; addressEntities);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes multiple addresses.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method deletes all the addresses provided in the list of {@link AddressVO} objects.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param addressVOS a list of {@link AddressVO} objects representing the addresses to delete
+&nbsp;     */
+&nbsp;    void deleteAllAddresses(List&lt;AddressVO&gt; addressVOS);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

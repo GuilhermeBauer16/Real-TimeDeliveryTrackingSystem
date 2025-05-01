@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Status.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums</a> &gt; <span class="el_source">Status.java</span></div><h1>Status.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+<span class="fc" id="L5">public enum Status {</span>
+
+<span class="fc" id="L7">    @JsonProperty(&quot;available&quot;)</span>
+    AVAILABLE(&quot;available&quot;),
+<span class="fc" id="L9">    @JsonProperty(&quot;in_use&quot;)</span>
+    IN_USE(&quot;IN_USE&quot;),
+<span class="fc" id="L11">    @JsonProperty(&quot;maintenance&quot;)</span>
+    MAINTENANCE(&quot;MAINTENANCE&quot;),
+<span class="fc" id="L13">    @JsonProperty(&quot;out_of_service&quot;)</span>
+    OUT_OF_SERVICE(&quot;OUT_OF_SERVICE&quot;);
+
+    private final String status;
+
+<span class="fc" id="L18">    Status(String status) {</span>
+<span class="fc" id="L19">        this.status = status;</span>
+<span class="fc" id="L20">    }</span>
+
+    public String getStatus() {
+<span class="nc" id="L23">        return status;</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

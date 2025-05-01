@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverRegistrationTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">service</a> &gt; <span class="el_source">DriverRegistrationTest.java</span></div><h1>DriverRegistrationTest.java</h1><pre class="source lang-java linenums">package service;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.DriverVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DriverLicenseAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.DriverRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.driver.DriverRegistrationService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle.VehicleService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.DriverLicenseValidatorUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import com.google.i18n.phonenumbers.NumberParseException;
+import constants.TestConstants;
+import jakarta.mail.MessagingException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+<span class="fc" id="L48">class DriverRegistrationTest {</span>
+
+    private static final String INVALID_DRIVER_MESSAGE = &quot;This Driver is invalid, please verify the fields and try again.&quot;;
+
+    private static final String DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE = &quot;This driver license is already registered, &quot; +
+            &quot;please verify the fields and try again.&quot;;
+
+
+    private static final String PHONE_NUMBER = &quot;+5511998765432&quot;;
+    private static final String DRIVER_LICENSE = &quot;14829179653&quot;;
+    private static final String LICENSE_PLATE = &quot;AQE1F34&quot;;
+    private static final String EMAIL = &quot;user@example.com&quot;;
+<span class="fc" id="L60">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;</span>
+
+    private UserVO userVO;
+    private DriverEntity driverEntity;
+    private DriverVO driverVO;
+    private VehicleVO vehicleVO;
+
+    @Mock
+    private VehicleService vehicleService;
+
+
+    @Mock
+    private DriverRepository repository;
+
+    @Mock
+    private AddressService addressService;
+
+    @Mock
+    private UserRegistrationService userRegistrationService;
+
+    @InjectMocks
+    private DriverRegistrationService service;
+
+    @BeforeEach
+    public void setUp() {
+
+<span class="fc" id="L86">        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY</span>
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+<span class="fc" id="L89">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME);
+
+<span class="fc" id="L92">        userVO = new UserVO(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+                EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME
+        );
+<span class="fc" id="L95">        vehicleVO = new VehicleVO(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L98">        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L101">        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList&lt;&gt;(List.of(vehicleEntity)), userEntity);</span>
+<span class="fc" id="L102">        driverVO = new DriverVO(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), new ArrayList&lt;&gt;(List.of(vehicleEntity)), userEntity);</span>
+
+<span class="fc" id="L104">    }</span>
+
+    @Test
+    void testCreateDriver_WhenSuccessful_ShouldReturnDriverObject() throws NumberParseException, MessagingException {
+
+<span class="fc" id="L109">        try (MockedStatic&lt;ValidatorUtils&gt; mockedValidatorUtils = mockStatic(ValidatorUtils.class);</span>
+<span class="fc" id="L110">             MockedStatic&lt;PhoneNumberValidator&gt; mockedPhoneNumberValidator = mockStatic(PhoneNumberValidator.class);</span>
+<span class="fc" id="L111">             MockedStatic&lt;DriverLicenseValidatorUtils&gt; mockedDriverLicenseValidatorUtils = mockStatic(DriverLicenseValidatorUtils.class)) {</span>
+
+<span class="fc" id="L113">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.checkObjectIsNullOrThrowException(any(), anyString(), any()))</span>
+<span class="fc" id="L114">                    .thenAnswer(invocation -&gt; null);</span>
+<span class="fc" id="L115">            mockedValidatorUtils.when(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(any(), anyString(), any()))</span>
+<span class="fc" id="L116">                    .thenAnswer(invocation -&gt; null);</span>
+<span class="fc" id="L117">            mockedPhoneNumberValidator.when(() -&gt; PhoneNumberValidator.validatePhoneNumber(anyString()))</span>
+<span class="fc" id="L118">                    .thenAnswer(invocation -&gt; null);</span>
+<span class="fc" id="L119">            mockedDriverLicenseValidatorUtils.when(() -&gt; DriverLicenseValidatorUtils.validateDriverLicense(anyString()))</span>
+<span class="fc" id="L120">                    .thenAnswer(invocation -&gt; null);</span>
+
+<span class="fc" id="L122">            when(repository.save(any(DriverEntity.class))).thenReturn(driverEntity);</span>
+<span class="fc" id="L123">            when(userRegistrationService.createUser(any(UserVO.class))).thenReturn(userVO);</span>
+<span class="fc" id="L124">            when(vehicleService.create(any(VehicleVO.class))).thenReturn(vehicleVO);</span>
+
+<span class="fc" id="L126">            DriverRegistrationResponse driver = service.create(driverVO);</span>
+
+<span class="fc" id="L128">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.checkObjectIsNullOrThrowException(any(), anyString(), any()));</span>
+<span class="fc" id="L129">            mockedValidatorUtils.verify(() -&gt; ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(any(), anyString(), any()));</span>
+<span class="fc" id="L130">            mockedPhoneNumberValidator.verify(() -&gt; PhoneNumberValidator.validatePhoneNumber(anyString()), times(1));</span>
+<span class="fc" id="L131">            mockedDriverLicenseValidatorUtils.verify(() -&gt; DriverLicenseValidatorUtils.validateDriverLicense(anyString()), times(1));</span>
+
+<span class="fc" id="L133">            verify(repository, times(1)).save(any(DriverEntity.class));</span>
+
+<span class="fc" id="L135">            assertNotNull(driver);</span>
+<span class="fc" id="L136">            assertNotNull(driver.getId());</span>
+<span class="fc" id="L137">            assertEquals(TestConstants.ID, driver.getId());</span>
+<span class="fc" id="L138">            assertEquals(PHONE_NUMBER, driver.getPhoneNumber());</span>
+<span class="fc" id="L139">            assertEquals(1, driver.getAddresses().size());</span>
+<span class="fc" id="L140">            assertEquals(1, driver.getVehicles().size());</span>
+<span class="fc" id="L141">            assertEquals(EMAIL, driver.getUserRegistrationResponse().getEmail());</span>
+<span class="fc" id="L142">            assertEquals(TestConstants.USER_USERNAME, driver.getUserRegistrationResponse().getName());</span>
+
+
+        }
+
+
+<span class="fc" id="L148">    }</span>
+
+    @Test
+    void testCreateDriver_WhenDriverIsInvalid_ShouldThrowInvalidDriverException() {
+
+<span class="pc" id="L153">        InvalidDriverException exception = assertThrows(InvalidDriverException.class, () -&gt; service.create(null));</span>
+
+<span class="fc" id="L155">        assertNotNull(exception);</span>
+<span class="fc" id="L156">        assertEquals(InvalidDriverException.ERROR.formatErrorMessage(INVALID_DRIVER_MESSAGE), exception.getMessage());</span>
+<span class="fc" id="L157">    }</span>
+
+    @Test
+    void testCreateDriver_WhenDriverIsAlreadyRegisterByAnotherDriver_ShouldThrowDriverLicenseAllReadyRegisterException() {
+
+
+<span class="fc" id="L163">        try (MockedStatic&lt;PhoneNumberValidator&gt; mockedPhoneNumberValidator = mockStatic(PhoneNumberValidator.class)) {</span>
+<span class="fc" id="L164">            mockedPhoneNumberValidator.when(() -&gt; PhoneNumberValidator.validatePhoneNumber(anyString()))</span>
+<span class="fc" id="L165">                    .thenAnswer(invocation -&gt; null);</span>
+
+<span class="fc" id="L167">            when(repository.findDriverByDriverLicense(DRIVER_LICENSE)).thenReturn(Optional.of(driverEntity));</span>
+<span class="pc" id="L168">            DriverLicenseAllReadyRegisterException exception = assertThrows(DriverLicenseAllReadyRegisterException.class, () -&gt; service.create(driverVO));</span>
+
+<span class="fc" id="L170">            assertNotNull(exception);</span>
+<span class="fc" id="L171">            assertEquals(DriverLicenseAllReadyRegisterException.ERROR.</span>
+<span class="fc" id="L172">                    formatErrorMessage(DRIVER_LICENSE_ALREADY_REGISTER_MESSAGE), exception.getMessage());</span>
+        }
+<span class="fc" id="L174">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

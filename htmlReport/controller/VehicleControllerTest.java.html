@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VehicleControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">VehicleControllerTest.java</span></div><h1>VehicleControllerTest.java</h1><pre class="source lang-java linenums">package controller;
+
+import TestClasses.VerificationCodeRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
+import config.TestConfigs;
+import constants.TestConstants;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import testContainers.AbstractionIntegrationTest;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+<span class="fc" id="L51">class VehicleControllerTest extends AbstractionIntegrationTest {</span>
+
+    @MockBean
+    private MercadoPagoService mercadoPagoService;
+
+    private static RequestSpecification specification;
+    private static ObjectMapper objectMapper;
+    private static VehicleVO vehicleVO;
+
+    private static final String URL_PREFIX = &quot;/vehicle&quot;;
+    private static final String VERIFY_URL_PREFIX = &quot;/verify&quot;;
+    private static final String VERIFICATION_CODE_URL_PREFIX = &quot;/verificationCode&quot;;
+    private static final String LOGIN_URL_PREFIX = &quot;/api/login&quot;;
+
+    private static final String LICENSE_PLATE = &quot;AQX1F34&quot;;
+    private static final String SECOND_LICENSE_PLATE = &quot;AAX1F34&quot;;
+
+    private static final String UPDATED_LICENSE_PLATE = &quot;AXA1F34&quot;;
+    private static final String EMAIL = &quot;johnzero@gmail.com&quot;;
+<span class="fc" id="L70">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;</span>
+    private static final String PHONE_NUMBER = &quot;5511995765432&quot;;
+    private static final String DRIVER_LICENSE = &quot;82435476439&quot;;
+    private static final boolean AUTHENTICATED = false;
+
+
+    @BeforeAll
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired DriverRepository driverRepository, @Autowired UserRepository userRepository,
+                      @Autowired AddressRepository addressRepository, @Autowired VehicleRepository vehicleRepository) {
+<span class="fc" id="L79">        objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L80">        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);</span>
+
+<span class="fc" id="L82">        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY</span>
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+<span class="fc" id="L85">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+<span class="fc" id="L86">                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,</span>
+                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
+<span class="fc" id="L89">        addressRepository.save(addressEntity);</span>
+<span class="fc" id="L90">        userRepository.save(userEntity);</span>
+
+<span class="fc" id="L92">        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L95">        vehicleVO = new VehicleVO(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                SECOND_LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L98">        vehicleRepository.save(vehicleEntity);</span>
+
+<span class="fc" id="L100">        DriverEntity driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, new ArrayList&lt;&gt;(List.of(addressEntity))</span>
+<span class="fc" id="L101">                , new ArrayList&lt;&gt;(List.of(vehicleEntity)), userEntity);</span>
+
+
+<span class="fc" id="L104">        driverRepository.save(driverEntity);</span>
+<span class="fc" id="L105">    }</span>
+
+    @Test
+    @Order(1)
+    void givenVerificationCodeRequestObject_whenVerifyUser_ShouldReturnNothing() {
+
+<span class="fc" id="L111">        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(EMAIL, TestConstants.USER_VERIFY_CODE,</span>
+                AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+
+<span class="fc" id="L115">        given()</span>
+<span class="fc" id="L116">                .basePath(VERIFICATION_CODE_URL_PREFIX)</span>
+<span class="fc" id="L117">                .port(TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L118">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L119">                .body(verificationCodeRequestTest)</span>
+<span class="fc" id="L120">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L121">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L122">                .when()</span>
+<span class="fc" id="L123">                .post(VERIFY_URL_PREFIX)</span>
+<span class="fc" id="L124">                .then()</span>
+<span class="fc" id="L125">                .statusCode(200)</span>
+<span class="fc" id="L126">                .extract()</span>
+<span class="fc" id="L127">                .body()</span>
+<span class="fc" id="L128">                .asString();</span>
+
+<span class="fc" id="L130">    }</span>
+
+
+    @Test
+    @Order(2)
+    void login() {
+
+<span class="fc" id="L137">        LoginRequest loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);</span>
+
+<span class="fc" id="L139">        LoginResponse loginResponse = given()</span>
+<span class="fc" id="L140">                .basePath(LOGIN_URL_PREFIX)</span>
+<span class="fc" id="L141">                .port(TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L142">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L143">                .body(loginRequest)</span>
+<span class="fc" id="L144">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L145">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L146">                .when()</span>
+<span class="fc" id="L147">                .post()</span>
+<span class="fc" id="L148">                .then()</span>
+<span class="fc" id="L149">                .statusCode(200)</span>
+<span class="fc" id="L150">                .extract()</span>
+<span class="fc" id="L151">                .body().as(LoginResponse.class);</span>
+
+<span class="fc" id="L153">        assertNotNull(loginResponse);</span>
+
+
+<span class="fc" id="L156">        specification = new RequestSpecBuilder()</span>
+<span class="fc" id="L157">                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())</span>
+<span class="fc" id="L158">                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L159">                .setBasePath(URL_PREFIX)</span>
+<span class="fc" id="L160">                .disableCsrf()</span>
+<span class="fc" id="L161">                .addFilter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L162">                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L163">                .build();</span>
+<span class="fc" id="L164">    }</span>
+
+
+    @Test
+    @Order(3)
+    void givenVehicleObject_whenCreateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
+
+<span class="fc" id="L171">        var content = given().spec(specification)</span>
+<span class="fc" id="L172">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L173">                .body(vehicleVO)</span>
+<span class="fc" id="L174">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L175">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L176">                .when()</span>
+<span class="fc" id="L177">                .post()</span>
+<span class="fc" id="L178">                .then()</span>
+<span class="fc" id="L179">                .statusCode(201)</span>
+<span class="fc" id="L180">                .extract()</span>
+<span class="fc" id="L181">                .body()</span>
+<span class="fc" id="L182">                .asString();</span>
+
+<span class="fc" id="L184">        VehicleVO createdVehicle = objectMapper.readValue(content, VehicleVO.class);</span>
+
+<span class="fc" id="L186">        Assertions.assertNotNull(createdVehicle);</span>
+<span class="fc" id="L187">        Assertions.assertNotNull(createdVehicle.getId());</span>
+<span class="fc" id="L188">        Assertions.assertTrue(createdVehicle.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L190">        assertEquals(TestConstants.VEHICLE_NAME, createdVehicle.getName());</span>
+<span class="fc" id="L191">        assertEquals(SECOND_LICENSE_PLATE, createdVehicle.getLicensePlate());</span>
+<span class="fc" id="L192">        assertEquals(TestConstants.VEHICLE_TYPE, createdVehicle.getType());</span>
+<span class="fc" id="L193">        assertEquals(TestConstants.VEHICLE_STATUS, createdVehicle.getStatus());</span>
+
+<span class="fc" id="L195">        vehicleVO.setId(createdVehicle.getId());</span>
+<span class="fc" id="L196">    }</span>
+
+    @Test
+    @Order(4)
+    void givenVehicleObject_whenFindVehicleById_ShouldReturnVehicleObject() throws JsonProcessingException {
+
+<span class="fc" id="L202">        var content = given().spec(specification)</span>
+<span class="fc" id="L203">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L204">                .pathParam(&quot;id&quot;, TestConstants.ID)</span>
+<span class="fc" id="L205">                .when()</span>
+<span class="fc" id="L206">                .get(&quot;/{id}&quot;)</span>
+<span class="fc" id="L207">                .then()</span>
+<span class="fc" id="L208">                .statusCode(200)</span>
+<span class="fc" id="L209">                .extract()</span>
+<span class="fc" id="L210">                .body()</span>
+<span class="fc" id="L211">                .asString();</span>
+
+<span class="fc" id="L213">        VehicleVO vehicle = objectMapper.readValue(content, VehicleVO.class);</span>
+
+<span class="fc" id="L215">        Assertions.assertNotNull(vehicle);</span>
+<span class="fc" id="L216">        Assertions.assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L217">        Assertions.assertTrue(vehicle.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L219">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L220">        assertEquals(LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L221">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L222">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+<span class="fc" id="L224">    }</span>
+
+    @Test
+    @Order(5)
+    void givenVehicleObject_whenFindVehicleByLicensePlate_ShouldReturnVehicleObject() throws JsonProcessingException {
+
+<span class="fc" id="L230">        var content = given().spec(specification)</span>
+<span class="fc" id="L231">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L232">                .pathParam(&quot;licensePlate&quot;, vehicleVO.getLicensePlate())</span>
+<span class="fc" id="L233">                .when()</span>
+<span class="fc" id="L234">                .get(&quot;/findByLicensePlate/{licensePlate}&quot;)</span>
+<span class="fc" id="L235">                .then()</span>
+<span class="fc" id="L236">                .statusCode(200)</span>
+<span class="fc" id="L237">                .extract()</span>
+<span class="fc" id="L238">                .body()</span>
+<span class="fc" id="L239">                .asString();</span>
+
+<span class="fc" id="L241">        VehicleVO vehicle = objectMapper.readValue(content, VehicleVO.class);</span>
+
+<span class="fc" id="L243">        Assertions.assertNotNull(vehicle);</span>
+<span class="fc" id="L244">        Assertions.assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L245">        Assertions.assertTrue(vehicle.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L247">        assertEquals(TestConstants.VEHICLE_NAME, vehicle.getName());</span>
+<span class="fc" id="L248">        assertEquals(SECOND_LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L249">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L250">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+<span class="fc" id="L252">    }</span>
+
+    @Test
+    @Order(6)
+    void givenVehicleObject_whenFindAllVehicle_ShouldReturnVehicleObjectList() throws JsonProcessingException {
+
+<span class="fc" id="L258">        var content = given().spec(specification)</span>
+<span class="fc" id="L259">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L260">                .when()</span>
+<span class="fc" id="L261">                .get()</span>
+<span class="fc" id="L262">                .then()</span>
+<span class="fc" id="L263">                .statusCode(200)</span>
+<span class="fc" id="L264">                .extract()</span>
+<span class="fc" id="L265">                .body()</span>
+<span class="fc" id="L266">                .asString();</span>
+
+<span class="fc" id="L268">        PaginatedResponse&lt;VehicleVO&gt; paginatedResponse =</span>
+<span class="fc" id="L269">                objectMapper.readValue(content, new TypeReference&lt;&gt;() {</span>
+                });
+
+<span class="fc" id="L272">        assertEquals(2, paginatedResponse.getContent().size());</span>
+
+<span class="fc" id="L274">    }</span>
+
+    @Test
+    @Order(7)
+    void givenVehicleObject_whenUpdateVehicle_ShouldReturnVehicleObject() throws JsonProcessingException {
+
+<span class="fc" id="L280">        vehicleVO.setLicensePlate(UPDATED_LICENSE_PLATE);</span>
+<span class="fc" id="L281">        vehicleVO.setName(TestConstants.VEHICLE_UPDATED_NAME);</span>
+
+<span class="fc" id="L283">        var content = given().spec(specification)</span>
+<span class="fc" id="L284">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L285">                .body(vehicleVO)</span>
+<span class="fc" id="L286">                .when()</span>
+<span class="fc" id="L287">                .put()</span>
+<span class="fc" id="L288">                .then()</span>
+<span class="fc" id="L289">                .statusCode(200)</span>
+<span class="fc" id="L290">                .extract()</span>
+<span class="fc" id="L291">                .body()</span>
+<span class="fc" id="L292">                .asString();</span>
+
+<span class="fc" id="L294">        VehicleVO vehicle = objectMapper.readValue(content, VehicleVO.class);</span>
+
+<span class="fc" id="L296">        Assertions.assertNotNull(vehicle);</span>
+<span class="fc" id="L297">        Assertions.assertNotNull(vehicle.getId());</span>
+<span class="fc" id="L298">        Assertions.assertTrue(vehicle.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L300">        assertEquals(TestConstants.VEHICLE_UPDATED_NAME, vehicle.getName());</span>
+<span class="fc" id="L301">        assertEquals(UPDATED_LICENSE_PLATE, vehicle.getLicensePlate());</span>
+<span class="fc" id="L302">        assertEquals(TestConstants.VEHICLE_TYPE, vehicle.getType());</span>
+<span class="fc" id="L303">        assertEquals(TestConstants.VEHICLE_STATUS, vehicle.getStatus());</span>
+
+<span class="fc" id="L305">    }</span>
+
+    @Order(8)
+    @Test
+    void givenVehicleObject_when_delete_ShouldReturnNoContent() {
+
+<span class="fc" id="L311">        given().spec(specification)</span>
+<span class="fc" id="L312">                .pathParam(&quot;id&quot;, vehicleVO.getId())</span>
+<span class="fc" id="L313">                .when()</span>
+<span class="fc" id="L314">                .delete(&quot;{id}&quot;)</span>
+<span class="fc" id="L315">                .then()</span>
+<span class="fc" id="L316">                .statusCode(204);</span>
+
+<span class="fc" id="L318">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

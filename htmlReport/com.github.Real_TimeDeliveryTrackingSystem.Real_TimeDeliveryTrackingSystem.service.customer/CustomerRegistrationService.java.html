@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerRegistrationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer</a> &gt; <span class="el_source">CustomerRegistrationService.java</span></div><h1>CustomerRegistrationService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.customer.InvalidCustomerException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.CustomerFactory;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CustomerRegistrationServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import com.google.i18n.phonenumbers.NumberParseException;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CustomerRegistrationService implements CustomerRegistrationServiceContract {
+
+    private static final String INVALID_CUSTOMER_MESSAGE = &quot;This customer is invalid, please verify the fields and try again.&quot;;
+
+    private static final String PHONE_PREFIX = &quot;+&quot;;
+
+
+    private final UserRegistrationService userRegistrationService;
+
+    private final CustomerRepository customerRepository;
+
+    private final AddressService addressService;
+
+    @Autowired
+<span class="fc" id="L43">    public CustomerRegistrationService(UserRegistrationService userRegistrationService, CustomerRepository customerRepository, AddressService addressService) {</span>
+<span class="fc" id="L44">        this.userRegistrationService = userRegistrationService;</span>
+<span class="fc" id="L45">        this.customerRepository = customerRepository;</span>
+<span class="fc" id="L46">        this.addressService = addressService;</span>
+<span class="fc" id="L47">    }</span>
+
+    @Override
+    public CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException, MessagingException {
+
+<span class="fc" id="L52">        ValidatorUtils.checkObjectIsNullOrThrowException(customerVO, INVALID_CUSTOMER_MESSAGE, InvalidCustomerException.class);</span>
+<span class="fc" id="L53">        customerVO.getUser().setUserProfile(UserProfile.ROLE_CUSTOMER);</span>
+
+<span class="fc" id="L55">        customerVO.setPhoneNumber(PHONE_PREFIX + customerVO.getPhoneNumber());</span>
+<span class="fc" id="L56">        PhoneNumberValidator.validatePhoneNumber(customerVO.getPhoneNumber());</span>
+
+<span class="fc" id="L58">        List&lt;AddressEntity&gt; addressEntities = addressService.createAddresses(customerVO.getAddresses());</span>
+<span class="fc" id="L59">        UserVO userVO = BuildMapper.parseObject(new UserVO(), customerVO.getUser());</span>
+<span class="fc" id="L60">        UserVO user = userRegistrationService.createUser(userVO);</span>
+<span class="fc" id="L61">        UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);</span>
+<span class="fc" id="L62">        CustomerEntity customerEntity = CustomerFactory.create(customerVO.getPhoneNumber(), addressEntities, userEntity);</span>
+<span class="fc" id="L63">        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(customerEntity, INVALID_CUSTOMER_MESSAGE, FieldNotFound.class);</span>
+<span class="fc" id="L64">        CustomerEntity savedCustomer = customerRepository.save(customerEntity);</span>
+<span class="fc" id="L65">        CustomerRegistrationResponse customerRegistrationResponse = BuildMapper.parseObject(new CustomerRegistrationResponse(), savedCustomer);</span>
+
+<span class="fc" id="L67">        customerRegistrationResponse.setUserRegistrationResponse(</span>
+<span class="fc" id="L68">                BuildMapper.parseObject(new UserRegistrationResponse(), savedCustomer.getUser()));</span>
+
+
+<span class="fc" id="L71">        return customerRegistrationResponse;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,151 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProductCustomerControllerContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductCustomerControllerContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ProductCustomerControllerContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.media.Content;
+&nbsp;import io.swagger.v3.oas.annotations.media.Schema;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Interface defining the contract for product-related operations in the customer controller.
+&nbsp; * This contract provides methods to find products by ID, name, and retrieve all products,
+&nbsp; * all with appropriate API documentation using Swagger annotations.
+&nbsp; */
+&nbsp;public interface ProductCustomerControllerContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a product by its ID.
+&nbsp;     *
+&nbsp;     * @param id the ID of the product to find
+&nbsp;     * @return the found product wrapped in a {@link ResponseEntity}
+&nbsp;     */
+&nbsp;    @GetMapping(value = &quot;/{id}&quot;)
+&nbsp;    @Operation(summary = &quot;find product by it&#39;s id&quot;,
+&nbsp;            description = &quot;Find product by it&#39;s id and returns the founded product.&quot;,
+&nbsp;            tags = &quot;Product&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;,
+&nbsp;                    content = @Content(schema = @Schema(implementation = ProductVO.class))),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Will throw Product Not found Exception&quot;,
+&nbsp;                    content = @Content),
+&nbsp;
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;ProductVO&gt; findProductById(@PathVariable(&quot;id&quot;) String id);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds products by name.
+&nbsp;     *
+&nbsp;     * @param name the name of the products to find
+&nbsp;     * @param pageable pagination information
+&nbsp;     * @return a {@link Page} containing the found products wrapped in a {@link ResponseEntity}
+&nbsp;     */
+&nbsp;    @GetMapping(&quot;findByName/{name}&quot;)
+&nbsp;    @Operation(summary = &quot;find products by name&quot;,
+&nbsp;            description = &quot;Find product by name id and returns the founded products.&quot;,
+&nbsp;            tags = &quot;Product&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;,
+&nbsp;                    content = @Content()),
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;Page&lt;ProductVO&gt;&gt; findProductsByName(@PathVariable(&quot;name&quot;) String name, Pageable pageable);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds all products.
+&nbsp;     *
+&nbsp;     * @param pageable pagination information
+&nbsp;     * @return a {@link Page} containing all the found products wrapped in a {@link ResponseEntity}
+&nbsp;     */
+&nbsp;    @GetMapping()
+&nbsp;    @Operation(summary = &quot;find all products&quot;,
+&nbsp;            description = &quot;Find all products and returns the founded products.&quot;,
+&nbsp;            tags = &quot;Product&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;,
+&nbsp;                    content = @Content()),
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;Page&lt;ProductVO&gt;&gt; findAllProduct(Pageable pageable);
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

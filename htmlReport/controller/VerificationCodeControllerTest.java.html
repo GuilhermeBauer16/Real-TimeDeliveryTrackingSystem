@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VerificationCodeControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">VerificationCodeControllerTest.java</span></div><h1>VerificationCodeControllerTest.java</h1><pre class="source lang-java linenums">package controller;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import config.TestConfigs;
+import constants.TestConstants;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import testContainers.AbstractionIntegrationTest;
+
+import static io.restassured.RestAssured.given;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+<span class="fc" id="L34">class VerificationCodeControllerTest extends AbstractionIntegrationTest {</span>
+
+    @MockBean
+    private MercadoPagoService mercadoPagoService;
+
+    private static final String URL_PREFIX = &quot;/verificationCode&quot;;
+    private static final String REGENERATE_CODE_URL_PREFIX = &quot;/regenerateCode/{email}&quot;;
+
+
+    private static final String EMAIL = &quot;verfication@gmail.com&quot;;
+<span class="fc" id="L44">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;</span>
+    private static final boolean AUTHENTICATED = false;
+
+
+    @RegisterExtension
+<span class="fc" id="L49">    static GreenMailExtension greenMail =</span>
+            new GreenMailExtension(ServerSetupTest.SMTP)
+<span class="fc" id="L51">                    .withConfiguration(GreenMailConfiguration.aConfig().withUser(&quot;duke&quot;, &quot;springboot&quot;))</span>
+<span class="fc" id="L52">                    .withPerMethodLifecycle(true);</span>
+
+    @BeforeAll
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired UserRepository userRepository) {
+
+<span class="fc" id="L57">        ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L58">        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);</span>
+
+<span class="fc" id="L60">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+<span class="fc" id="L61">                EMAIL, passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,</span>
+                TestConstants.USER_VERIFY_CODE, AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+<span class="fc" id="L64">        userRepository.save(userEntity);</span>
+
+
+<span class="fc" id="L67">    }</span>
+
+
+    @Test
+    @Order(1)
+    void givenRegenerateVerificationCodeRequestObject_whenVerifyUser_ShouldReturnNothing() {
+
+
+<span class="fc" id="L75">        given()</span>
+<span class="fc" id="L76">                .basePath(URL_PREFIX)</span>
+<span class="fc" id="L77">                .port(TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L78">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L79">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L80">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L81">                .when()</span>
+<span class="fc" id="L82">                .post(REGENERATE_CODE_URL_PREFIX, EMAIL)</span>
+<span class="fc" id="L83">                .then()</span>
+<span class="fc" id="L84">                .statusCode(200)</span>
+<span class="fc" id="L85">                .extract()</span>
+<span class="fc" id="L86">                .body()</span>
+<span class="fc" id="L87">                .asString();</span>
+
+
+<span class="fc" id="L90">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

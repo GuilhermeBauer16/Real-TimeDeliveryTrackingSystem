@@ -1,0 +1,126 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LoginControllerContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: LoginControllerContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LoginControllerContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.controller.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.LoginService;
+&nbsp;import io.swagger.v3.oas.annotations.Operation;
+&nbsp;import io.swagger.v3.oas.annotations.media.Content;
+&nbsp;import io.swagger.v3.oas.annotations.media.Schema;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponse;
+&nbsp;import io.swagger.v3.oas.annotations.responses.ApiResponses;
+&nbsp;import org.springframework.http.MediaType;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;
+&nbsp;/**
+&nbsp; * API endpoint contract for user login operations.
+&nbsp; *
+&nbsp; * &lt;p&gt;This controller provides an endpoint for authenticating users.
+&nbsp; * The client must send a {@link LoginRequest} containing user credentials,
+&nbsp; * and if successful, receives a {@link LoginResponse} containing the authentication details
+&nbsp; * including a JWT token.
+&nbsp; */
+&nbsp;
+&nbsp;public interface LoginControllerContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Authenticates a user based on provided login credentials.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This endpoint accepts a JSON payload containing the user&#39;s credentials,
+&nbsp;     * such as username/email and password. On successful authentication,
+&nbsp;     * it returns a {@link LoginResponse} with a JWT token.
+&nbsp;     *
+&nbsp;     * @param request The {@link LoginRequest} object containing the user&#39;s login credentials.
+&nbsp;     * @return {@link ResponseEntity} containing the {@link LoginResponse} with a JWT token
+&nbsp;     * if authentication is successful, or an appropriate error response otherwise.
+&nbsp;     * @see LoginResponse
+&nbsp;     * @see LoginRequest
+&nbsp;     * @see LoginService
+&nbsp;     */
+&nbsp;
+&nbsp;    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+&nbsp;            produces = MediaType.APPLICATION_JSON_VALUE)
+&nbsp;    @Operation(summary = &quot;Do a login&quot;,
+&nbsp;            description = &quot;Do a login and return an JWT token if was success&quot;,
+&nbsp;            tags = &quot;login&quot;)
+&nbsp;    @ApiResponses(value = {
+&nbsp;            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Successful operation&quot;,
+&nbsp;                    content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+&nbsp;            @ApiResponse(responseCode = &quot;401&quot;, description = &quot;BadCredentials Exception or User Not Authenticated Exception&quot;,
+&nbsp;                    content = @Content),
+&nbsp;            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;User Not Found&quot;,
+&nbsp;                    content = @Content),
+&nbsp;            @ApiResponse(responseCode = &quot;500&quot;, description = &quot;Internal server error&quot;,
+&nbsp;                    content = @Content)
+&nbsp;    })
+&nbsp;    ResponseEntity&lt;LoginResponse&gt; login(@RequestBody LoginRequest request);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

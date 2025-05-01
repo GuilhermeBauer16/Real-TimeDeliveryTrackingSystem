@@ -1,0 +1,119 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CodeValidatorServiceContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: CodeValidatorServiceContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CodeValidatorServiceContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.VerificationCodeRequest;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotAuthenticatedException;
+&nbsp;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contract for validating user verification codes during authentication.
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface defines methods for evaluating verification codes and checking if a user is already authenticated.
+&nbsp; * The implementing class is responsible for processing verification code requests, ensuring that users are not already authenticated,
+&nbsp; * and validating the expiration and correctness of the provided verification codes.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;
+&nbsp;public interface CodeValidatorServiceContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluates the provided verification code and updates the user&#39;s authentication status.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method checks if the verification code provided by the user is valid, not expired, and corresponds to the user.
+&nbsp;     * If the code is valid and the user is authenticated successfully, the user&#39;s status is updated.
+&nbsp;     * If any issue arises (e.g., expired code, invalid code, user already authenticated), an exception will be thrown.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param verifyCodeRequest the request containing the user&#39;s email and the verification code to be evaluated
+&nbsp;     * @throws ExpiredVerificationCodeException if the verification code has expired
+&nbsp;     * @throws InvalidVerificationCodeException if the provided code is invalid
+&nbsp;     * @throws UserAlreadyAuthenticatedException if the user is already authenticated
+&nbsp;     */
+&nbsp;
+&nbsp;    void evaluatedVerifyCode(VerificationCodeRequest verifyCodeRequest);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verifies if a user is already authenticated based on their email.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method checks the authentication status of the user. If the user is not authenticated,
+&nbsp;     * a {@link UserNotAuthenticatedException} will be thrown.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param email the email address of the user to check
+&nbsp;     * @throws UserNotAuthenticatedException if the user is not authenticated
+&nbsp;     */
+&nbsp;
+&nbsp;    void verifyIfUserIsAuthenticated(String email);
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

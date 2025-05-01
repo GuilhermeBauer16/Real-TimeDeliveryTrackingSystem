@@ -1,0 +1,121 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmailSendServiceContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: EmailSendServiceContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">EmailSendServiceContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;import jakarta.mail.internet.MimeMessage;
+&nbsp;import org.springframework.mail.javamail.JavaMailSender;
+&nbsp;import org.springframework.mail.javamail.MimeMessageHelper;
+&nbsp;import org.thymeleaf.context.Context;
+&nbsp;import org.thymeleaf.spring6.SpringTemplateEngine;
+&nbsp;
+&nbsp;import java.math.BigDecimal;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contract for sending emails with validation codes to users.
+&nbsp; * &lt;p&gt;
+&nbsp; * This interface defines the method for sending validation codes via email, which is typically used for
+&nbsp; * verifying user email addresses during the authentication or registration process.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementing classes are responsible for:
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;Generating a unique validation code.&lt;/li&gt;
+&nbsp; *   &lt;li&gt;Sending the code to the user&#39;s email address.&lt;/li&gt;
+&nbsp; *   &lt;li&gt;Handling email sending exceptions appropriately.&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;public interface EmailSendServiceContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends an email with a validation code to the specified user&#39;s email address.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method generates a validation code and sends it via email using an HTML template.
+&nbsp;     * It may throw a {@link MessagingException} if there is an issue during the email-sending process.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param email the email address of the user to whom the validation code will be sent
+&nbsp;     * @throws MessagingException                if an error occurs while sending the email
+&nbsp;     * @throws IllegalArgumentException          if the provided email address is invalid
+&nbsp;     * @throws UserAlreadyAuthenticatedException if the user is already authenticated.
+&nbsp;     * @see JavaMailSender
+&nbsp;     * @see MimeMessageHelper
+&nbsp;     * @see MimeMessage
+&nbsp;     * @see SpringTemplateEngine
+&nbsp;     * @see Context
+&nbsp;     */
+&nbsp;
+&nbsp;    void sendEmailWithValidatorCodeToUser(String email) throws MessagingException;
+&nbsp;
+&nbsp;    void sendMailToApprovedPayment(String to, List&lt;TemporaryProductVO&gt; temporaryProductVOS, BigDecimal totalPrice) throws MessagingException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

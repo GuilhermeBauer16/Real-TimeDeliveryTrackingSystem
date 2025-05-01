@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverRepositoryTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">repository</a> &gt; <span class="el_source">DriverRepositoryTest.java</span></div><h1>DriverRepositoryTest.java</h1><pre class="source lang-java linenums">package repository;
+
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.DriverEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.DriverRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import constants.TestConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
+import testContainers.AbstractionIntegrationTest;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(classes = RealTimeDeliveryTrackingSystemApplication.class)
+class DriverRepositoryTest extends AbstractionIntegrationTest {
+
+
+    private static final String PHONE_NUMBER = &quot;+5511998765432&quot;;
+    private static final String DRIVER_LICENSE = &quot;12628901031&quot;;
+
+    private static final String LICENSE_PLATE = &quot;ABE1F34&quot;;
+    private static final String EMAIL = &quot;driveruser@example.com&quot;;
+<span class="fc" id="L43">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_DRIVER;</span>
+
+
+    private DriverEntity driverEntity;
+
+
+    private final DriverRepository repository;
+    private final AddressRepository addressRepository;
+    private final UserRepository userRepository;
+    private final VehicleRepository vehicleRepository;
+
+    @Autowired
+<span class="fc" id="L55">    DriverRepositoryTest(DriverRepository repository, AddressRepository addressRepository, UserRepository userRepository, VehicleRepository vehicleRepository) {</span>
+<span class="fc" id="L56">        this.repository = repository;</span>
+<span class="fc" id="L57">        this.addressRepository = addressRepository;</span>
+<span class="fc" id="L58">        this.userRepository = userRepository;</span>
+<span class="fc" id="L59">        this.vehicleRepository = vehicleRepository;</span>
+<span class="fc" id="L60">    }</span>
+
+
+    @BeforeEach
+    void setUp() {
+
+<span class="fc" id="L66">        AddressEntity addressEntity = new AddressEntity(TestConstants.ID, TestConstants.ADDRESS_STREET, TestConstants.ADDRESS_CITY</span>
+                , TestConstants.ADDRESS_STATE, TestConstants.ADDRESS_POSTAL_CODE, TestConstants.ADDRESS_COUNTRY);
+
+<span class="fc" id="L69">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+                EMAIL,TestConstants.USER_PASSWORD, ROLE_NAME);
+
+<span class="fc" id="L72">        addressRepository.save(addressEntity);</span>
+<span class="fc" id="L73">        userRepository.save(userEntity);</span>
+
+<span class="fc" id="L75">        VehicleEntity vehicleEntity = new VehicleEntity(TestConstants.ID, TestConstants.VEHICLE_NAME,</span>
+                LICENSE_PLATE, TestConstants.VEHICLE_TYPE, TestConstants.VEHICLE_STATUS);
+
+<span class="fc" id="L78">        vehicleRepository.save(vehicleEntity);</span>
+
+<span class="fc" id="L80">        driverEntity = new DriverEntity(TestConstants.ID, PHONE_NUMBER, DRIVER_LICENSE, List.of(addressEntity), List.of(vehicleEntity), userEntity);</span>
+<span class="fc" id="L81">        repository.save(driverEntity);</span>
+
+<span class="fc" id="L83">    }</span>
+
+
+    @Test
+    void testFindAddressesByDriverEmail_WhenTheAddressesWasFound_ShouldReturnAAddressPageableList() {
+
+<span class="fc" id="L89">        Pageable pageable = PageRequest.of(0, 10);</span>
+<span class="fc" id="L90">        Page&lt;AddressEntity&gt; foundedAddresses = repository.findAddressesByDriverEmail(driverEntity.getUser().getEmail(), pageable);</span>
+<span class="fc" id="L91">        AddressEntity addressEntity = foundedAddresses.getContent().getFirst();</span>
+<span class="fc" id="L92">        assertNotNull(foundedAddresses);</span>
+<span class="fc" id="L93">        assertNotNull(addressEntity);</span>
+<span class="fc" id="L94">        assertNotNull(addressEntity.getId());</span>
+<span class="fc" id="L95">        assertEquals(TestConstants.ID, addressEntity.getId());</span>
+<span class="fc" id="L96">        assertEquals(TestConstants.ADDRESS_STREET, addressEntity.getStreet());</span>
+<span class="fc" id="L97">        assertEquals(TestConstants.ADDRESS_CITY, addressEntity.getCity());</span>
+<span class="fc" id="L98">        assertEquals(TestConstants.ADDRESS_STATE, addressEntity.getState());</span>
+<span class="fc" id="L99">        assertEquals(TestConstants.ADDRESS_POSTAL_CODE, addressEntity.getPostalCode());</span>
+<span class="fc" id="L100">        assertEquals(TestConstants.ADDRESS_COUNTRY, addressEntity.getCountry());</span>
+
+
+<span class="fc" id="L103">    }</span>
+
+    @Test
+    void testFindDriverByUserEmail_WhenTheDriverWasFound_ShouldReturnADriverObject() {
+
+
+<span class="fc" id="L109">        DriverEntity foundedDriver = repository.findDriverByUserEmail(driverEntity.getUser().getEmail()).orElseThrow(null);</span>
+
+<span class="fc" id="L111">        assertNotNull(foundedDriver);</span>
+<span class="fc" id="L112">        assertNotNull(foundedDriver.getId());</span>
+<span class="fc" id="L113">        assertEquals(TestConstants.ID, foundedDriver.getId());</span>
+<span class="fc" id="L114">        assertEquals(PHONE_NUMBER, foundedDriver.getPhoneNumber());</span>
+<span class="fc" id="L115">        assertEquals(1, foundedDriver.getAddresses().size());</span>
+<span class="fc" id="L116">        assertEquals(EMAIL, foundedDriver.getUser().getEmail());</span>
+<span class="fc" id="L117">        assertEquals(TestConstants.USER_USERNAME, foundedDriver.getUser().getName());</span>
+<span class="fc" id="L118">        assertEquals(TestConstants.USER_PASSWORD, foundedDriver.getUser().getPassword());</span>
+<span class="fc" id="L119">        assertEquals(ROLE_NAME, foundedDriver.getUser().getUserProfile());</span>
+<span class="fc" id="L120">        assertEquals(1, foundedDriver.getVehicles().size());</span>
+
+
+<span class="fc" id="L123">    }</span>
+
+    @Test
+    void testFindDriverByDriverLicense_WhenTheDriverWasFound_ShouldReturnADriverObject() {
+
+
+<span class="fc" id="L129">        DriverEntity foundedDriver = repository.findDriverByDriverLicense(driverEntity.getDriverLicense()).orElseThrow(null);</span>
+
+<span class="fc" id="L131">        assertNotNull(foundedDriver);</span>
+<span class="fc" id="L132">        assertNotNull(foundedDriver.getId());</span>
+<span class="fc" id="L133">        assertEquals(TestConstants.ID, foundedDriver.getId());</span>
+<span class="fc" id="L134">        assertEquals(PHONE_NUMBER, foundedDriver.getPhoneNumber());</span>
+<span class="fc" id="L135">        assertEquals(1, foundedDriver.getAddresses().size());</span>
+<span class="fc" id="L136">        assertEquals(EMAIL, foundedDriver.getUser().getEmail());</span>
+<span class="fc" id="L137">        assertEquals(TestConstants.USER_USERNAME, foundedDriver.getUser().getName());</span>
+<span class="fc" id="L138">        assertEquals(TestConstants.USER_PASSWORD, foundedDriver.getUser().getPassword());</span>
+<span class="fc" id="L139">        assertEquals(ROLE_NAME, foundedDriver.getUser().getUserProfile());</span>
+<span class="fc" id="L140">        assertEquals(1, foundedDriver.getVehicles().size());</span>
+
+
+<span class="fc" id="L143">    }</span>
+
+    @Test
+    void testFindVehicleByDriverEmail_WhenTheDriverWasFound_ShouldReturnAVehicleObject() {
+
+<span class="fc" id="L148">        Pageable pageable = PageRequest.of(0, 10);</span>
+<span class="fc" id="L149">        Page&lt;VehicleEntity&gt; vehiclesByDriverEmail = repository.findVehiclesByDriverEmail(driverEntity.getUser().getEmail(), pageable);</span>
+<span class="fc" id="L150">        VehicleEntity foundedVehicle = vehiclesByDriverEmail.getContent().getFirst();</span>
+
+<span class="fc" id="L152">        assertNotNull(foundedVehicle);</span>
+<span class="fc" id="L153">        assertNotNull(foundedVehicle.getId());</span>
+<span class="fc" id="L154">        assertEquals(TestConstants.ID, foundedVehicle.getId());</span>
+<span class="fc" id="L155">        assertEquals(TestConstants.VEHICLE_NAME, foundedVehicle.getName());</span>
+<span class="fc" id="L156">        assertEquals(LICENSE_PLATE, foundedVehicle.getLicensePlate());</span>
+<span class="fc" id="L157">        assertEquals(TestConstants.VEHICLE_TYPE, foundedVehicle.getType());</span>
+<span class="fc" id="L158">        assertEquals(TestConstants.VEHICLE_STATUS, foundedVehicle.getStatus());</span>
+
+
+<span class="fc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

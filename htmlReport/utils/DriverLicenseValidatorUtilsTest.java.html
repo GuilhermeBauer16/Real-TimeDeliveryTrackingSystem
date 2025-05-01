@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverLicenseValidatorUtilsTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">utils</a> &gt; <span class="el_source">DriverLicenseValidatorUtilsTest.java</span></div><h1>DriverLicenseValidatorUtilsTest.java</h1><pre class="source lang-java linenums">package utils;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.InvalidDriverLicenseException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.DriverLicenseValidatorUtils;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+<span class="fc" id="L12">public class DriverLicenseValidatorUtilsTest {</span>
+
+    private static final String INVALID_DRIVER_LICENSE_MESSAGE = &quot;The driver license is invalid. &quot; +
+            &quot;Please verify the fields and try again!&quot;;
+
+<span class="fc" id="L17">    private final String DRIVER_LICENSE = &quot;35034151605&quot;;</span>
+<span class="fc" id="L18">    private final String INVALID_DRIVER_LICENSE = &quot;12345&quot;;</span>
+<span class="fc" id="L19">    private final String INVALID_DRIVER_LICENSE_WITH_SAME_DIGITS = &quot;11111111111&quot;;</span>
+<span class="fc" id="L20">    private final String INVALID_DRIVER_LICENSE_CHECKSUM = &quot;12345678901&quot;;</span>
+<span class="fc" id="L21">    private final String INVALID_DRIVER_LICENSE_BY_FIRST_NUMBER_CHECKSUM = &quot;98765432109&quot;;</span>
+
+
+    @Test
+    void testValidateDriverLicense_WhenDriverLicenseIsValid_DoNothing() {
+
+<span class="fc" id="L27">        assertDoesNotThrow(() -&gt; DriverLicenseValidatorUtils.validateDriverLicense(DRIVER_LICENSE));</span>
+
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    void testValidateDriverLicense_WhenDriverLicenseLengthIsLessThan11Digits_ShouldThrowInvalidDriverLicenseException() {
+
+<span class="fc" id="L34">        InvalidDriverLicenseException exception = assertThrows(InvalidDriverLicenseException.class,</span>
+<span class="nc" id="L35">                () -&gt; DriverLicenseValidatorUtils.validateDriverLicense(INVALID_DRIVER_LICENSE));</span>
+
+<span class="fc" id="L37">        assertNotNull(exception);</span>
+<span class="fc" id="L38">        assertEquals(InvalidDriverLicenseException.ERROR.formatErrorMessage(INVALID_DRIVER_LICENSE_MESSAGE), exception.getMessage());</span>
+
+
+<span class="fc" id="L41">    }</span>
+
+
+    @Test
+    void testValidateDriverLicense_WhenDriverLicenseHaveAllSameDigits_ShouldThrowInvalidDriverLicenseException() {
+
+<span class="fc" id="L47">        InvalidDriverLicenseException exception = assertThrows(InvalidDriverLicenseException.class,</span>
+<span class="nc" id="L48">                () -&gt; DriverLicenseValidatorUtils.validateDriverLicense(INVALID_DRIVER_LICENSE_WITH_SAME_DIGITS));</span>
+
+<span class="fc" id="L50">        assertNotNull(exception);</span>
+<span class="fc" id="L51">        assertEquals(InvalidDriverLicenseException.ERROR.formatErrorMessage(INVALID_DRIVER_LICENSE_MESSAGE), exception.getMessage());</span>
+<span class="fc" id="L52">    }</span>
+
+    @Test
+    void testValidateDriverLicense_WhenDriverLicenseIsInvalidByTheChecksum_ShouldThrowInvalidDriverLicenseException() {
+
+<span class="fc" id="L57">        InvalidDriverLicenseException exception = assertThrows(InvalidDriverLicenseException.class,</span>
+<span class="nc" id="L58">                () -&gt; DriverLicenseValidatorUtils.validateDriverLicense(INVALID_DRIVER_LICENSE_CHECKSUM));</span>
+
+<span class="fc" id="L60">        assertNotNull(exception);</span>
+<span class="fc" id="L61">        assertEquals(InvalidDriverLicenseException.ERROR.formatErrorMessage(INVALID_DRIVER_LICENSE_MESSAGE), exception.getMessage());</span>
+<span class="fc" id="L62">    }</span>
+
+
+    @Test
+    void testValidateDriverLicense_WhenDriverLicenseIsInvalidByTheFirstNumberChecksumIsHigherThan10_ShouldThrowInvalidDriverLicenseException() {
+
+<span class="fc" id="L68">        InvalidDriverLicenseException exception = assertThrows(InvalidDriverLicenseException.class,</span>
+<span class="nc" id="L69">                () -&gt; DriverLicenseValidatorUtils.validateDriverLicense(INVALID_DRIVER_LICENSE_BY_FIRST_NUMBER_CHECKSUM));</span>
+
+<span class="fc" id="L71">        assertNotNull(exception);</span>
+<span class="fc" id="L72">        assertEquals(InvalidDriverLicenseException.ERROR.formatErrorMessage(INVALID_DRIVER_LICENSE_MESSAGE), exception.getMessage());</span>
+<span class="fc" id="L73">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

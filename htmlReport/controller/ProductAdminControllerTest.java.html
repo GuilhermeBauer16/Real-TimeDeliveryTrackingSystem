@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductAdminControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">controller</a> &gt; <span class="el_source">ProductAdminControllerTest.java</span></div><h1>ProductAdminControllerTest.java</h1><pre class="source lang-java linenums">package controller;
+
+import TestClasses.VerificationCodeRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import config.TestConfigs;
+import constants.TestConstants;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import testContainers.AbstractionIntegrationTest;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+<span class="fc" id="L44">class ProductAdminControllerTest extends AbstractionIntegrationTest {</span>
+
+
+    @RegisterExtension
+<span class="fc" id="L48">    static GreenMailExtension greenMail =</span>
+            new GreenMailExtension(ServerSetupTest.SMTP)
+<span class="fc" id="L50">                    .withConfiguration(GreenMailConfiguration.aConfig().withUser(&quot;duke&quot;, &quot;springboot&quot;))</span>
+<span class="fc" id="L51">                    .withPerMethodLifecycle(true);</span>
+
+    private static RequestSpecification specification;
+    private static ObjectMapper objectMapper;
+
+    @MockBean
+    private MercadoPagoService mercadoPagoService;
+
+    private static ProductVO productVO;
+
+    private static final String URL_PREFIX = &quot;/product&quot;;
+    private static final String VERIFICATION_CODE_URL_PREFIX = &quot;/verificationCode&quot;;
+    private static final String VERIFY_URL_PREFIX = &quot;/verify&quot;;
+    private static final String LOGIN_URL_PREFIX = &quot;/api/login&quot;;
+
+    private static final String EMAIL = &quot;adminProduct@example.com&quot;;
+<span class="fc" id="L67">    private static final UserProfile ROLE_NAME = UserProfile.ROLE_ADMIN;</span>
+    private static final boolean AUTHENTICATED = false;
+
+
+    @BeforeAll
+    static void setUp(@Autowired PasswordEncoder passwordEncoder, @Autowired UserRepository userRepository) {
+<span class="fc" id="L73">        objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L74">        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);</span>
+
+<span class="fc" id="L76">        productVO = new ProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,</span>
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE,TestConstants.PRODUCT_QUANTITY);
+
+<span class="fc" id="L79">        UserEntity userEntity = new UserEntity(TestConstants.ID, TestConstants.USER_USERNAME,</span>
+<span class="fc" id="L80">                EMAIL,passwordEncoder.encode(TestConstants.USER_PASSWORD), ROLE_NAME,</span>
+                TestConstants.USER_VERIFY_CODE,AUTHENTICATED,TestConstants.USER_CODE_EXPIRATION);
+
+<span class="fc" id="L83">        userRepository.save(userEntity);</span>
+
+
+
+<span class="fc" id="L87">    }</span>
+
+    @Test
+    @Order(1)
+    void givenCustomerObject_whenVerifyCustomer_ShouldReturnNothing() {
+
+<span class="fc" id="L93">        VerificationCodeRequest verificationCodeRequestTest = new VerificationCodeRequest(EMAIL, TestConstants.USER_VERIFY_CODE,</span>
+                AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
+
+
+<span class="fc" id="L97">        given()</span>
+<span class="fc" id="L98">                .basePath(VERIFICATION_CODE_URL_PREFIX)</span>
+<span class="fc" id="L99">                .port(TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L100">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L101">                .body(verificationCodeRequestTest)</span>
+<span class="fc" id="L102">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L103">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L104">                .when()</span>
+<span class="fc" id="L105">                .post(VERIFY_URL_PREFIX)</span>
+<span class="fc" id="L106">                .then()</span>
+<span class="fc" id="L107">                .statusCode(200)</span>
+<span class="fc" id="L108">                .extract()</span>
+<span class="fc" id="L109">                .body()</span>
+<span class="fc" id="L110">                .asString();</span>
+
+<span class="fc" id="L112">    }</span>
+
+
+    @Test
+    @Order(2)
+    void login() {
+
+<span class="fc" id="L119">        LoginRequest loginRequest = new LoginRequest(EMAIL, TestConstants.USER_PASSWORD);</span>
+
+<span class="fc" id="L121">        LoginResponse loginResponse = given()</span>
+<span class="fc" id="L122">                .basePath(LOGIN_URL_PREFIX)</span>
+<span class="fc" id="L123">                .port(TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L124">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L125">                .body(loginRequest)</span>
+<span class="fc" id="L126">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L127">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L128">                .when()</span>
+<span class="fc" id="L129">                .post()</span>
+<span class="fc" id="L130">                .then()</span>
+<span class="fc" id="L131">                .statusCode(200)</span>
+<span class="fc" id="L132">                .extract()</span>
+<span class="fc" id="L133">                .body().as(LoginResponse.class);</span>
+
+<span class="fc" id="L135">        assertNotNull(loginResponse);</span>
+
+
+<span class="fc" id="L138">        specification = new RequestSpecBuilder()</span>
+<span class="fc" id="L139">                .addHeader(TestConfigs.HEADER_PARAM_AUTHORIZATION, TestConstants.URL_BEARER_PREFIX + loginResponse.getToken())</span>
+<span class="fc" id="L140">                .setBaseUri(TestConstants.URL_HOST_PREFIX + TestConfigs.SERVER_PORT)</span>
+<span class="fc" id="L141">                .setBasePath(URL_PREFIX)</span>
+<span class="fc" id="L142">                .disableCsrf()</span>
+<span class="fc" id="L143">                .addFilter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L144">                .addFilter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L145">                .build();</span>
+<span class="fc" id="L146">    }</span>
+
+    @Test
+    @Order(3)
+    void givenProductObject_whenCreateProduct_ShouldReturnProductObject() throws JsonProcessingException {
+
+<span class="fc" id="L152">        var content = given().spec(specification)</span>
+<span class="fc" id="L153">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L154">                .body(productVO)</span>
+<span class="fc" id="L155">                .filter(new RequestLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L156">                .filter(new ResponseLoggingFilter(LogDetail.ALL))</span>
+<span class="fc" id="L157">                .when()</span>
+<span class="fc" id="L158">                .post()</span>
+<span class="fc" id="L159">                .then()</span>
+<span class="fc" id="L160">                .statusCode(201)</span>
+<span class="fc" id="L161">                .extract()</span>
+<span class="fc" id="L162">                .body()</span>
+<span class="fc" id="L163">                .asString();</span>
+
+<span class="fc" id="L165">        ProductVO product = objectMapper.readValue(content, ProductVO.class);</span>
+
+<span class="fc" id="L167">        Assertions.assertNotNull(product);</span>
+<span class="fc" id="L168">        Assertions.assertNotNull(product.getId());</span>
+<span class="fc" id="L169">        Assertions.assertTrue(product.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L171">        assertEquals(TestConstants.PRODUCT_NAME, product.getName());</span>
+<span class="fc" id="L172">        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L173">        assertEquals(TestConstants.PRODUCT_PRICE, product.getPrice());</span>
+<span class="fc" id="L174">        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+
+
+<span class="fc" id="L177">        productVO.setId(product.getId());</span>
+<span class="fc" id="L178">    }</span>
+
+    @Test
+    @Order(4)
+    void givenProductObject_whenUpdateProduct_ShouldReturnProductObject() throws JsonProcessingException {
+
+<span class="fc" id="L184">        productVO.setPrice(TestConstants.PRODUCT_UPDATED_PRICE);</span>
+<span class="fc" id="L185">        productVO.setName(TestConstants.PRODUCT_UPDATED_NAME);</span>
+
+<span class="fc" id="L187">        var content = given().spec(specification)</span>
+<span class="fc" id="L188">                .contentType(TestConfigs.CONTENT_TYPE_JSON)</span>
+<span class="fc" id="L189">                .body(productVO)</span>
+<span class="fc" id="L190">                .when()</span>
+<span class="fc" id="L191">                .put()</span>
+<span class="fc" id="L192">                .then()</span>
+<span class="fc" id="L193">                .statusCode(200)</span>
+<span class="fc" id="L194">                .extract()</span>
+<span class="fc" id="L195">                .body()</span>
+<span class="fc" id="L196">                .asString();</span>
+
+<span class="fc" id="L198">        ProductVO product = objectMapper.readValue(content, ProductVO.class);</span>
+
+<span class="fc" id="L200">        Assertions.assertNotNull(product);</span>
+<span class="fc" id="L201">        Assertions.assertNotNull(product.getId());</span>
+<span class="fc" id="L202">        Assertions.assertTrue(product.getId().matches(&quot;[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}&quot;));</span>
+
+<span class="fc" id="L204">        assertEquals(TestConstants.PRODUCT_UPDATED_NAME, product.getName());</span>
+<span class="fc" id="L205">        assertEquals(TestConstants.PRODUCT_DESCRIPTION, product.getDescription());</span>
+<span class="fc" id="L206">        assertEquals(TestConstants.PRODUCT_UPDATED_PRICE, product.getPrice());</span>
+<span class="fc" id="L207">        assertEquals(TestConstants.PRODUCT_QUANTITY, product.getQuantity());</span>
+
+
+<span class="fc" id="L210">    }</span>
+
+    @Order(5)
+    @Test
+    void givenVehicleObject_when_delete_ShouldReturnNoContent() {
+
+<span class="fc" id="L216">        given().spec(specification)</span>
+<span class="fc" id="L217">                .pathParam(&quot;id&quot;, productVO.getId())</span>
+<span class="fc" id="L218">                .when()</span>
+<span class="fc" id="L219">                .delete(&quot;{id}&quot;)</span>
+<span class="fc" id="L220">                .then()</span>
+<span class="fc" id="L221">                .statusCode(204);</span>
+
+<span class="fc" id="L223">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

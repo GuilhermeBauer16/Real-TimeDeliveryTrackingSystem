@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VehicleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle</a> &gt; <span class="el_source">VehicleService.java</span></div><h1>VehicleService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DuplicatedLicensePlateException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.VehicleNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.VehicleFactory;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.VehicleServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.LicencePlateUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class VehicleService implements VehicleServiceContract {
+    private static final String DUPLICATED_LICENSE_PLATE_MESSAGE = &quot;That license plate already registered in the system. &quot; +
+            &quot;Please verify the license plate and try again!.&quot;;
+    private static final String VEHICLE_NOT_FOUND = &quot;These Vehicle was Not Found&quot;;
+    private final VehicleRepository repository;
+
+    @Autowired
+<span class="fc" id="L30">    public VehicleService(VehicleRepository vehicleRepository) {</span>
+<span class="fc" id="L31">        this.repository = vehicleRepository;</span>
+
+<span class="fc" id="L33">    }</span>
+
+    @Override
+    public VehicleVO create(VehicleVO vehicleVO) {
+
+<span class="fc" id="L38">        ValidatorUtils.checkObjectIsNullOrThrowException(vehicleVO, VEHICLE_NOT_FOUND, VehicleNotFoundException.class);</span>
+<span class="fc" id="L39">        String validatedLicencePlate = LicencePlateUtils.validateLicencePlate(vehicleVO.getLicensePlate());</span>
+<span class="fc" id="L40">        verifyIfLicensePlateIsNotADuplicateValue(validatedLicencePlate);</span>
+<span class="fc" id="L41">        VehicleEntity vehicleEntity = VehicleFactory.create(vehicleVO.getName(), validatedLicencePlate, vehicleVO.getType(),</span>
+<span class="fc" id="L42">                vehicleVO.getStatus());</span>
+<span class="fc" id="L43">        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(vehicleEntity, VEHICLE_NOT_FOUND, FieldNotFound.class);</span>
+<span class="fc" id="L44">        VehicleEntity savedVehicle = repository.save(vehicleEntity);</span>
+<span class="fc" id="L45">        return BuildMapper.parseObject(new VehicleVO(), savedVehicle);</span>
+    }
+
+    @Override
+    public VehicleVO update(VehicleVO vehicleVO) {
+
+<span class="fc" id="L51">        VehicleEntity vehicleEntity = repository.findById(vehicleVO.getId())</span>
+<span class="fc" id="L52">                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</span>
+<span class="fc" id="L53">        LicencePlateUtils.validateLicencePlate(vehicleVO.getLicensePlate());</span>
+<span class="fc" id="L54">        VehicleEntity updatedVehicleEntity = ValidatorUtils.updateFieldIfNotNull(vehicleEntity</span>
+                , vehicleVO, VEHICLE_NOT_FOUND, FieldNotFound.class);
+<span class="fc" id="L56">        VehicleEntity savedVehicle = repository.save(updatedVehicleEntity);</span>
+
+<span class="fc" id="L58">        return BuildMapper.parseObject(new VehicleVO(), savedVehicle);</span>
+    }
+
+    @Override
+    public VehicleVO findById(String id) {
+<span class="fc" id="L63">        VehicleEntity vehicleEntity = repository.findById(id)</span>
+<span class="fc" id="L64">                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</span>
+<span class="fc" id="L65">        return BuildMapper.parseObject(new VehicleVO(), vehicleEntity);</span>
+    }
+
+    @Override
+    public VehicleVO findByLicensePlate(String licensePlate) {
+
+<span class="fc" id="L71">        String validatedLicencePlate = LicencePlateUtils.validateLicencePlate(licensePlate);</span>
+<span class="fc" id="L72">        VehicleEntity vehicleEntity = repository.findByLicensePlate(validatedLicencePlate)</span>
+<span class="fc" id="L73">                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</span>
+<span class="fc" id="L74">        return BuildMapper.parseObject(new VehicleVO(), vehicleEntity);</span>
+    }
+
+    @Override
+    public Page&lt;VehicleVO&gt; findAll(Pageable pageable) {
+
+<span class="fc" id="L80">        Page&lt;VehicleEntity&gt; vehicles = repository.findAll(pageable);</span>
+
+<span class="fc" id="L82">        List&lt;VehicleVO&gt; vehicleVOS = vehicles.getContent().stream().map(</span>
+<span class="fc" id="L83">                vehicleEntity -&gt; BuildMapper.parseObject(new VehicleVO(), vehicleEntity)).toList();</span>
+
+<span class="fc" id="L85">        return new PageImpl&lt;&gt;(vehicleVOS, pageable, vehicles.getTotalElements());</span>
+    }
+
+    @Override
+    public void delete(String id) {
+
+<span class="fc" id="L91">        VehicleEntity vehicleEntity = repository.findById(id)</span>
+<span class="fc" id="L92">                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</span>
+
+<span class="fc" id="L94">        repository.delete(vehicleEntity);</span>
+
+
+<span class="fc" id="L97">    }</span>
+
+    @Override
+    public void deleteAllVehicles(List&lt;VehicleVO&gt; vehicleVOS) {
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        for (VehicleVO vehicleVO : vehicleVOS) {</span>
+<span class="nc" id="L103">            delete(vehicleVO.getId());</span>
+<span class="nc" id="L104">        }</span>
+<span class="nc" id="L105">    }</span>
+
+    private void verifyIfLicensePlateIsNotADuplicateValue(String licensePlate) {
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (repository.findByLicensePlate(licensePlate).isPresent()) {</span>
+<span class="fc" id="L110">            throw new DuplicatedLicensePlateException(DUPLICATED_LICENSE_PLATE_MESSAGE);</span>
+        }
+<span class="fc" id="L112">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailSenderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email</a> &gt; <span class="el_source">EmailSenderService.java</span></div><h1>EmailSenderService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.EmailSendServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.CodeGeneratorUtils;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+
+@Service
+public class EmailSenderService implements EmailSendServiceContract {
+
+    private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = &quot;This user is already authenticated.&quot;;
+    private static final String EMAIL_TEMPLATE_PATH = &quot;email/verification-email&quot;;
+    private static final String SUBJECT = &quot;Verification of the Email&quot;;
+    private static final String CHARSET = &quot;UTF-8&quot;;
+    private static final String CONTEXT_CODE_VARIABLE = &quot;code&quot;;
+    private static final int CODE_LENGTH = 6;
+    private static final int EXPIRATION_TIME = 30;
+
+    private static final String LOCALE_LANGUAGE = &quot;pt&quot;;
+    private static final String LOCALE_COUNTRY = &quot;BR&quot;;
+    private static final String PAYMENT_TEMPLATE_PATH = &quot;email/payment-approved&quot;;
+    private static final String PAYMENT_SUBJECT = &quot;Payment Approved&quot;;
+    private static final String CONTEXT_BUYER_NAME_VARIABLE = &quot;buyerName&quot;;
+    private static final String CONTEXT_ITEMS_VARIABLE = &quot;items&quot;;
+    private static final String CONTEXT_TOTAL_VARIABLE = &quot;total&quot;;
+
+
+    private final JavaMailSender mailSender;
+    private final SpringTemplateEngine templateEngine;
+    private final UserService userService;
+
+
+    @Autowired
+<span class="fc" id="L51">    public EmailSenderService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, UserService userService) {</span>
+<span class="fc" id="L52">        this.mailSender = mailSender;</span>
+<span class="fc" id="L53">        this.templateEngine = templateEngine;</span>
+<span class="fc" id="L54">        this.userService = userService;</span>
+<span class="fc" id="L55">    }</span>
+
+    private void sendValidatorCode(String to, String code) throws MessagingException {
+
+<span class="fc" id="L59">        MimeMessage mimeMessage = mailSender.createMimeMessage();</span>
+<span class="fc" id="L60">        MimeMessageHelper mimeMessageHelper =</span>
+                new MimeMessageHelper(mimeMessage,
+                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                        CHARSET);
+
+<span class="fc" id="L65">        Context context = new Context();</span>
+<span class="fc" id="L66">        context.setVariable(CONTEXT_CODE_VARIABLE, code);</span>
+
+
+<span class="fc" id="L69">        String html = templateEngine.process(EMAIL_TEMPLATE_PATH, context);</span>
+<span class="fc" id="L70">        mimeMessageHelper.setTo(to);</span>
+<span class="fc" id="L71">        mimeMessageHelper.setText(html, true);</span>
+<span class="fc" id="L72">        mimeMessageHelper.setSubject(SUBJECT);</span>
+<span class="fc" id="L73">        mailSender.send(mimeMessage);</span>
+
+<span class="fc" id="L75">    }</span>
+
+    @Override
+    public void sendEmailWithValidatorCodeToUser(String email) throws MessagingException {
+
+<span class="fc" id="L80">        UserVO userByEmail = userService.findUserByEmail(email);</span>
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (userByEmail.isAuthenticated()) {</span>
+<span class="fc" id="L83">            throw new UserAlreadyAuthenticatedException(USER_ALREADY_AUTHENTICATED_MESSAGE);</span>
+
+        }
+<span class="fc" id="L86">        String code = CodeGeneratorUtils.generateCode(CODE_LENGTH);</span>
+<span class="fc" id="L87">        sendValidatorCode(email, code);</span>
+
+<span class="fc" id="L89">        UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));</span>
+<span class="fc" id="L90">        userService.updateUser(userUpdateRequest);</span>
+
+
+<span class="fc" id="L93">    }</span>
+
+    @Override
+    public void sendMailToApprovedPayment(String to, List&lt;TemporaryProductVO&gt; temporaryProductVOS, BigDecimal totalPrice) throws MessagingException {
+
+<span class="nc" id="L98">        UserVO userByEmail = userService.findUserByEmail(to);</span>
+
+<span class="nc" id="L100">        Locale brazil = Locale.of(LOCALE_LANGUAGE, LOCALE_COUNTRY);</span>
+<span class="nc" id="L101">        NumberFormat currencyFormat = NumberFormat.getNumberInstance(brazil);</span>
+<span class="nc" id="L102">        currencyFormat.setMinimumFractionDigits(2);</span>
+<span class="nc" id="L103">        currencyFormat.setMaximumFractionDigits(2);</span>
+<span class="nc" id="L104">        String formattedTotal = currencyFormat.format(totalPrice);</span>
+
+<span class="nc" id="L106">        MimeMessage mimeMessage = mailSender.createMimeMessage();</span>
+<span class="nc" id="L107">        MimeMessageHelper mimeMessageHelper =</span>
+                new MimeMessageHelper(mimeMessage,
+                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                        CHARSET);
+
+<span class="nc" id="L112">        Context context = new Context();</span>
+<span class="nc" id="L113">        context.setVariable(CONTEXT_BUYER_NAME_VARIABLE, userByEmail.getName());</span>
+<span class="nc" id="L114">        context.setVariable(CONTEXT_ITEMS_VARIABLE, temporaryProductVOS);</span>
+<span class="nc" id="L115">        context.setVariable(CONTEXT_TOTAL_VARIABLE, formattedTotal);</span>
+
+
+<span class="nc" id="L118">        String html = templateEngine.process(PAYMENT_TEMPLATE_PATH, context);</span>
+<span class="nc" id="L119">        mimeMessageHelper.setTo(to);</span>
+<span class="nc" id="L120">        mimeMessageHelper.setText(html, true);</span>
+<span class="nc" id="L121">        mimeMessageHelper.setSubject(PAYMENT_SUBJECT);</span>
+<span class="nc" id="L122">        mailSender.send(mimeMessage);</span>
+
+<span class="nc" id="L124">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

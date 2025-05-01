@@ -1,0 +1,128 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Type</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums</a>
+</div>
+
+<h1>Coverage Summary for Class: Type (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Type</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;
+<b class="fc">&nbsp;public enum Type {</b>
+<b class="fc">&nbsp;    @JsonProperty(&quot;car&quot;)</b>
+&nbsp;    CAR(&quot;CAR&quot;),
+<b class="fc">&nbsp;    @JsonProperty(&quot;truck&quot;)</b>
+&nbsp;    TRUCK(&quot;TRUCK&quot;),
+<b class="fc">&nbsp;    @JsonProperty(&quot;van&quot;)</b>
+&nbsp;    VAN(&quot;VAN&quot;),
+<b class="fc">&nbsp;    @JsonProperty(&quot;motorcycle&quot;)</b>
+&nbsp;    MOTORCYCLE(&quot;MOTORCYCLE&quot;);
+&nbsp;
+&nbsp;    private final String type;
+&nbsp;
+<b class="fc">&nbsp;    Type(String type) {</b>
+<b class="fc">&nbsp;        this.type = type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getType() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

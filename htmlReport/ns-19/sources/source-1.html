@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomerRegistrationService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerRegistrationService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomerRegistrationService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.AddressEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.CustomerEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.customer.InvalidCustomerException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.CustomerFactory;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.CustomerRepository;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.UserRegistrationResponse;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.address.AddressService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserRegistrationService;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CustomerRegistrationServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PhoneNumberValidator;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+&nbsp;import com.google.i18n.phonenumbers.NumberParseException;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class CustomerRegistrationService implements CustomerRegistrationServiceContract {
+&nbsp;
+&nbsp;    private static final String INVALID_CUSTOMER_MESSAGE = &quot;This customer is invalid, please verify the fields and try again.&quot;;
+&nbsp;
+&nbsp;    private static final String PHONE_PREFIX = &quot;+&quot;;
+&nbsp;
+&nbsp;
+&nbsp;    private final UserRegistrationService userRegistrationService;
+&nbsp;
+&nbsp;    private final CustomerRepository customerRepository;
+&nbsp;
+&nbsp;    private final AddressService addressService;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public CustomerRegistrationService(UserRegistrationService userRegistrationService, CustomerRepository customerRepository, AddressService addressService) {</b>
+<b class="fc">&nbsp;        this.userRegistrationService = userRegistrationService;</b>
+<b class="fc">&nbsp;        this.customerRepository = customerRepository;</b>
+<b class="fc">&nbsp;        this.addressService = addressService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException, MessagingException {
+&nbsp;
+<b class="fc">&nbsp;        ValidatorUtils.checkObjectIsNullOrThrowException(customerVO, INVALID_CUSTOMER_MESSAGE, InvalidCustomerException.class);</b>
+<b class="fc">&nbsp;        customerVO.getUser().setUserProfile(UserProfile.ROLE_CUSTOMER);</b>
+&nbsp;
+<b class="fc">&nbsp;        customerVO.setPhoneNumber(PHONE_PREFIX + customerVO.getPhoneNumber());</b>
+<b class="fc">&nbsp;        PhoneNumberValidator.validatePhoneNumber(customerVO.getPhoneNumber());</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;AddressEntity&gt; addressEntities = addressService.createAddresses(customerVO.getAddresses());</b>
+<b class="fc">&nbsp;        UserVO userVO = BuildMapper.parseObject(new UserVO(), customerVO.getUser());</b>
+<b class="fc">&nbsp;        UserVO user = userRegistrationService.createUser(userVO);</b>
+<b class="fc">&nbsp;        UserEntity userEntity = BuildMapper.parseObject(new UserEntity(), user);</b>
+<b class="fc">&nbsp;        CustomerEntity customerEntity = CustomerFactory.create(customerVO.getPhoneNumber(), addressEntities, userEntity);</b>
+<b class="fc">&nbsp;        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(customerEntity, INVALID_CUSTOMER_MESSAGE, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        CustomerEntity savedCustomer = customerRepository.save(customerEntity);</b>
+<b class="fc">&nbsp;        CustomerRegistrationResponse customerRegistrationResponse = BuildMapper.parseObject(new CustomerRegistrationResponse(), savedCustomer);</b>
+&nbsp;
+<b class="fc">&nbsp;        customerRegistrationResponse.setUserRegistrationResponse(</b>
+<b class="fc">&nbsp;                BuildMapper.parseObject(new UserRegistrationResponse(), savedCustomer.getUser()));</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return customerRegistrationResponse;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.config;
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.filters.CsrfCookieFilter;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.filters.JwtValidationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
+@Configuration
+<span class="fc" id="L26">public class SecurityConfig {</span>
+
+<span class="fc" id="L28">    private static final String[] DRIVER_RESOURCES = {&quot;/vehicle/**&quot;, &quot;/driver/**&quot;, &quot;/driverAddress/**&quot;};</span>
+<span class="fc" id="L29">    private static final String[] CUSTOMER_RESOURCES = {&quot;/customer/**&quot;, &quot;/customer/product/**&quot;, &quot;/shoppingCart/**&quot;,</span>
+            &quot;/payment/v1/checkout/**&quot;, &quot;index/**&quot;, &quot;/mercadoPago/**&quot;};
+
+<span class="fc" id="L32">    private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {&quot;/vehicle/**&quot;, &quot;/api/login&quot;, &quot;/signInCustomer&quot;, &quot;/customer/**&quot;,</span>
+            &quot;/signInDriver/**&quot;, &quot;/driver/**&quot;, &quot;/driverAddress/**&quot;, &quot;/customerAddress/**&quot;, &quot;/verificationCode/**&quot;, &quot;/product/**&quot;
+            , &quot;/customer/product/**&quot;, &quot;/shoppingCart/**&quot;, &quot;/payment/v1/checkout/**&quot;, &quot;index/**&quot;, &quot;/mercadoPago/**&quot;,&quot;/ipn/**&quot;};
+<span class="fc" id="L35">    private static final String[] ADMIN_RESOURCES = {&quot;/product/**&quot;};</span>
+    private static final String ROLE_ADMIN = &quot;ADMIN&quot;;
+    private static final String ROLE_CUSTOMER = &quot;CUSTOMER&quot;;
+    private static final String ROLE_DRIVER = &quot;DRIVER&quot;;
+
+
+    @Bean
+    @Autowired
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtValidationFilter jwtValidationFilter) throws Exception {
+<span class="fc" id="L44">        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();</span>
+<span class="fc" id="L45">        requestHandler.setCsrfRequestAttributeName(&quot;_csrf&quot;);</span>
+
+<span class="fc" id="L47">        return http</span>
+<span class="fc" id="L48">                .httpBasic(AbstractHttpConfigurer::disable)</span>
+<span class="fc" id="L49">                .csrf(csrf -&gt; csrf.csrfTokenRequestHandler(requestHandler)</span>
+<span class="fc" id="L50">                        .ignoringRequestMatchers(CSRF_IGNORE_REQUEST_MATCHER)</span>
+<span class="fc" id="L51">                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))</span>
+<span class="fc" id="L52">                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+<span class="fc" id="L53">                .cors(cors -&gt; cors.configurationSource(corsConfigurationSource()))</span>
+<span class="fc" id="L54">                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)</span>
+<span class="fc" id="L55">                .addFilterAfter(jwtValidationFilter, BasicAuthenticationFilter.class)</span>
+<span class="fc" id="L56">                .sessionManagement(</span>
+<span class="fc" id="L57">                        session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+<span class="fc" id="L58">                .authorizeHttpRequests(</span>
+                        authorizeHttpRequests -&gt; authorizeHttpRequests
+//
+<span class="fc" id="L61">                                .requestMatchers(DRIVER_RESOURCES).hasRole(ROLE_DRIVER)</span>
+<span class="fc" id="L62">                                .requestMatchers(CUSTOMER_RESOURCES).hasRole(ROLE_CUSTOMER)</span>
+<span class="fc" id="L63">                                .requestMatchers(ADMIN_RESOURCES).hasRole(ROLE_ADMIN)</span>
+<span class="fc" id="L64">                                .anyRequest().permitAll()</span>
+
+
+                )
+//                .headers(headers -&gt; headers
+//                        .contentSecurityPolicy(csp -&gt; csp.policyDirectives(
+//                                &quot;default-src 'self'; &quot; +
+//                                        &quot;script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: &quot; +
+//                                        &quot;*.mercadopago.com mercadopago.com.br *.mercadopago.com.br &quot; +
+//                                        &quot;hotjar.com *.hotjar.com static.hotjar.com *.static.hotjar.com script.hotjar.com *.script.hotjar.com; &quot; +
+//                                        &quot;connect-src 'self' &quot; +
+//                                        &quot;*.mercadopago.com mercadopago.com.br *.mercadopago.com.br &quot; +
+//                                        &quot;*.hotjar.com static.hotjar.com script.hotjar.com;&quot; // 🔹 Permite conexões
+//                        )))
+
+<span class="fc" id="L79">                .build();</span>
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+<span class="fc" id="L84">        return new BCryptPasswordEncoder();</span>
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+<span class="fc" id="L89">        CorsConfiguration configuration = new CorsConfiguration();</span>
+<span class="fc" id="L90">        configuration.setAllowedOrigins(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L91">        configuration.setAllowedMethods(List.of(&quot;*&quot;));</span>
+<span class="fc" id="L92">        configuration.setAllowedHeaders(List.of(&quot;*&quot;));</span>
+
+<span class="fc" id="L94">        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource =</span>
+                new UrlBasedCorsConfigurationSource();
+
+<span class="fc" id="L97">        urlBasedCorsConfigurationSource.registerCorsConfiguration(&quot;/**&quot;, configuration);</span>
+<span class="fc" id="L98">        return urlBasedCorsConfigurationSource;</span>
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+<span class="fc" id="L103">        return configuration.getAuthenticationManager();</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

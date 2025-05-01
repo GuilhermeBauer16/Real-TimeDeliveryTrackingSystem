@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserRegistrationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">All in Real-TimeDeliveryTrackingSystem (1) Coverage Results</a> &gt; <a href="index.source.html" class="el_package">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user</a> &gt; <span class="el_source">UserRegistrationService.java</span></div><h1>UserRegistrationService.java</h1><pre class="source lang-java linenums">package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user;
+
+
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.EmailAllReadyRegisterException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.UserFactory;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.UserRegistrationServiceContract;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.EmailValidatorUtils;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+public class UserRegistrationService implements UserRegistrationServiceContract {
+
+    private static final String USER_NOT_FOUND_MESSAGE = &quot;That User was not found&quot;;
+    private static final String EMAIL_ALREADY_REGISTER_MESSAGE = &quot;The email %s is already registered for another user!&quot;;
+
+
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final EmailSenderService emailSenderService;
+
+    @Autowired
+<span class="fc" id="L36">    public UserRegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailSenderService emailSenderService) {</span>
+
+<span class="fc" id="L38">        this.userRepository = userRepository;</span>
+<span class="fc" id="L39">        this.passwordEncoder = passwordEncoder;</span>
+<span class="fc" id="L40">        this.emailSenderService = emailSenderService;</span>
+<span class="fc" id="L41">    }</span>
+
+    @Override
+    @Transactional
+    public UserVO createUser(UserVO userVO) throws MessagingException {
+
+<span class="fc" id="L47">        ValidatorUtils.checkObjectIsNullOrThrowException(userVO,USER_NOT_FOUND_MESSAGE, UserNotFoundException.class);</span>
+<span class="fc" id="L48">        userVO.setPassword(passwordEncoder.encode(userVO.getPassword()));</span>
+
+<span class="fc" id="L50">        EmailValidatorUtils.verifyEmailPattern(userVO.getEmail());</span>
+<span class="fc" id="L51">        checkIfEmailAlreadyRegistered(userVO.getEmail());</span>
+
+<span class="fc" id="L53">        UserEntity userFactory = UserFactory.create(userVO.getName(),userVO.getEmail(),userVO.getPassword(),userVO.getUserProfile());</span>
+<span class="fc" id="L54">        userFactory.setAuthenticated(false);</span>
+<span class="fc" id="L55">        userFactory.setVerifyCode(&quot;null&quot;);</span>
+<span class="fc" id="L56">        userFactory.setCodeExpiration(LocalDateTime.now());</span>
+<span class="fc" id="L57">        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(userFactory,USER_NOT_FOUND_MESSAGE, FieldNotFound.class);</span>
+<span class="fc" id="L58">        UserEntity userEntity = userRepository.save(userFactory);</span>
+<span class="fc" id="L59">        emailSenderService.sendEmailWithValidatorCodeToUser(userFactory.getEmail());</span>
+<span class="fc" id="L60">        return BuildMapper.parseObject(new UserVO(),userEntity);</span>
+    }
+
+    private void checkIfEmailAlreadyRegistered(String email) {
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if(userRepository.findUserByEmail(email).isPresent()) {</span>
+
+<span class="fc" id="L67">            throw new EmailAllReadyRegisterException(String.format(EMAIL_ALREADY_REGISTER_MESSAGE, email));</span>
+        }
+<span class="fc" id="L69">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

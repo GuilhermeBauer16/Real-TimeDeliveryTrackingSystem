@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProductService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product</a>
+</div>
+
+<h1>Coverage Summary for Class: ProductService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProductService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.ProductEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.InvalidProductException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotFoundException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.ProductFactory;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ProductRepository;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.ProductServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PriceUtils;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.QuantityUtils;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageImpl;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class ProductService implements ProductServiceContract {
+&nbsp;
+&nbsp;    private static final String PRODUCT_NOT_FOUND = &quot;This product was not found.&quot;;
+&nbsp;    private static final String INVALID_PRODUCT_MESSAGE = &quot;This product is invalid, please verify the fields and try again.&quot;;
+&nbsp;
+&nbsp;    private final ProductRepository repository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public ProductService(ProductRepository productRepository) {</b>
+&nbsp;
+<b class="fc">&nbsp;        this.repository = productRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ProductVO createProduct(ProductVO productVO) {
+&nbsp;
+<b class="fc">&nbsp;        ValidatorUtils.checkObjectIsNullOrThrowException(productVO, INVALID_PRODUCT_MESSAGE, InvalidProductException.class);</b>
+<b class="fc">&nbsp;        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());</b>
+<b class="fc">&nbsp;        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());</b>
+<b class="fc">&nbsp;        ProductEntity productEntity = ProductFactory.create(productVO.getName(), productVO.getDescription(), productVO.getPrice(),productVO.getQuantity());</b>
+<b class="fc">&nbsp;        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(productEntity, INVALID_PRODUCT_MESSAGE, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        ProductEntity savedProduct = repository.save(productEntity);</b>
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new ProductVO(), savedProduct);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ProductVO updateProduct(ProductVO productVO) {
+&nbsp;
+<b class="fc">&nbsp;        ProductEntity productEntity = repository.findById(productVO.getId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ProductNotFoundException(PRODUCT_NOT_FOUND));</b>
+&nbsp;
+<b class="fc">&nbsp;        ProductEntity updatedProduct = ValidatorUtils.updateFieldIfNotNull(productEntity, productVO, PRODUCT_NOT_FOUND, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(updatedProduct, PRODUCT_NOT_FOUND, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        QuantityUtils.checkIfQuantityIsHigherThanOne(productVO.getQuantity());</b>
+<b class="fc">&nbsp;        PriceUtils.checkIfPriceIsHigherThanZero(productVO.getPrice());</b>
+<b class="fc">&nbsp;        repository.save(updatedProduct);</b>
+&nbsp;        
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new ProductVO(), updatedProduct);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ProductVO findProductById(String productId) {
+&nbsp;
+<b class="fc">&nbsp;        ProductEntity productEntity = repository.findById(productId).orElseThrow(() -&gt; new ProductNotFoundException(PRODUCT_NOT_FOUND));</b>
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new ProductVO(), productEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;ProductVO&gt; findProductsByName(String name,Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        Page&lt;ProductEntity&gt; products = repository.findByProductName(name, pageable);</b>
+<b class="fc">&nbsp;        List&lt;ProductVO&gt; productVOS = products.getContent().stream().map(productEntity -&gt;</b>
+<b class="fc">&nbsp;                BuildMapper.parseObject(new ProductVO(), productEntity)).toList();</b>
+&nbsp;
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        return new PageImpl&lt;&gt;(productVOS,pageable,products.getTotalElements());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;ProductVO&gt; findAllProducts(Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        Page&lt;ProductEntity&gt; products = repository.findAll(pageable);</b>
+<b class="fc">&nbsp;        List&lt;ProductVO&gt; productVOS = products.getContent().stream().map(productEntity -&gt;</b>
+<b class="fc">&nbsp;                BuildMapper.parseObject(new ProductVO(), productEntity)).toList();</b>
+&nbsp;
+<b class="fc">&nbsp;        return new PageImpl&lt;&gt;(productVOS, pageable, products.getTotalElements());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteProduct(String productId) {
+&nbsp;
+<b class="fc">&nbsp;        ProductEntity productEntity = repository.findById(productId).orElseThrow(() -&gt; new ProductNotFoundException(PRODUCT_NOT_FOUND));</b>
+<b class="fc">&nbsp;        repository.delete(productEntity);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

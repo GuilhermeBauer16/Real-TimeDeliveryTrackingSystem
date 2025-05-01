@@ -13,7 +13,7 @@ public interface MercadoPagoServiceContract {
      *
      * @return a {@link String} representing the generated preference ID or URL.
      * @throws MPApiException if an error occurs while interacting with the MercadoPago API.
-     * @throws MPException if a general MercadoPago error occurs.
+     * @throws MPException    if a general MercadoPago error occurs.
      */
     String createPreference() throws MPApiException, MPException;
 

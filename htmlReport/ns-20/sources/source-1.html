@@ -1,0 +1,229 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VehicleService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle</a>
+</div>
+
+<h1>Coverage Summary for Class: VehicleService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VehicleService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.1%
+  </span>
+  <span class="absValue">
+    (32/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.vehicle;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.VehicleEntity;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.VehicleVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.driver.DuplicatedLicensePlateException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.FieldNotFound;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.vehicle.VehicleNotFoundException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.factory.VehicleFactory;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.VehicleRepository;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.VehicleServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.LicencePlateUtils;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.ValidatorUtils;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageImpl;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class VehicleService implements VehicleServiceContract {
+&nbsp;    private static final String DUPLICATED_LICENSE_PLATE_MESSAGE = &quot;That license plate already registered in the system. &quot; +
+&nbsp;            &quot;Please verify the license plate and try again!.&quot;;
+&nbsp;    private static final String VEHICLE_NOT_FOUND = &quot;These Vehicle was Not Found&quot;;
+&nbsp;    private final VehicleRepository repository;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public VehicleService(VehicleRepository vehicleRepository) {</b>
+<b class="fc">&nbsp;        this.repository = vehicleRepository;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public VehicleVO create(VehicleVO vehicleVO) {
+&nbsp;
+<b class="fc">&nbsp;        ValidatorUtils.checkObjectIsNullOrThrowException(vehicleVO, VEHICLE_NOT_FOUND, VehicleNotFoundException.class);</b>
+<b class="fc">&nbsp;        String validatedLicencePlate = LicencePlateUtils.validateLicencePlate(vehicleVO.getLicensePlate());</b>
+<b class="fc">&nbsp;        verifyIfLicensePlateIsNotADuplicateValue(validatedLicencePlate);</b>
+<b class="fc">&nbsp;        VehicleEntity vehicleEntity = VehicleFactory.create(vehicleVO.getName(), validatedLicencePlate, vehicleVO.getType(),</b>
+<b class="fc">&nbsp;                vehicleVO.getStatus());</b>
+<b class="fc">&nbsp;        ValidatorUtils.checkFieldNotNullAndNotEmptyOrThrowException(vehicleEntity, VEHICLE_NOT_FOUND, FieldNotFound.class);</b>
+<b class="fc">&nbsp;        VehicleEntity savedVehicle = repository.save(vehicleEntity);</b>
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new VehicleVO(), savedVehicle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public VehicleVO update(VehicleVO vehicleVO) {
+&nbsp;
+<b class="fc">&nbsp;        VehicleEntity vehicleEntity = repository.findById(vehicleVO.getId())</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</b>
+<b class="fc">&nbsp;        LicencePlateUtils.validateLicencePlate(vehicleVO.getLicensePlate());</b>
+<b class="fc">&nbsp;        VehicleEntity updatedVehicleEntity = ValidatorUtils.updateFieldIfNotNull(vehicleEntity</b>
+&nbsp;                , vehicleVO, VEHICLE_NOT_FOUND, FieldNotFound.class);
+<b class="fc">&nbsp;        VehicleEntity savedVehicle = repository.save(updatedVehicleEntity);</b>
+&nbsp;
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new VehicleVO(), savedVehicle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public VehicleVO findById(String id) {
+<b class="fc">&nbsp;        VehicleEntity vehicleEntity = repository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</b>
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new VehicleVO(), vehicleEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public VehicleVO findByLicensePlate(String licensePlate) {
+&nbsp;
+<b class="fc">&nbsp;        String validatedLicencePlate = LicencePlateUtils.validateLicencePlate(licensePlate);</b>
+<b class="fc">&nbsp;        VehicleEntity vehicleEntity = repository.findByLicensePlate(validatedLicencePlate)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</b>
+<b class="fc">&nbsp;        return BuildMapper.parseObject(new VehicleVO(), vehicleEntity);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;VehicleVO&gt; findAll(Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        Page&lt;VehicleEntity&gt; vehicles = repository.findAll(pageable);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;VehicleVO&gt; vehicleVOS = vehicles.getContent().stream().map(</b>
+<b class="fc">&nbsp;                vehicleEntity -&gt; BuildMapper.parseObject(new VehicleVO(), vehicleEntity)).toList();</b>
+&nbsp;
+<b class="fc">&nbsp;        return new PageImpl&lt;&gt;(vehicleVOS, pageable, vehicles.getTotalElements());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void delete(String id) {
+&nbsp;
+<b class="fc">&nbsp;        VehicleEntity vehicleEntity = repository.findById(id)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new VehicleNotFoundException(VEHICLE_NOT_FOUND));</b>
+&nbsp;
+<b class="fc">&nbsp;        repository.delete(vehicleEntity);</b>
+&nbsp;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteAllVehicles(List&lt;VehicleVO&gt; vehicleVOS) {
+&nbsp;
+<b class="nc">&nbsp;        for (VehicleVO vehicleVO : vehicleVOS) {</b>
+<b class="nc">&nbsp;            delete(vehicleVO.getId());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void verifyIfLicensePlateIsNotADuplicateValue(String licensePlate) {
+&nbsp;
+<b class="fc">&nbsp;        if (repository.findByLicensePlate(licensePlate).isPresent()) {</b>
+<b class="fc">&nbsp;            throw new DuplicatedLicensePlateException(DUPLICATED_LICENSE_PLATE_MESSAGE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

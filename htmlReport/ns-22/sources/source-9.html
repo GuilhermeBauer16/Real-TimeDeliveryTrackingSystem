@@ -1,0 +1,99 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomerRegistrationServiceContract</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomerRegistrationServiceContract (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CustomerRegistrationServiceContract</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.CustomerVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.CustomerRegistrationResponse;
+&nbsp;import com.google.i18n.phonenumbers.NumberParseException;
+&nbsp;import jakarta.mail.MessagingException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Service contract for managing customer registration.
+&nbsp; *
+&nbsp; * &lt;p&gt;This interface defines the contract for customer registration services,
+&nbsp; * including creating new customer records and returning the registration result.&lt;/p&gt;
+&nbsp; *
+&nbsp; * @see CustomerVO
+&nbsp; * @see CustomerRegistrationResponse
+&nbsp; */
+&nbsp;
+&nbsp;public interface CustomerRegistrationServiceContract {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers a new customer in the system.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;This method takes a {@link CustomerVO} object containing customer details
+&nbsp;     * and creates a new customer record in the system. The result of the registration
+&nbsp;     * process is returned as a {@link CustomerRegistrationResponse} object.&lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param customerVO the customer details encapsulated in a {@link CustomerVO} object
+&nbsp;     * @return a {@link CustomerRegistrationResponse} object containing the result of the registration process
+&nbsp;     */
+&nbsp;    CustomerRegistrationResponse create(CustomerVO customerVO) throws NumberParseException, MessagingException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>

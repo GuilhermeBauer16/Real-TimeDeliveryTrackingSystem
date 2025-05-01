@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CodeValidatorService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email</a>
+</div>
+
+<h1>Coverage Summary for Class: CodeValidatorService (com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CodeValidatorService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CodeValidatorService$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email;
+&nbsp;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.ExpiredVerificationCodeException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.utils.InvalidVerificationCodeException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserNotAuthenticatedException;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.mapper.BuildMapper;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.VerificationCodeRequest;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.CodeValidatorServiceContract;
+&nbsp;import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class CodeValidatorService implements CodeValidatorServiceContract {
+&nbsp;
+&nbsp;    private final UserService userService;
+&nbsp;
+&nbsp;    private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = &quot;This user is already authenticated.&quot;;
+&nbsp;    private static final String USER_NOT_AUTHENTICATED_MESSAGE = &quot;This user is not authenticated, please authenticate the user and try again.&quot;;
+&nbsp;    private static final String EXPIRED_VERIFICATION_CODE_MESSAGE = &quot;This verification code is expired.&quot;;
+&nbsp;    private static final String INVALID_VERIFICATION_CODE_MESSAGE = &quot;This verification code %s is not valid.&quot;;
+&nbsp;
+&nbsp;    @Autowired
+<b class="fc">&nbsp;    public CodeValidatorService(UserService userService) {</b>
+<b class="fc">&nbsp;        this.userService = userService;</b>
+&nbsp;    }
+&nbsp;    @Override
+&nbsp;    @Transactional
+&nbsp;    public void evaluatedVerifyCode(VerificationCodeRequest verifyCodeRequest) {
+&nbsp;
+<b class="fc">&nbsp;        UserVO userVO = userService.findUserByEmail(verifyCodeRequest.getEmail());</b>
+<b class="fc">&nbsp;        System.out.println(userVO.getCodeExpiration());</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (userVO.isAuthenticated()) {</b>
+<b class="fc">&nbsp;            throw new UserAlreadyAuthenticatedException(USER_ALREADY_AUTHENTICATED_MESSAGE);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (LocalDateTime.now().isAfter(userVO.getCodeExpiration())) {</b>
+<b class="fc">&nbsp;            throw new ExpiredVerificationCodeException(EXPIRED_VERIFICATION_CODE_MESSAGE);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (!userVO.getVerifyCode().strip().equals(verifyCodeRequest.getCode())) {</b>
+<b class="fc">&nbsp;            throw new InvalidVerificationCodeException(String.format(INVALID_VERIFICATION_CODE_MESSAGE, verifyCodeRequest.getCode()));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        userVO.setAuthenticated(true);</b>
+<b class="fc">&nbsp;        UserUpdateRequest userUpdateRequest = BuildMapper.parseObject(new UserUpdateRequest(), userVO);</b>
+<b class="fc">&nbsp;        userService.updateUser(userUpdateRequest);</b>
+&nbsp;    }
+&nbsp;    @Override
+&nbsp;    public void verifyIfUserIsAuthenticated(String email) {
+&nbsp;
+<b class="fc">&nbsp;        UserVO userVO = userService.findUserByEmail(email);</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        if (!userVO.isAuthenticated()) {</b>
+<b class="fc">&nbsp;            throw new UserNotAuthenticatedException(USER_NOT_AUTHENTICATED_MESSAGE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-27 17:26</div>
+</div>
+</body>
+</html>
