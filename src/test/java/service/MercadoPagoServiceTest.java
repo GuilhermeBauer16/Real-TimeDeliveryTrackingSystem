@@ -58,6 +58,9 @@ class MercadoPagoServiceTest {
     private static final String PAYMENT_TOPIC = "payment";
     private static final String EMAIL = "test@example.com";
     private static final String NUMERIC_ID = "123";
+    private static final String PAYMENT_URL = "https://test-payment-link.com";
+    private static final String INVALID_PAYMENT_TOPIC = "invalid-payment-topic";
+    private static final BigDecimal TRANSACTION_AMOUNT = BigDecimal.valueOf(TestConstants.PRODUCT_PRICE);
 
 
     @Mock
@@ -108,7 +111,7 @@ class MercadoPagoServiceTest {
     void testCreatePreference_WhenSuccessful_ShouldReturnPaymentLink() throws MPException {
 
         Preference mockPreference = mock(Preference.class);
-        when(mockPreference.getInitPoint()).thenReturn("https://test-payment-link.com");
+        when(mockPreference.getInitPoint()).thenReturn(PAYMENT_URL);
 
         try (MockedConstruction<PreferenceClient> mocked = mockConstruction(PreferenceClient.class,
                 (mock, context) -> when(mock.create(any(PreferenceRequest.class))).thenReturn(mockPreference))) {
@@ -118,32 +121,30 @@ class MercadoPagoServiceTest {
             String result = mercadoPagoService.createPreference();
 
             assertNotNull(result);
-            Assertions.assertEquals("https://test-payment-link.com", result);
+            Assertions.assertEquals(PAYMENT_URL, result);
         }
     }
 
     @Test
-    void testCreatePreference_WhenShoppingCartIsEmpty_ShouldThrowShoppingCartNotFoundException() {
+    void testCreatePreference_WhenHaveProblemToCreateAPreference_ShouldThrowMercadoPagoException() {
 
         when(shoppingCartService.findShoppingCart()).thenReturn(shoppingCartResponse);
         MercadoPagoException exception = assertThrows(MercadoPagoException.class, () -> mercadoPagoService.createPreference());
 
         assertNotNull(exception);
-        Assertions.assertEquals(MercadoPagoException.ERROR.formatErrorMessage(MERCADO_PAGO_EXCEPTION_MESSAGE), exception.getMessage());
+        Assertions.assertEquals(MercadoPagoException.ERROR.formatErrorMessage(
+                MERCADO_PAGO_EXCEPTION_MESSAGE), exception.getMessage());
     }
 
     @Test
     void testHandlerWithApprovedPayment_WhenPaymentWasApproved_ShouldSendMailToUser() {
 
 
-        Long validLongId = Long.parseLong(NUMERIC_ID);
-
-
         when(payment.getStatus()).thenReturn(PENDENT_PAYMENT_STATUS);
 
 
         try (MockedConstruction<PaymentClient> mocked = mockConstruction(PaymentClient.class,
-                (mock, context) -> when(mock.get(validLongId)).thenReturn(payment))) {
+                (mock, context) -> when(mock.get(Long.parseLong(NUMERIC_ID))).thenReturn(payment))) {
 
             mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PAYMENT_TOPIC);
 
@@ -161,27 +162,23 @@ class MercadoPagoServiceTest {
     @Test
     void testHandlerWithApprovedPayment_WhenStatusIsApproved_ShouldProcessProductAndSendEmail() throws Exception {
 
-        String productId = "product-001";
-        BigDecimal transactionAmount = BigDecimal.valueOf(50);
 
-        PaymentItem item = mock(PaymentItem.class);
-        when(item.getId()).thenReturn(productId);
-
+        when(paymentItem.getId()).thenReturn(TestConstants.ID);
         when(payment.getStatus()).thenReturn(APPROVED_PAYMENT_STATUS);
         when(payment.getAdditionalInfo()).thenReturn(paymentAdditionalInfo);
-        when(payment.getTransactionAmount()).thenReturn(transactionAmount);
-        when(paymentAdditionalInfo.getItems()).thenReturn(List.of(item));
+        when(payment.getTransactionAmount()).thenReturn(TRANSACTION_AMOUNT);
+        when(paymentAdditionalInfo.getItems()).thenReturn(List.of(paymentItem));
 
         TemporaryProductVO temporaryProduct = new TemporaryProductVO();
-        temporaryProduct.setId(productId);
+        temporaryProduct.setId(TestConstants.ID);
         temporaryProduct.setQuantity(2);
 
         ProductVO product = new ProductVO();
-        product.setId(productId);
+        product.setId(TestConstants.ID);
         product.setQuantity(10);
 
-        when(temporaryProductService.findTemporaryProductById(productId)).thenReturn(temporaryProduct);
-        when(productService.findProductById(productId)).thenReturn(product);
+        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProduct);
+        when(productService.findProductById(TestConstants.ID)).thenReturn(product);
         ReflectionTestUtils.setField(mercadoPagoService, "testMail", EMAIL);
 
         try (MockedConstruction<PaymentClient> mocked = mockConstruction(PaymentClient.class,
@@ -190,10 +187,10 @@ class MercadoPagoServiceTest {
             mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PAYMENT_TOPIC);
 
             verify(productService).updateProduct(argThat(updated ->
-                    updated.getQuantity() == 8 && updated.getId().equals(productId)
+                    updated.getQuantity() == 8 && updated.getId().equals(TestConstants.ID)
             ));
             verify(shoppingCartService).deleteShoppingCart(EMAIL);
-            verify(emailSenderService).sendMailToApprovedPayment(eq(EMAIL), anyList(), eq(transactionAmount));
+            verify(emailSenderService).sendMailToApprovedPayment(eq(EMAIL), anyList(), eq(TRANSACTION_AMOUNT));
         }
     }
 
@@ -201,20 +198,15 @@ class MercadoPagoServiceTest {
     @Test
     void testHandlerWithApprovedPayment_WhenPaymentNotApproved_ShouldNotProcess() {
 
+        mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PENDENT_PAYMENT_STATUS);
 
-        try (MockedConstruction<PaymentClient> mocked = mockConstruction(PaymentClient.class,
-                (mock, context) -> when(mock.get(Long.parseLong(NUMERIC_ID))).thenReturn(payment))) {
+        verifyNoInteractions(productService, temporaryProductService, emailSenderService);
 
-            mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PENDENT_PAYMENT_STATUS);
-
-            verifyNoInteractions(productService, temporaryProductService, emailSenderService);
-        }
     }
 
     @Test
     void testHandlerWithApprovedPayment_WhenTopicIsInvalid_ShouldDoNothing() {
-        mercadoPagoService.handlerWithApprovedPayment("123", "invalid_topic");
-
+        mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, INVALID_PAYMENT_TOPIC);
 
         verifyNoInteractions(temporaryProductService, productService, shoppingCartService, emailSenderService);
     }
