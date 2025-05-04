@@ -62,7 +62,8 @@ class MercadoPagoServiceTest {
     private static final String INVALID_PAYMENT_TOPIC = "invalid-payment-topic";
     private static final BigDecimal TRANSACTION_AMOUNT = BigDecimal.valueOf(TestConstants.PRODUCT_PRICE);
 
-
+    private ProductVO productVO;
+    private TemporaryProductVO temporaryProductVO;
     @Mock
     private ShoppingCartService shoppingCartService;
 
@@ -92,6 +93,22 @@ class MercadoPagoServiceTest {
     @BeforeEach
     void setUp() {
         TemporaryProductEntity temporaryProductEntity = new TemporaryProductEntity(
+                TestConstants.ID,
+                TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION,
+                TestConstants.PRODUCT_PRICE,
+                TestConstants.PRODUCT_QUANTITY
+        );
+
+        temporaryProductVO = new TemporaryProductVO(
+                TestConstants.ID,
+                TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION,
+                TestConstants.PRODUCT_PRICE,
+                TestConstants.PRODUCT_QUANTITY
+        );
+
+        productVO = new ProductVO(
                 TestConstants.ID,
                 TestConstants.PRODUCT_NAME,
                 TestConstants.PRODUCT_DESCRIPTION,
@@ -162,23 +179,16 @@ class MercadoPagoServiceTest {
     @Test
     void testHandlerWithApprovedPayment_WhenStatusIsApproved_ShouldProcessProductAndSendEmail() throws Exception {
 
-
+        temporaryProductVO.setQuantity(4);
         when(paymentItem.getId()).thenReturn(TestConstants.ID);
         when(payment.getStatus()).thenReturn(APPROVED_PAYMENT_STATUS);
         when(payment.getAdditionalInfo()).thenReturn(paymentAdditionalInfo);
         when(payment.getTransactionAmount()).thenReturn(TRANSACTION_AMOUNT);
         when(paymentAdditionalInfo.getItems()).thenReturn(List.of(paymentItem));
 
-        TemporaryProductVO temporaryProduct = new TemporaryProductVO();
-        temporaryProduct.setId(TestConstants.ID);
-        temporaryProduct.setQuantity(2);
+        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProductVO);
+        when(productService.findProductById(TestConstants.ID)).thenReturn(productVO);
 
-        ProductVO product = new ProductVO();
-        product.setId(TestConstants.ID);
-        product.setQuantity(10);
-
-        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProduct);
-        when(productService.findProductById(TestConstants.ID)).thenReturn(product);
         ReflectionTestUtils.setField(mercadoPagoService, "testMail", EMAIL);
 
         try (MockedConstruction<PaymentClient> mocked = mockConstruction(PaymentClient.class,
