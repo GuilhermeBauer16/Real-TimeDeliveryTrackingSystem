@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   db:
     image: mysql:8.3.0
@@ -24,12 +26,13 @@ services:
     networks:
       - Real-Time_Delivery_Tracking_System_network
 
-  real-time_delivery_tracking_system:
+    volumes:
+      - mysql_data:/var/lib/mysql
 
+  real-time_delivery_tracking_system:
+    build: .
     image: guilhermebauer/real-timedeliverytrackingsystem:latest
     container_name: Real-Time_Delivery_Tracking_System
-    build: .
-    #
     restart: always
     environment:
       TZ: America/Sao_Paulo
@@ -38,24 +41,22 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
-      SPRING_MAIL_USERNAME: ${jAVA_MAIL_EMAIL}
-      SPRING_MAIL_PASSWORD: ${jAVA_MAIL_PASSWORD}
+      SPRING_MAIL_USERNAME: ${JAVA_MAIL_EMAIL}
+      SPRING_MAIL_PASSWORD: ${JAVA_MAIL_PASSWORD}
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_TRUST: smtp.gmail.com
       SPRING_MAIL_TEST-CONNECTION: "true"
-
-
     ports:
       - "${EXPOSE_PORT}:${CONTAINER_PORT}"
-
-
     depends_on:
       - db
-
     networks:
       - Real-Time_Delivery_Tracking_System_network
 
 networks:
   Real-Time_Delivery_Tracking_System_network:
     driver: bridge
+
+volumes:
+  mysql_data:

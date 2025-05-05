@@ -128,7 +128,7 @@ class MercadoPagoNotificationControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(3)
-    void givenProductObject_whenCreateProduct_ShouldReturnProductObject() {
+    void givenPaymentNotification_whenNotificationIsSend_ShouldReturnNotificationStatus() {
 
         var response = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)

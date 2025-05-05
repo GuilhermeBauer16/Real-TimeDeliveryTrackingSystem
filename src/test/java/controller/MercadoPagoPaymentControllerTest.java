@@ -143,7 +143,7 @@ class MercadoPagoPaymentControllerTest extends AbstractionIntegrationTest {
                 .when()
                 .post()
                 .then()
-                .statusCode(200)
+                .statusCode(201)
                 .extract()
                 .asString();
 
