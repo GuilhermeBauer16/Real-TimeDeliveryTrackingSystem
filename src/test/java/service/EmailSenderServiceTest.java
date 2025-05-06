@@ -1,5 +1,6 @@
 package service;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
@@ -18,6 +19,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,7 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class EmailSenderServiceTest {
+class EmailSenderServiceTest {
 
     private static final String USER_ALREADY_AUTHENTICATED_MESSAGE = "This user is already authenticated.";
 
@@ -51,14 +55,16 @@ public class EmailSenderServiceTest {
     @Mock
     private UserVO userVO;
 
+    private TemporaryProductVO temporaryProductVO;
+
     @InjectMocks
     private EmailSenderService emailSenderService;
 
 
     private static final String EMAIL = "customerAddress@example.com";
+    private static final String PROCESSED_MAIL = "processed-email-content";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
     private static final boolean AUTHENTICATED = false;
-
 
 
     @BeforeEach
@@ -67,6 +73,8 @@ public class EmailSenderServiceTest {
                 EMAIL, TestConstants.USER_PASSWORD, ROLE_NAME, TestConstants.USER_VERIFY_CODE,
                 AUTHENTICATED, TestConstants.USER_CODE_EXPIRATION);
 
+        temporaryProductVO = new TemporaryProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
+                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY);
     }
 
     @Test
@@ -86,10 +94,24 @@ public class EmailSenderServiceTest {
 
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
-        when(templateEngine.process(anyString(), any())).thenReturn("processed-email-content");
+        when(templateEngine.process(anyString(), any())).thenReturn(PROCESSED_MAIL);
 
 
         emailSenderService.sendEmailWithValidatorCodeToUser(EMAIL);
+
+
+        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+
+    }
+
+    @Test
+    void sendMailToApprovedPayment_WhenPaymentIsApproved_ShouldSendEmail() throws MessagingException {
+
+        when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
+        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+        when(templateEngine.process(anyString(), any())).thenReturn(PROCESSED_MAIL);
+
+        emailSenderService.sendMailToApprovedPayment(EMAIL, List.of(temporaryProductVO), new BigDecimal(TestConstants.SHOPPING_CART_TOTAL_PRICE));
 
 
         verify(javaMailSender, times(1)).send(any(MimeMessage.class));

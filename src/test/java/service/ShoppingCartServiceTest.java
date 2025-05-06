@@ -11,11 +11,11 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ProductNotAssociatedWithTheCustomerException;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.product.ShoppingCartNotFoundException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.shoppingCart.ShoppingCartNotFoundException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.ShoppingCartRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.ShoppingCartRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.ShoppingCartService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.shoppingCart.ShoppingCartService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.customer.CustomerService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
@@ -507,13 +507,11 @@ class ShoppingCartServiceTest {
     void testDeleteShoppingCart_WhenShoppingCartWasDeleted_ShouldDoNothing() {
 
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn(EMAIL);
+
         when(repository.findShoppingCartByCustomerEmail(EMAIL)).thenReturn(Optional.of(shoppingCartEntity));
         doNothing().when(repository).delete(shoppingCartEntity);
 
-        service.deleteShoppingCart();
+        service.deleteShoppingCart(EMAIL);
         verify(repository, times(1)).findShoppingCartByCustomerEmail(EMAIL);
         verify(repository, times(1)).delete(any(ShoppingCartEntity.class));
 
@@ -523,15 +521,11 @@ class ShoppingCartServiceTest {
     @Test
     void testDeleteShoppingCart_WhenCustomerIsNotFound_ShouldThrowCustomerNotFoundException() {
 
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(userDetails.getUsername()).thenReturn(EMAIL);
         when(repository.findShoppingCartByCustomerEmail(EMAIL)).thenReturn(Optional.empty());
 
 
         ShoppingCartNotFoundException exception = assertThrows(
-                ShoppingCartNotFoundException.class, () -> service.deleteShoppingCart());
+                ShoppingCartNotFoundException.class, () -> service.deleteShoppingCart(EMAIL));
 
         assertNotNull(exception);
         assertEquals(ShoppingCartNotFoundException.ERROR.formatErrorMessage(SHOPPING_CART_NOT_FOUND_MESSAGE), exception.getMessage());

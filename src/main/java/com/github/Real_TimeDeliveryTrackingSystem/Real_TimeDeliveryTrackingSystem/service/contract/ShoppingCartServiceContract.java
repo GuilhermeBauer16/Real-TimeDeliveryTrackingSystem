@@ -55,5 +55,5 @@ public interface ShoppingCartServiceContract {
     /**
      * Clears the entire shopping cart, removing all items.
      */
-    void deleteShoppingCart();
+    void deleteShoppingCart(String email);
 }

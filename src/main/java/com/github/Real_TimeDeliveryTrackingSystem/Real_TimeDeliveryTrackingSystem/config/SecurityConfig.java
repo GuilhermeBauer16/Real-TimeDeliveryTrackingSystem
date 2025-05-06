@@ -26,11 +26,12 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] DRIVER_RESOURCES = {"/vehicle/**", "/driver/**", "/driverAddress/**"};
-    private static final String[] CUSTOMER_RESOURCES = {"/customer/**", "/customer/product/**", "/shoppingCart/**"};
+    private static final String[] CUSTOMER_RESOURCES = {"/customer/**", "/customer/product/**", "/shoppingCart/**",
+            "/payment/v1/checkout/**", "index/**", "/mercadoPago/**"};
 
     private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login", "/signInCustomer", "/customer/**",
             "/signInDriver/**", "/driver/**", "/driverAddress/**", "/customerAddress/**", "/verificationCode/**", "/product/**"
-            , "/customer/product/**", "/shoppingCart/**"};
+            , "/customer/product/**", "/shoppingCart/**", "/payment/v1/checkout/**", "index/**", "/mercadoPago/**","/ipn/**"};
     private static final String[] ADMIN_RESOURCES = {"/product/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
@@ -49,7 +50,7 @@ public class SecurityConfig {
                         .ignoringRequestMatchers(CSRF_IGNORE_REQUEST_MATCHER)
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .cors(cors -> corsConfigurationSource())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(jwtValidationFilter, BasicAuthenticationFilter.class)
                 .sessionManagement(
@@ -64,7 +65,16 @@ public class SecurityConfig {
 
 
                 )
-
+//                .headers(headers -> headers
+//                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+//                                "default-src 'self'; " +
+//                                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: " +
+//                                        "*.mercadopago.com mercadopago.com.br *.mercadopago.com.br " +
+//                                        "hotjar.com *.hotjar.com static.hotjar.com *.static.hotjar.com script.hotjar.com *.script.hotjar.com; " +
+//                                        "connect-src 'self' " +
+//                                        "*.mercadopago.com mercadopago.com.br *.mercadopago.com.br " +
+//                                        "*.hotjar.com static.hotjar.com script.hotjar.com;" // 🔹 Permite conexões
+//                        )))
 
                 .build();
     }

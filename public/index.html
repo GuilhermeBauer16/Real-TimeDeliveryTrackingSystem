@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+
+<h1>Checkout Page</h1>
+<button id="checkout-btn">Pay Now</button>
+
+<script>
+  // Initialize Mercado Pago with your public key
+  const mercadoPago = new MercadoPago("APP_USR-300b9dae-b058-4942-8524-4e40de36c6e6", { locale: "pt-BR" });
+
+  document.getElementById("checkout-btn").addEventListener("click", async () => {
+    // Fetch the preference ID from the backend
+    const response = await fetch("http://localhost:8080/mercadoPago/create", { method: "POST" });
+    const data = await response.json();
+
+    if (data.preferenceId) {
+      // Redirect to Mercado Pago Checkout
+      window.location.href = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${data.preferenceId}`;
+      alert("work!")
+    } else {
+      alert("Error creating payment preference");
+    }
+  });
+</script>
+
+</body>
+</html>

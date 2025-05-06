@@ -157,5 +157,5 @@ public interface ShoppingCartControllerContract {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<Void> deleteShoppingCart();
+    ResponseEntity<Void> deleteShoppingCart(@RequestBody String email);
 }
