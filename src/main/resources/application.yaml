@@ -5,9 +5,6 @@ mercado-pago:
   test-mail: ${TEST_MAIL}
   nrok-url: ${NROK_URL}
 
-stripe:
-  stripe-secret-key: ${STRIPE_SECRET_KEY}
-  stripe-public-key: ${STRIPE_PUBLIC_KEY}
 security:
   jwt:
     token:
