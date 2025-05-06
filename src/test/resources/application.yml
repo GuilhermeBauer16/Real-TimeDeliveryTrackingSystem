@@ -4,6 +4,13 @@ security:
       secret-key: ${SECRET_KEY}
       expire-length: ${EXPIRE_LENGTH}
 
+mercado-pago:
+  mercado-pago-public-key: ${MERCADO_PAGO_PUBLIC_KEY}
+  mercado-pago-access-token: ${MERCADO_PAGO_ACCESS_TOKEN}
+  mercado-pago-webhook-secret: ${MERCADO_PAGO_WEBHOOK_SECRET}
+  test-mail: ${TEST_MAIL}
+  nrok-url: ${NROK_URL}
+
 server:
   port: 8888
 
