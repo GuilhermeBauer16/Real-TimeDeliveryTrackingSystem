@@ -56,7 +56,7 @@ Here is the Ngrok documentation to implement it: [NgRok Documentation](https://d
 
 * You can pull the Docker image using this command:
  ```dotdocker
-docker pull guilhermebauer/study_management
+docker pull guilhermebauer/real-timedeliverytrackingsystem
 ```
 
 * <span style="color:red;"> But remember, for Docker to work, you need to have Docker installed on your machine. Here is the link to the official documentation to install Docker: [Docker Installation Guide](https://docs.docker.com/get-docker/)</span>
