@@ -24,7 +24,7 @@ It also sends a mail to the user with the items brought and the total price paid
 
 ###  Necessary dependencies 
   * The necessary depedencies to the implementation work.
-  * 
+  * It is necessary to configure the mail sender. Here is an explanation of how to do this: [Mail Sender Explanation](https://github.com/GuilhermeBauer16/Real-TimeDeliveryTrackingSystem/tree/mailSenderExplanation)
 
 
 ```
