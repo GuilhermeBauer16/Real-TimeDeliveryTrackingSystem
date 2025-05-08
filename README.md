@@ -42,7 +42,9 @@ It also sends a mail to the user with the items brought and the total price paid
 
 
 ```
-
+## NROk
+ * For test proposure, I use the Ngrok to up a server, but I recoment just for test proposure,
+   here the ngrok documentation to implement: [NgRok Documentation](https://dashboard.ngrok.com/get-started/setup/linux) 
 ## Docker 
 
 * You can pull the Docker image using this command:
