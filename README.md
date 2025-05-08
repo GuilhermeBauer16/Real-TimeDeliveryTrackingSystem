@@ -20,11 +20,16 @@ status is approved. When the payment is approved, the product quantity is reduce
 It also sends a mail to the user with the items brought and the total price paid. 
 
 ## Configurations 
-* Bellow is the necessary configuratitions to the implementation work.
 
-###  Necessary dependencies 
+* Bellow is the necessary configuratitions to the implementation work.
+* It is necessary to configure the mail sender. Here is an explanation of how to do this: [Mail Sender Explanation](https://github.com/GuilhermeBauer16/Real-TimeDeliveryTrackingSystem/tree/mailSenderExplanation)
+
+## Mercado Pago
+ * Here is the Mercado Pago documentation: [Mercado Pago Documentation](https://www.mercadopago.com.br/developers/en/reference)
+
+## Necessary dependencies 
   * The necessary depedencies to the implementation work.
-  * It is necessary to configure the mail sender. Here is an explanation of how to do this: [Mail Sender Explanation](https://github.com/GuilhermeBauer16/Real-TimeDeliveryTrackingSystem/tree/mailSenderExplanation)
+
 
 
 ```
@@ -43,8 +48,10 @@ It also sends a mail to the user with the items brought and the total price paid
 
 ```
 ## NROk
- * For test proposure, I use the Ngrok to up a server, but I recoment just for test proposure,
-   here the ngrok documentation to implement: [NgRok Documentation](https://dashboard.ngrok.com/get-started/setup/linux) 
+
+ * For testing purposes, I use Ngrok to start a server. However, I recommend using it only for testing.
+Here is the Ngrok documentation to implement it: [NgRok Documentation](https://dashboard.ngrok.com/get-started/setup/linux)
+
 ## Docker 
 
 * You can pull the Docker image using this command:
