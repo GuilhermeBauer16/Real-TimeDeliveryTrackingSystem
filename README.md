@@ -47,7 +47,7 @@ It also sends a mail to the user with the items brought and the total price paid
 
 
 ```
-## NROk
+## NGROk
 
  * For testing purposes, I use Ngrok to start a server. However, I recommend using it only for testing.
 Here is the Ngrok documentation to implement it: [NgRok Documentation](https://dashboard.ngrok.com/get-started/setup/linux)
