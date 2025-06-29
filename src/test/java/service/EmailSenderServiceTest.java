@@ -4,6 +4,9 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaEmailProducer;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
 import constants.TestConstants;
@@ -55,6 +58,9 @@ class EmailSenderServiceTest {
     @Mock
     private UserVO userVO;
 
+    @Mock
+    private KafkaEmailProducer kafkaEmailProducer;
+
     private TemporaryProductVO temporaryProductVO;
 
     @InjectMocks
@@ -90,17 +96,16 @@ class EmailSenderServiceTest {
     }
 
     @Test
-    void testSendEmailWithValidatorCodeToUser_WhenUserIsNotAuthenticated_ShouldSendEmail() throws MessagingException {
+    void testSendEmailWithValidatorCodeToUser_WhenUserIsNotAuthenticated_ShouldSendEmail() {
 
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
-        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
-        when(templateEngine.process(anyString(), any())).thenReturn(PROCESSED_MAIL);
-
 
         emailSenderService.sendEmailWithValidatorCodeToUser(EMAIL);
 
+        verify(userService, times(1)).findUserByEmail(EMAIL);
+        verify(kafkaEmailProducer, times(1)).sendEmailVerificationCode(any(EmailVerificationMessageRequest.class));
+        verify(userService, times(1)).updateUser(any(UserUpdateRequest.class));
 
-        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
 
     }
 

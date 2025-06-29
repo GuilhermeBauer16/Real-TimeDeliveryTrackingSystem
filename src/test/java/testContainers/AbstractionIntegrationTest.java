@@ -4,12 +4,12 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.utility.DockerImageName;
 
-import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -21,22 +21,16 @@ public class AbstractionIntegrationTest {
 
 
         static MySQLContainer<?> mySQL = new MySQLContainer<>("mysql:8.0.28");
+        static KafkaContainer kafka = new KafkaContainer(
+                DockerImageName.parse("apache/kafka-native:3.8.0")
+                        .asCompatibleSubstituteFor("apache/kafka")
+        );
 
 
         private static void startContainers() {
-            Startables.deepStart(Stream.of(mySQL)).join();
+            Startables.deepStart(Stream.of(mySQL, kafka)).join();
 
 
-        }
-
-
-        private static DataSource createDataSource() {
-            DriverManagerDataSource dataSource = new DriverManagerDataSource();
-            dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-            dataSource.setUrl(mySQL.getJdbcUrl());
-            dataSource.setUsername(mySQL.getUsername());
-            dataSource.setPassword(mySQL.getPassword());
-            return dataSource;
         }
 
 
@@ -67,6 +61,8 @@ public class AbstractionIntegrationTest {
             config.put("spring.mail.password", "springboot");
             config.put("spring.mail.protocol", "smtp");
             config.put("spring.mail.test-connection", "false");
+
+            config.put("spring.kafka.bootstrap-servers", kafka.getBootstrapServers());
 
             return config;
         }
