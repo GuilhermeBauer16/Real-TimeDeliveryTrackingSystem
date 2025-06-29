@@ -5,9 +5,6 @@ mercado-pago:
   test-mail: ${TEST_MAIL}
   nrok-url: ${NROK_URL}
 
-
-
-
 security:
   jwt:
     token:
@@ -15,7 +12,7 @@ security:
 spring:
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: email-service-group
       auto-offset-reset: earliest

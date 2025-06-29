@@ -15,6 +15,7 @@ services:
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
       - KAFKA_KRAFT_CLUSTER_ID=kraft-cluster-1
+
   db:
     image: mysql:8.3.0
     container_name: mysql_db_Real-Time_Delivery_Tracking_System

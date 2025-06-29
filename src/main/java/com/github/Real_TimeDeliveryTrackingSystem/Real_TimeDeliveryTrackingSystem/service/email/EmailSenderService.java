@@ -80,7 +80,7 @@ public class EmailSenderService implements EmailSendServiceContract {
     }
 
     @Override
-    public void sendEmailWithValidatorCodeToUser(String email) throws MessagingException {
+    public void sendEmailWithValidatorCodeToUser(String email) {
 
         UserVO userByEmail = userService.findUserByEmail(email);
 
@@ -129,7 +129,8 @@ public class EmailSenderService implements EmailSendServiceContract {
 
     }
 
-    public void doSendMailToApprovedPayment(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice) {
+    @Override
+    public void sendMailWithApprovedPaymentToKafkaProducer(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice) {
 
         PaymentApprovedMessageRequest message = new PaymentApprovedMessageRequest(to, temporaryProductVOS, totalPrice);
         kafkaEmailProducer.sendPaymentApprovedMessage(message);

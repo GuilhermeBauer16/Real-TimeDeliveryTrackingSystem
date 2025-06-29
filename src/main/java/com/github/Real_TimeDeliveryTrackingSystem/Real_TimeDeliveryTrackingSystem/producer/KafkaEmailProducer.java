@@ -11,21 +11,22 @@ public class KafkaEmailProducer {
 
     private final KafkaTemplate<String, EmailVerificationMessageRequest> emailKafkaTemplate;
     private final KafkaTemplate<String, PaymentApprovedMessageRequest> paymentKafkaTemplate;
+    private static final String KAFKA_EMAIL_TOPIC = "email-verification-topic";
+    private static final String KAFKA_PAYMENT_APPROVED_TOPIC = "payment-approved-topic";
 
     @Autowired
-    public KafkaEmailProducer(KafkaTemplate<String, EmailVerificationMessageRequest> emailKafkaTemplate, KafkaTemplate<String, PaymentApprovedMessageRequest> paymentKafkaTemplate) {
+    public KafkaEmailProducer(KafkaTemplate<String, EmailVerificationMessageRequest> emailKafkaTemplate,
+                              KafkaTemplate<String, PaymentApprovedMessageRequest> paymentKafkaTemplate) {
         this.emailKafkaTemplate = emailKafkaTemplate;
         this.paymentKafkaTemplate = paymentKafkaTemplate;
 
     }
 
     public void sendEmailVerificationCode(EmailVerificationMessageRequest emailVerificationMessageRequest) {
-        emailKafkaTemplate.send("email-verification-topic", emailVerificationMessageRequest);
-        System.out.println("Email send!!!!");
+        emailKafkaTemplate.send(KAFKA_EMAIL_TOPIC, emailVerificationMessageRequest);
     }
 
     public void sendPaymentApprovedMessage(PaymentApprovedMessageRequest paymentApprovedMessageRequest) {
-        paymentKafkaTemplate.send("payment-approved-topic", paymentApprovedMessageRequest);
-        System.out.println("Email send to a approved Payment!!!!");
+        paymentKafkaTemplate.send(KAFKA_PAYMENT_APPROVED_TOPIC, paymentApprovedMessageRequest);
     }
 }

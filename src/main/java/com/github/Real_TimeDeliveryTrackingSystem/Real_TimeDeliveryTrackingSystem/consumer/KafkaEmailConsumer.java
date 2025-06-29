@@ -3,6 +3,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaEmailConsumer {
 
-
+    private static final String KAFKA_EMAIL_TOPIC = "email-verification-topic";
+    private static final String KAFKA_EMAIL_CONTAINER_FACTORY = "emailVerificationKafkaListenerContainerFactory";
+    private static final String KAFKA_PAYMENT_APPROVED_TOPIC = "payment-approved-topic";
+    private static final String KAFKA_PAYMENT_APPROVED_CONTAINER_FACTORY = "paymentApprovedKafkaListenerContainerFactory";
+    private static final String KAFKA_EMAIL_GROUP_ID = "email-service-group";
     private final EmailSenderService emailSenderService;
 
     @Autowired
@@ -19,30 +24,31 @@ public class KafkaEmailConsumer {
         this.emailSenderService = emailSenderService;
     }
 
-    @KafkaListener(topics = "email-verification-topic", groupId = "email-service-group",
-            containerFactory = "emailVerificationKafkaListenerContainerFactory")
+    @KafkaListener(topics = KAFKA_EMAIL_TOPIC, groupId = KAFKA_EMAIL_GROUP_ID,
+            containerFactory = KAFKA_EMAIL_CONTAINER_FACTORY)
     public void listenEmailVerification(EmailVerificationMessageRequest emailVerificationMessageRequest) {
-        System.out.println(emailVerificationMessageRequest);
 
         try {
             emailSenderService.sendValidatorCode(emailVerificationMessageRequest.getEmail(), emailVerificationMessageRequest.getCode());
-            System.out.println("Payment approved email sent successfully to: " + emailVerificationMessageRequest.getEmail());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MessagingException e) {
+
+            System.out.println("occur an error to send email verification message: " + e.getMessage());
         }
+
+
     }
 
-    @KafkaListener(topics = "payment-approved-topic", groupId = "email-service-group",
-            containerFactory = "PaymentApprovedKafkaListenerContainerFactory")
-    public void listenPaymentApproved(PaymentApprovedMessageRequest message) {
-        System.out.println("Received payment approved message: " + message);
+    @KafkaListener(topics = KAFKA_PAYMENT_APPROVED_TOPIC, groupId = KAFKA_EMAIL_GROUP_ID,
+            containerFactory = KAFKA_PAYMENT_APPROVED_CONTAINER_FACTORY)
+    public void listenPaymentApproved(PaymentApprovedMessageRequest paymentApprovedMessageRequest)  {
+
         try {
-
-            emailSenderService.sendMailToApprovedPayment(message.getRecipientEmail(), message.getTemporaryProductVOList(), message.getTotalAmount());
-            System.out.println("Payment approved email sent successfully to: " + message.getRecipientEmail());
-        } catch (Exception e) {
-            System.err.println("Failed to send payment approved email to " + message.getRecipientEmail() + ": " + e.getMessage());
-
+            emailSenderService.sendMailToApprovedPayment(paymentApprovedMessageRequest.getRecipientEmail()
+                    , paymentApprovedMessageRequest.getTemporaryProductVOList(), paymentApprovedMessageRequest.getTotalAmount());
+        } catch (MessagingException e) {
+            System.out.println("occur an error to send payment verification message: " + e.getMessage());
         }
+
+
     }
 }
