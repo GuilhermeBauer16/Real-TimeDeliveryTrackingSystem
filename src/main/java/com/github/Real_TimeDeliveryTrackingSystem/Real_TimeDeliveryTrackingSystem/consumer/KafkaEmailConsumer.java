@@ -26,28 +26,19 @@ public class KafkaEmailConsumer {
 
     @KafkaListener(topics = KAFKA_EMAIL_TOPIC, groupId = KAFKA_EMAIL_GROUP_ID,
             containerFactory = KAFKA_EMAIL_CONTAINER_FACTORY)
-    public void listenEmailVerification(EmailVerificationMessageRequest emailVerificationMessageRequest) {
+    public void listenEmailVerification(EmailVerificationMessageRequest emailVerificationMessageRequest) throws MessagingException {
 
-        try {
-            emailSenderService.sendValidatorCode(emailVerificationMessageRequest.getEmail(), emailVerificationMessageRequest.getCode());
-        } catch (MessagingException e) {
-
-            System.out.println("occur an error to send email verification message: " + e.getMessage());
-        }
+        emailSenderService.sendValidatorCode(emailVerificationMessageRequest.getEmail(), emailVerificationMessageRequest.getCode());
 
 
     }
 
     @KafkaListener(topics = KAFKA_PAYMENT_APPROVED_TOPIC, groupId = KAFKA_EMAIL_GROUP_ID,
             containerFactory = KAFKA_PAYMENT_APPROVED_CONTAINER_FACTORY)
-    public void listenPaymentApproved(PaymentApprovedMessageRequest paymentApprovedMessageRequest)  {
+    public void listenPaymentApproved(PaymentApprovedMessageRequest paymentApprovedMessageRequest) throws MessagingException {
 
-        try {
-            emailSenderService.sendMailToApprovedPayment(paymentApprovedMessageRequest.getRecipientEmail()
-                    , paymentApprovedMessageRequest.getTemporaryProductVOList(), paymentApprovedMessageRequest.getTotalAmount());
-        } catch (MessagingException e) {
-            System.out.println("occur an error to send payment verification message: " + e.getMessage());
-        }
+        emailSenderService.sendMailToApprovedPayment(paymentApprovedMessageRequest.getRecipientEmail()
+                , paymentApprovedMessageRequest.getTemporaryProductVOList(), paymentApprovedMessageRequest.getTotalAmount());
 
 
     }

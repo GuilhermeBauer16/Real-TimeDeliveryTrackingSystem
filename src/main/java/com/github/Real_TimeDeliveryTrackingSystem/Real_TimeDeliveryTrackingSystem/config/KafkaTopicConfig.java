@@ -7,11 +7,13 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 public class KafkaTopicConfig {
+    private static final String KAFKA_EMAIL_VERIFICATION_TOPIC = "email-verification-topic";
+    private static final String KAFKA_PAYMENT_APPROVED_TOPIC = "payment-approved-topic";
 
 
     @Bean
     public NewTopic emailVerificationTopic() {
-        return TopicBuilder.name("email-verification-topic")
+        return TopicBuilder.name(KAFKA_EMAIL_VERIFICATION_TOPIC)
                 .partitions(3)
                 .replicas(1)
                 .build();
@@ -19,7 +21,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic paymentApprovedTopic() {
-        return TopicBuilder.name("payment-approved-topic")
+        return TopicBuilder.name(KAFKA_PAYMENT_APPROVED_TOPIC)
                 .partitions(3)
                 .replicas(1)
                 .build();

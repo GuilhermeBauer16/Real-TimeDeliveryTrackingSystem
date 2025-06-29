@@ -42,8 +42,7 @@ public class KafkaConsumerConfig {
         configProps.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, EMAIL_VERIFICATION_GROUP_ID);
         configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.*"); // Or "*" for all
-        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest");
+        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, EmailVerificationMessageRequest.class.getName());
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KAFKA_OUTSET);
         return new DefaultKafkaConsumerFactory<>(configProps);
 
@@ -68,8 +67,7 @@ public class KafkaConsumerConfig {
         configProps.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, PAYMENT_APPROVED_GROUP_ID);
         configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.*"); // Or "*" for all
-        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest"); // Or "*" for all
+        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, PaymentApprovedMessageRequest.class.getName());
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KAFKA_OUTSET);
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
