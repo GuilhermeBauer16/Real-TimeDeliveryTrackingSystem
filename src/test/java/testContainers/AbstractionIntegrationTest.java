@@ -5,6 +5,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.lifecycle.Startables;
@@ -26,9 +27,11 @@ public class AbstractionIntegrationTest {
                         .asCompatibleSubstituteFor("apache/kafka")
         );
 
+        static GenericContainer<?> greenMail = new GenericContainer<>(DockerImageName.parse("greenmail/standalone:latest"));
+
 
         private static void startContainers() {
-            Startables.deepStart(Stream.of(mySQL, kafka)).join();
+            Startables.deepStart(Stream.of(mySQL, kafka, greenMail)).join();
 
 
         }

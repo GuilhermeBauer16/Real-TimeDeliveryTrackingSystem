@@ -45,11 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class DriverRegistrationControllerTest extends AbstractionIntegrationTest {
 
-    @RegisterExtension
-    static GreenMailExtension greenMail =
-            new GreenMailExtension(ServerSetupTest.SMTP)
-                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
-                    .withPerMethodLifecycle(true);
+//    @RegisterExtension
+//    static GreenMailExtension greenMail =
+//            new GreenMailExtension(ServerSetupTest.SMTP)
+//                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
+//                    .withPerMethodLifecycle(true);
 
 
     @MockBean

@@ -44,11 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ProductAdminControllerTest extends AbstractionIntegrationTest {
 
 
-    @RegisterExtension
-    static GreenMailExtension greenMail =
-            new GreenMailExtension(ServerSetupTest.SMTP)
-                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
-                    .withPerMethodLifecycle(true);
+//    @RegisterExtension
+//    static GreenMailExtension greenMail =
+//            new GreenMailExtension(ServerSetupTest.SMTP)
+//                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
+//                    .withPerMethodLifecycle(true);
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;

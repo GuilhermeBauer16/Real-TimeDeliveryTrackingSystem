@@ -47,11 +47,11 @@ class CustomerRegistrationControllerTest extends AbstractionIntegrationTest {
     private MercadoPagoService mercadoPagoService;
 
 
-    @RegisterExtension
-    static GreenMailExtension greenMail =
-            new GreenMailExtension(ServerSetupTest.SMTP)
-                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
-                    .withPerMethodLifecycle(true);
+//    @RegisterExtension
+//    static GreenMailExtension greenMail =
+//            new GreenMailExtension(ServerSetupTest.SMTP)
+//                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
+//                    .withPerMethodLifecycle(true);
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;

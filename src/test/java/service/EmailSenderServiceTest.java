@@ -5,7 +5,7 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaEmailProducer;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
@@ -15,6 +15,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +34,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,6 +73,7 @@ class EmailSenderServiceTest {
     private static final String PROCESSED_MAIL = "processed-email-content";
     private static final UserProfile ROLE_NAME = UserProfile.ROLE_CUSTOMER;
     private static final boolean AUTHENTICATED = false;
+    private static final BigDecimal TOTAL_PRICE = BigDecimal.valueOf(TestConstants.SHOPPING_CART_TOTAL_PRICE);
 
 
     @BeforeEach
@@ -81,6 +84,20 @@ class EmailSenderServiceTest {
 
         temporaryProductVO = new TemporaryProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
                 TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY);
+    }
+
+    @Test
+    void testSendValidatorCode_WhenSuccess_ShouldSendEmail() throws MessagingException {
+
+        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+        when(templateEngine.process(anyString(), any())).thenReturn(PROCESSED_MAIL);
+
+        emailSenderService.sendValidatorCode(EMAIL, TestConstants.USER_VERIFY_CODE);
+
+        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+        verify(javaMailSender, times(1)).createMimeMessage();
+        verify(templateEngine, times(1)).process(anyString(), any());
+
     }
 
     @Test
@@ -98,19 +115,20 @@ class EmailSenderServiceTest {
     @Test
     void testSendEmailWithValidatorCodeToUser_WhenUserIsNotAuthenticated_ShouldSendEmail() {
 
+
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
 
         emailSenderService.sendEmailWithValidatorCodeToUser(EMAIL);
 
+
         verify(userService, times(1)).findUserByEmail(EMAIL);
-        verify(kafkaEmailProducer, times(1)).sendEmailVerificationCode(any(EmailVerificationMessageRequest.class));
         verify(userService, times(1)).updateUser(any(UserUpdateRequest.class));
 
 
     }
 
     @Test
-    void sendMailToApprovedPayment_WhenPaymentIsApproved_ShouldSendEmail() throws MessagingException {
+    void testSendMailToApprovedPayment_WhenPaymentIsApproved_ShouldSendEmail() throws MessagingException {
 
         when(userService.findUserByEmail(EMAIL)).thenReturn(userVO);
         when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
@@ -120,6 +138,25 @@ class EmailSenderServiceTest {
 
 
         verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+
+    }
+
+
+    @Test
+    void testSendMailWithApprovedPaymentToKafkaProducer_WhenSuccess_ShouldSendToKafkaProducer() {
+
+        List<TemporaryProductVO> temporaryProductVOS = List.of(temporaryProductVO);
+        ArgumentCaptor<PaymentApprovedMessageRequest> messageArgumentCaptor = ArgumentCaptor.forClass(PaymentApprovedMessageRequest.class);
+        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(EMAIL, temporaryProductVOS, TOTAL_PRICE);
+
+        verify(kafkaEmailProducer, times(1)).sendPaymentApprovedMessage(messageArgumentCaptor.capture());
+        PaymentApprovedMessageRequest captorValue = messageArgumentCaptor.getValue();
+
+        assertEquals(EMAIL, captorValue.getRecipientEmail());
+        assertEquals(captorValue.getTemporaryProductVOList(), temporaryProductVOS);
+        assertEquals(TOTAL_PRICE, captorValue.getTotalAmount());
+
+        verifyNoMoreInteractions(kafkaEmailProducer);
 
     }
 }
