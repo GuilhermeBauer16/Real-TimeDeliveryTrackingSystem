@@ -100,7 +100,6 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
                     temporaryProductService.updateTemporaryProduct(temporaryProductVO);
                     shoppingCartEntity.setTotalPrice(shoppingCartEntity.getTotalPrice() + updatedPrice);
 
-
                 }
 
 
@@ -112,12 +111,7 @@ public class ShoppingCartService implements ShoppingCartServiceContract {
                 shoppingCartEntity.getTemporaryProducts().add(temporaryProductEntity);
 
 
-
-
-
-
             }
-
 
             repository.save(shoppingCartEntity);
 

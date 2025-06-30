@@ -189,7 +189,7 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
         }
 
         shoppingCartService.deleteShoppingCart(testMail);
-        emailSenderService.sendMailToApprovedPayment(testMail, temporaryProductVOS, payment.getTransactionAmount());
+        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, payment.getTransactionAmount());
 
 
     }

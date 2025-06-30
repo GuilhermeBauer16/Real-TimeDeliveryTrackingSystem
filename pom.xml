@@ -119,6 +119,14 @@
             <scope>test</scope>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -232,19 +240,6 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!--		&lt;!&ndash; PayPal &ndash;&gt;-->
-
-        <!--		<dependency>-->
-        <!--			<groupId>com.paypal.sdk</groupId>-->
-        <!--			<artifactId>paypal-core</artifactId>-->
-        <!--			<version>1.7.2</version>-->
-        <!--		</dependency>-->
-
-
-        <!--		<dependency>-->
-        <!--			<groupId>com.paypal.sdk</groupId>-->
-        <!--			<artifactId>rest-api-sdk</artifactId>-->
-        <!--			<version>1.14.0</version>  </dependency>-->
 
         <!-- Mercado Pago -->
         <dependency>
@@ -253,10 +248,18 @@
             <version>2.1.29</version>
         </dependency>
 
+
         <dependency>
             <groupId>com.mercadopago</groupId>
             <artifactId>dx-java</artifactId>
             <version>1.8.0</version> </dependency>
+
+        <!-- Kafka -->
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.stripe</groupId>

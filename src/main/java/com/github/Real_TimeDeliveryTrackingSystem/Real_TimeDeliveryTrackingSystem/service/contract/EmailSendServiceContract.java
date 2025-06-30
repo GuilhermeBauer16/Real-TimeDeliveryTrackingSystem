@@ -50,4 +50,6 @@ public interface EmailSendServiceContract {
     void sendEmailWithValidatorCodeToUser(String email) throws MessagingException;
 
     void sendMailToApprovedPayment(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice) throws MessagingException;
+
+    void sendMailWithApprovedPaymentToKafkaProducer(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice);
 }

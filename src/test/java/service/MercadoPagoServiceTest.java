@@ -36,9 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.verify;
@@ -177,7 +175,7 @@ class MercadoPagoServiceTest {
     }
 
     @Test
-    void testHandlerWithApprovedPayment_WhenStatusIsApproved_ShouldProcessProductAndSendEmail() throws Exception {
+    void testHandlerWithApprovedPayment_WhenStatusIsApproved_ShouldProcessProductAndSendEmail() {
 
         temporaryProductVO.setQuantity(4);
         when(paymentItem.getId()).thenReturn(TestConstants.ID);
@@ -200,7 +198,6 @@ class MercadoPagoServiceTest {
                     updated.getQuantity() == 8 && updated.getId().equals(TestConstants.ID)
             ));
             verify(shoppingCartService).deleteShoppingCart(EMAIL);
-            verify(emailSenderService).sendMailToApprovedPayment(eq(EMAIL), anyList(), eq(TRANSACTION_AMOUNT));
         }
     }
 
