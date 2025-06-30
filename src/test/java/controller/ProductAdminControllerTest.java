@@ -12,9 +12,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
 import config.TestConfigs;
 import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
@@ -28,7 +25,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -43,12 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest(classes = RealTimeDeliveryTrackingSystemApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ProductAdminControllerTest extends AbstractionIntegrationTest {
 
-
-//    @RegisterExtension
-//    static GreenMailExtension greenMail =
-//            new GreenMailExtension(ServerSetupTest.SMTP)
-//                    .withConfiguration(GreenMailConfiguration.aConfig().withUser("duke", "springboot"))
-//                    .withPerMethodLifecycle(true);
 
     private static RequestSpecification specification;
     private static ObjectMapper objectMapper;
