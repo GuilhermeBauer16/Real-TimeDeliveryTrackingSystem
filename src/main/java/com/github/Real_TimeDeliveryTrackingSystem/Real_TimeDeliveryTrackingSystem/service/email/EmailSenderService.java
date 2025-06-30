@@ -3,6 +3,9 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.UserVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.user.UserAlreadyAuthenticatedException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaEmailProducer;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.UserUpdateRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.EmailSendServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.user.UserService;
@@ -45,16 +48,18 @@ public class EmailSenderService implements EmailSendServiceContract {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
     private final UserService userService;
+    private final KafkaEmailProducer kafkaEmailProducer;
 
 
     @Autowired
-    public EmailSenderService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, UserService userService) {
+    public EmailSenderService(JavaMailSender mailSender, SpringTemplateEngine templateEngine, UserService userService, KafkaEmailProducer kafkaEmailProducer) {
         this.mailSender = mailSender;
         this.templateEngine = templateEngine;
         this.userService = userService;
+        this.kafkaEmailProducer = kafkaEmailProducer;
     }
 
-    private void sendValidatorCode(String to, String code) throws MessagingException {
+    public void sendValidatorCode(String to, String code) throws MessagingException {
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper =
@@ -75,7 +80,7 @@ public class EmailSenderService implements EmailSendServiceContract {
     }
 
     @Override
-    public void sendEmailWithValidatorCodeToUser(String email) throws MessagingException {
+    public void sendEmailWithValidatorCodeToUser(String email) {
 
         UserVO userByEmail = userService.findUserByEmail(email);
 
@@ -84,7 +89,8 @@ public class EmailSenderService implements EmailSendServiceContract {
 
         }
         String code = CodeGeneratorUtils.generateCode(CODE_LENGTH);
-        sendValidatorCode(email, code);
+        EmailVerificationMessageRequest emailVerificationMessageRequest = new EmailVerificationMessageRequest(email, code);
+        kafkaEmailProducer.sendEmailVerificationCode(emailVerificationMessageRequest);
 
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(email, code, false, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
         userService.updateUser(userUpdateRequest);
@@ -121,6 +127,13 @@ public class EmailSenderService implements EmailSendServiceContract {
         mimeMessageHelper.setSubject(PAYMENT_SUBJECT);
         mailSender.send(mimeMessage);
 
+    }
+
+    @Override
+    public void sendMailWithApprovedPaymentToKafkaProducer(String to, List<TemporaryProductVO> temporaryProductVOS, BigDecimal totalPrice) {
+
+        PaymentApprovedMessageRequest message = new PaymentApprovedMessageRequest(to, temporaryProductVOS, totalPrice);
+        kafkaEmailProducer.sendPaymentApprovedMessage(message);
     }
 
 
