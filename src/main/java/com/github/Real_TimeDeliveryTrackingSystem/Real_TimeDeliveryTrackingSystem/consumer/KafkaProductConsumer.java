@@ -1,5 +1,6 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.consumer;
 
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.consumer.contract.KafkaProductConsumerContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
@@ -16,12 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class KafkaProductConsumer {
+public class KafkaProductConsumer implements KafkaProductConsumerContract {
 
     private static final String KAFKA_PRODUCT_TOPIC = "product-topic";
     private static final String KAFKA_PRODUCT_CONTAINER_FACTORY = "productKafkaListenerContainerFactory";
     private static final String PRODUCT_GROUP_ID = "product-group";
 
+    /**
+     * <p>This variable is only used in test environment,
+     * in production environment change the use for the method</p>
+     * <h3>Production Example:</h3>
+     * <pre> {@code
+     *  PaymentClient paymentClient = new PaymentClient();
+     *  Payment payment = paymentClient.get(Long.parseLong(id));
+     *  payment.getPayer().getEmail();}</pre>
+     * <h4>Put the <pre>{@code payment.getPayer().getEmail(); } </pre> in the place of the variable testMail</h4>
+     */
     private final String testMail;
 
     private final ProductService productService;
@@ -43,6 +54,7 @@ public class KafkaProductConsumer {
 
     @KafkaListener(topics = KAFKA_PRODUCT_TOPIC, groupId = PRODUCT_GROUP_ID,
             containerFactory = KAFKA_PRODUCT_CONTAINER_FACTORY)
+    @Override
     public void listenProductUpdate(PaymentProcessedRequest paymentProcessedRequest) {
 
 
@@ -64,26 +76,4 @@ public class KafkaProductConsumer {
 
     }
 
-
-//    private void handlerWithProductProcess(Payment payment) throws MessagingException {
-//        List<PaymentItem> items = payment.getAdditionalInfo().getItems();
-//
-//
-//        List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
-//        for (PaymentItem paymentItem : items) {
-//
-//
-//            TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
-//            ProductVO productById = productService.findProductById(paymentItem.getId());
-//            productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
-//            productService.updateProduct(productById);
-//            temporaryProductVOS.add(temporaryProductById);
-//
-//        }
-//
-//        shoppingCartService.deleteShoppingCart(testMail);
-//        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, payment.getTransactionAmount());
-//
-//
-//    }
 }

@@ -1,15 +1,10 @@
 package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago;
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaProductProducer;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.shoppingCart.ShoppingCartService;
 import com.mercadopago.MercadoPagoConfig;
 import com.mercadopago.client.payment.PaymentClient;
@@ -23,12 +18,10 @@ import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.payment.PaymentItem;
-import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,22 +34,10 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
 
 
     /**
-     * <p>This variable is only used in test environment,
-     * in production environment change the use for the method</p>
-     * <h3>Production Example:</h3>
-     * <pre> {@code
-     *  PaymentClient paymentClient = new PaymentClient();
-     *  Payment payment = paymentClient.get(Long.parseLong(id));
-     *  payment.getPayer().getEmail();}</pre>
-     * <h4>Put the <pre>{@code payment.getPayer().getEmail(); } </pre> in the place of the variable testMail</h4>
-     */
-    private final String testMail;
-
-    /**
      * <p>This variable is used to start an Ngrok server and is intended only for testing purposes.
      * In production, a better approach should be used.</p>
      */
-    private final String nrokUrl;
+    private final String ngrokUrl;
 
     private static final String CURRENCY = "BRL";
     private static final String PAYMENT_STATUS = "approved";
@@ -70,22 +51,15 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
             " Mercado Pago payment API";
 
     private final ShoppingCartService shoppingCartService;
-    private final TemporaryProductService temporaryProductService;
-    private final ProductService productService;
-    private final EmailSenderService emailSenderService;
     private final KafkaProductProducer kafkaProductProducer;
 
     @Autowired
-    public MercadoPagoService(@Value("${mercado-pago.access-token}") String accessToken, @Value("${mercado-pago.test-mail}") String testMail,
-                              @Value("${mercado-pago.nrok-url}") String nrokUrl,
-                              ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService, KafkaProductProducer kafkaProductProducer) {
+    public MercadoPagoService(@Value("${mercado-pago.access-token}") String accessToken,
+                              @Value("${mercado-pago.nrok-url}") String ngrokUrl,
+                              ShoppingCartService productService, KafkaProductProducer kafkaProductProducer) {
         this.accessToken = accessToken;
-        this.testMail = testMail;
-        this.nrokUrl = nrokUrl;
+        this.ngrokUrl = ngrokUrl;
         this.shoppingCartService = productService;
-        this.temporaryProductService = temporaryProductService;
-        this.productService = productService1;
-        this.emailSenderService = emailSenderService;
         this.kafkaProductProducer = kafkaProductProducer;
     }
 
@@ -129,12 +103,12 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
                 .backUrls(PreferenceBackUrlsRequest.builder()
-                        .success(nrokUrl + SUCCESS_URL)
-                        .failure(nrokUrl + FAILURE_URL)
-                        .pending(nrokUrl + PENDING_URL).build())
+                        .success(ngrokUrl + SUCCESS_URL)
+                        .failure(ngrokUrl + FAILURE_URL)
+                        .pending(ngrokUrl + PENDING_URL).build())
                 .autoReturn(PAYMENT_STATUS)
                 .paymentMethods(paymentMethods)
-                .notificationUrl(nrokUrl + NOTIFICATION_URL)
+                .notificationUrl(ngrokUrl + NOTIFICATION_URL)
                 .expires(true)
                 .build();
 
@@ -165,9 +139,7 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
 
                 if (payment.getStatus().equals(PAYMENT_STATUS)) {
 
-
                     kafkaProductProducer.sendProductMessage(generatePaymentProcessedRequest(payment));
-//                    handlerWithProductProcess(payment);
                 }
 
 
@@ -184,34 +156,13 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
 
         List<String> productIds = new ArrayList<>();
 
-        for(PaymentItem paymentItem: payment.getAdditionalInfo().getItems()){
+        for (PaymentItem paymentItem : payment.getAdditionalInfo().getItems()) {
             productIds.add(paymentItem.getId());
         }
-        return new PaymentProcessedRequest(payment.getPaymentMethodId(),payment.getPayer().getEmail(),payment.getTransactionAmount(),productIds);
+        return new PaymentProcessedRequest(payment.getPaymentMethodId(), payment.getPayer().getEmail(), payment.getTransactionAmount(), productIds);
 
     }
 
-//    private void handlerWithProductProcess(Payment payment) throws MessagingException {
-//        List<PaymentItem> items = payment.getAdditionalInfo().getItems();
-//
-//
-//        List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
-//        for (PaymentItem paymentItem : items) {
-//
-//
-//            TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
-//            ProductVO productById = productService.findProductById(paymentItem.getId());
-//            productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
-//            productService.updateProduct(productById);
-//            temporaryProductVOS.add(temporaryProductById);
-//
-//        }
-//
-//        shoppingCartService.deleteShoppingCart(testMail);
-//        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, payment.getTransactionAmount());
-//
-//
-//    }
 
 }
 
