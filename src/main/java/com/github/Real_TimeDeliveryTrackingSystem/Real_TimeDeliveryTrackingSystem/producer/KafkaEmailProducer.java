@@ -11,6 +11,7 @@ public class KafkaEmailProducer {
 
     private final KafkaTemplate<String, EmailVerificationMessageRequest> emailKafkaTemplate;
     private final KafkaTemplate<String, PaymentApprovedMessageRequest> paymentKafkaTemplate;
+
     private static final String KAFKA_EMAIL_TOPIC = "email-verification-topic";
     private static final String KAFKA_PAYMENT_APPROVED_TOPIC = "payment-approved-topic";
 

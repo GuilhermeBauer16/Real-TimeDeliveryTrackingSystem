@@ -4,6 +4,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaProductProducer;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.contract.MercadoPagoServiceContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,11 +73,12 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
     private final TemporaryProductService temporaryProductService;
     private final ProductService productService;
     private final EmailSenderService emailSenderService;
+    private final KafkaProductProducer kafkaProductProducer;
 
     @Autowired
     public MercadoPagoService(@Value("${mercado-pago.access-token}") String accessToken, @Value("${mercado-pago.test-mail}") String testMail,
                               @Value("${mercado-pago.nrok-url}") String nrokUrl,
-                              ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService) {
+                              ShoppingCartService productService, TemporaryProductService temporaryProductService, ProductService productService1, EmailSenderService emailSenderService, KafkaProductProducer kafkaProductProducer) {
         this.accessToken = accessToken;
         this.testMail = testMail;
         this.nrokUrl = nrokUrl;
@@ -82,6 +86,7 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
         this.temporaryProductService = temporaryProductService;
         this.productService = productService1;
         this.emailSenderService = emailSenderService;
+        this.kafkaProductProducer = kafkaProductProducer;
     }
 
     @Override
@@ -159,7 +164,10 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
 
 
                 if (payment.getStatus().equals(PAYMENT_STATUS)) {
-                    handlerWithProductProcess(payment);
+
+
+                    kafkaProductProducer.sendProductMessage(generatePaymentProcessedRequest(payment));
+//                    handlerWithProductProcess(payment);
                 }
 
 
@@ -172,27 +180,38 @@ public class MercadoPagoService implements MercadoPagoServiceContract {
 
     }
 
-    private void handlerWithProductProcess(Payment payment) throws MessagingException {
-        List<PaymentItem> items = payment.getAdditionalInfo().getItems();
+    private PaymentProcessedRequest generatePaymentProcessedRequest(Payment payment) {
 
+        List<String> productIds = new ArrayList<>();
 
-        List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
-        for (PaymentItem paymentItem : items) {
-
-
-            TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
-            ProductVO productById = productService.findProductById(paymentItem.getId());
-            productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
-            productService.updateProduct(productById);
-            temporaryProductVOS.add(temporaryProductById);
-
+        for(PaymentItem paymentItem: payment.getAdditionalInfo().getItems()){
+            productIds.add(paymentItem.getId());
         }
-
-        shoppingCartService.deleteShoppingCart(testMail);
-        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, payment.getTransactionAmount());
-
+        return new PaymentProcessedRequest(payment.getPaymentMethodId(),payment.getPayer().getEmail(),payment.getTransactionAmount(),productIds);
 
     }
+
+//    private void handlerWithProductProcess(Payment payment) throws MessagingException {
+//        List<PaymentItem> items = payment.getAdditionalInfo().getItems();
+//
+//
+//        List<TemporaryProductVO> temporaryProductVOS = new ArrayList<>();
+//        for (PaymentItem paymentItem : items) {
+//
+//
+//            TemporaryProductVO temporaryProductById = temporaryProductService.findTemporaryProductById(paymentItem.getId());
+//            ProductVO productById = productService.findProductById(paymentItem.getId());
+//            productById.setQuantity(productById.getQuantity() - temporaryProductById.getQuantity());
+//            productService.updateProduct(productById);
+//            temporaryProductVOS.add(temporaryProductById);
+//
+//        }
+//
+//        shoppingCartService.deleteShoppingCart(testMail);
+//        emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, payment.getTransactionAmount());
+//
+//
+//    }
 
 }
 
