@@ -2,6 +2,8 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
+import com.mercadopago.resources.payment.Payment;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,5 +58,22 @@ public class KafkaProducerConfig {
     @Bean
     public KafkaTemplate<String, PaymentApprovedMessageRequest> paymentApprovedKafkaTemplate() {
         return new KafkaTemplate<>(paymentApprovedProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, PaymentProcessedRequest> productProducerFactory() {
+
+        Map<String, Object> productProducerProps = new HashMap<>();
+        productProducerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        productProducerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        productProducerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        productProducerProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
+        return new DefaultKafkaProducerFactory<>(productProducerProps);
+
+    }
+
+    @Bean
+    public KafkaTemplate<String, PaymentProcessedRequest> productKafkaTemplate() {
+        return new KafkaTemplate<>(productProducerFactory());
     }
 }
