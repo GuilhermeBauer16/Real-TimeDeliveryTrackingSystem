@@ -2,6 +2,7 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.EmailVerificationMessageRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentApprovedMessageRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,8 @@ import java.util.Map;
 public class KafkaConsumerConfig {
 
     private static final String EMAIL_VERIFICATION_GROUP_ID = "email-verification-group";
-
     private static final String PAYMENT_APPROVED_GROUP_ID = "payment-approved-group";
+    private static final String PRODUCT_GROUP_ID = "product-group";
     private static final String KAFKA_OUTSET = "earliest";
 
     private final String bootstrapServer;
@@ -76,6 +77,30 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, PaymentApprovedMessageRequest> paymentApprovedKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, PaymentApprovedMessageRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(paymentApprovedConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, PaymentProcessedRequest> productConsumerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        configProps.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
+        configProps.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, PRODUCT_GROUP_ID);
+        configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, true);
+        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, PaymentProcessedRequest.class.getName());
+        configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KAFKA_OUTSET);
+        return new DefaultKafkaConsumerFactory<>(configProps);
+    }
+
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, PaymentProcessedRequest> productKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, PaymentProcessedRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(productConsumerFactory());
         return factory;
     }
 }
