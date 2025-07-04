@@ -3,7 +3,6 @@ package service;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.exception.mercadoPago.MercadoPagoException;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.producer.KafkaProductProducer;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.ShoppingCartResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.shoppingCart.ShoppingCartService;
@@ -83,7 +82,6 @@ class MercadoPagoServiceTest {
     @BeforeEach
     void setUp() {
 
-//        paymentProcessedRequest = new PaymentProcessedRequest(TestConstants.ID, EMAIL, TRANSACTION_AMOUNT, List.of(TestConstants.ID, TestConstants.ID));
         TemporaryProductEntity temporaryProductEntity = new TemporaryProductEntity(
                 TestConstants.ID,
                 TestConstants.PRODUCT_NAME,
@@ -183,50 +181,6 @@ class MercadoPagoServiceTest {
         mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, INVALID_PAYMENT_TOPIC);
         verifyNoInteractions(kafkaProductProducer);
     }
-
-//    @Test
-//    void testHandlerWithApprovedPayment_WhenStatusIsApproved_ShouldProcessProductAndSendEmail() {
-//
-//        temporaryProductVO.setQuantity(4);
-//        when(paymentItem.getId()).thenReturn(TestConstants.ID);
-//        when(payment.getStatus()).thenReturn(APPROVED_PAYMENT_STATUS);
-//        when(payment.getAdditionalInfo()).thenReturn(paymentAdditionalInfo);
-//        when(payment.getTransactionAmount()).thenReturn(TRANSACTION_AMOUNT);
-//        when(paymentAdditionalInfo.getItems()).thenReturn(List.of(paymentItem));
-//
-//        when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProductVO);
-//        when(productService.findProductById(TestConstants.ID)).thenReturn(productVO);
-//
-//        ReflectionTestUtils.setField(mercadoPagoService, "testMail", EMAIL);
-//
-//        try (MockedConstruction<PaymentClient> mocked = mockConstruction(PaymentClient.class,
-//                (mock, context) -> when(mock.get(Long.parseLong(NUMERIC_ID))).thenReturn(payment))) {
-//
-//            mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PAYMENT_TOPIC);
-//
-//            verify(productService).updateProduct(argThat(updated ->
-//                    updated.getQuantity() == 8 && updated.getId().equals(TestConstants.ID)
-//            ));
-//            verify(shoppingCartService).deleteShoppingCart(EMAIL);
-//        }
-//    }
-
-
-//    @Test
-//    void testHandlerWithApprovedPayment_WhenPaymentNotApproved_ShouldNotProcess() {
-//
-//        mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, PENDENT_PAYMENT_STATUS);
-//
-//        verifyNoInteractions(productService, temporaryProductService, emailSenderService);
-//
-//    }
-//
-//    @Test
-//    void testHandlerWithApprovedPayment_WhenTopicIsInvalid_ShouldDoNothing() {
-//        mercadoPagoService.handlerWithApprovedPayment(NUMERIC_ID, INVALID_PAYMENT_TOPIC);
-//
-//        verifyNoInteractions(temporaryProductService, productService, shoppingCartService, emailSenderService);
-//    }
 
 
     @Test
