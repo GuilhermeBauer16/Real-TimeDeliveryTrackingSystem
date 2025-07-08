@@ -5,6 +5,13 @@ I choose Kafka because it is a framework that handles it so well. The implementa
 to handle the mail and stock management services. 
 
 ## Working Example
+
+### Producer Example
+![Screenshot from 2025-07-08 15-47-02](https://github.com/user-attachments/assets/420f3bd9-b4d4-49f7-881b-50a32acebd0b)
+
+### Consumer Example
+![Screenshot from 2025-07-08 15-51-57](https://github.com/user-attachments/assets/adc221eb-b95c-43ad-b67b-ecfd8b14cbd8)
+
 ## Configurations 
 
 * Bellow is the necessary configuratitions to the implementation work.
