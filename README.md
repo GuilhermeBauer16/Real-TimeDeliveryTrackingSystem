@@ -13,9 +13,11 @@ to handle the mail and stock management services. 
 ![Screenshot from 2025-07-08 15-51-57](https://github.com/user-attachments/assets/adc221eb-b95c-43ad-b67b-ecfd8b14cbd8)
 
 ## Learning
-In this funcionality, I learned how to implement Kafka in a SpringBoot project. Related to kafka I learned mainly concepts of kafka,
-I learn how to set up a docker with a kafka server, the differences of kafka with and without the zookeaper. How to create kafka topic with partitions and replicas.
-I learned to how to send messages to kafka broker using the producer
+In this functionality, I learned how to implement Kafka in a SpringBoot project. I learned how to set up Docker with a Kafka server,
+,and the differences between Kafka with and without Zookeeper. The current versions don't use Zookeeper. The alternative is to use the KRaft (Kafka Raft Metadata). 
+I learned how to create a Kafka topic with partitions and replicas. I learned how to send messages to the Kafka broker using the producer to send these messages.
+I use the KafkaTemplate with a group-id. To listen to this topic message, I create a consumer when the business rules are executed. In the email topic,
+I configured the retention.ms to store the data for just 30 minutes ( the pattern is 1 week) because the verification code is valid for 30 minutes. 
 
 ## Configurations 
 
