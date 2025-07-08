@@ -12,6 +12,11 @@ to handle the mail and stock management services. 
 ### Consumer Example
 ![Screenshot from 2025-07-08 15-51-57](https://github.com/user-attachments/assets/adc221eb-b95c-43ad-b67b-ecfd8b14cbd8)
 
+## Learning
+In this funcionality, I learned how to implement Kafka in a SpringBoot project. Related to kafka I learned mainly concepts of kafka,
+I learn how to set up a docker with a kafka server, the differences of kafka with and without the zookeaper. How to create kafka topic with partitions and replicas.
+I learned to how to send messages to kafka broker using the producer
+
 ## Configurations 
 
 * Bellow is the necessary configuratitions to the implementation work.
