@@ -59,7 +59,9 @@ public enum ExceptionDetails {
 
     // Mercado Pago
     MERCADO_PAGO_EXCEPTION_MESSAGE("Occur an error into connected with mercado pago for the reason: %s", HttpStatus.BAD_REQUEST),
-    ;
+
+    // Order
+    ORDER_NOT_FOUND_MESSAGE("Occur an error in find the order for the reason: %s", HttpStatus.NOT_FOUND);
 
     private final String message;
     private final HttpStatus httpStatus;

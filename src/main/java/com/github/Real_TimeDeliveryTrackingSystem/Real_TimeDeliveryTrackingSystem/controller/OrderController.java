@@ -4,6 +4,8 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.OrderResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,5 +25,11 @@ public class OrderController implements OrderControllerContract {
     public ResponseEntity<OrderResponse> findOrderById(String id) {
         OrderResponse orderById = orderService.findOrderById(id);
         return ResponseEntity.ok(orderById);
+    }
+
+    @Override
+    public ResponseEntity<Page<OrderResponse>> findAllOrders(Pageable pageable) {
+        Page<OrderResponse> allOrders = orderService.findAllProducts(pageable);
+        return ResponseEntity.ok(allOrders);
     }
 }

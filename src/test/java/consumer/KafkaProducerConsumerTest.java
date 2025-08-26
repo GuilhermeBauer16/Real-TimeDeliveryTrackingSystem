@@ -77,6 +77,7 @@ class KafkaProducerConsumerTest {
         when(productService.findProductById(TestConstants.ID)).thenReturn(productVO);
         when(temporaryProductService.findTemporaryProductById(TestConstants.ID)).thenReturn(temporaryProductVO);
 
+
         kafkaProductConsumer.listenProductUpdate(paymentProcessedRequest);
 
 
