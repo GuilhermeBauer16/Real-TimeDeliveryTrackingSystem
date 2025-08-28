@@ -3,7 +3,10 @@ package com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyst
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.consumer.contract.KafkaProductConsumerContract;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.ProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.OrderStatus;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.OrderRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.PaymentProcessedRequest;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.OrderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.email.EmailSenderService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.ProductService;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.product.TemporaryProductService;
@@ -39,17 +42,19 @@ public class KafkaProductConsumer implements KafkaProductConsumerContract {
     private final TemporaryProductService temporaryProductService;
     private final EmailSenderService emailSenderService;
     private final ShoppingCartService shoppingCartService;
+    private final OrderService orderService;
 
     @Autowired
     public KafkaProductConsumer(@Value("${mercado-pago.test-mail}") String testMail, ProductService productService,
                                 TemporaryProductService temporaryProductService, EmailSenderService emailSenderService,
-                                ShoppingCartService shoppingCartService) {
+                                ShoppingCartService shoppingCartService, OrderService orderService) {
         this.testMail = testMail;
         this.productService = productService;
         this.temporaryProductService = temporaryProductService;
 
         this.emailSenderService = emailSenderService;
         this.shoppingCartService = shoppingCartService;
+        this.orderService = orderService;
     }
 
     @KafkaListener(topics = KAFKA_PRODUCT_TOPIC, groupId = PRODUCT_GROUP_ID,
@@ -70,8 +75,11 @@ public class KafkaProductConsumer implements KafkaProductConsumerContract {
 
         }
 
+        OrderRequest orderRequest = new OrderRequest(testMail, paymentProcessedRequest.getTransitionalAmount(), temporaryProductVOS, OrderStatus.PAYMENT_APPROVED);
+        orderService.createOrder(orderRequest);
         shoppingCartService.deleteShoppingCart(testMail);
         emailSenderService.sendMailWithApprovedPaymentToKafkaProducer(testMail, temporaryProductVOS, paymentProcessedRequest.getTransitionalAmount());
+
 
 
     }
