@@ -1,6 +1,8 @@
 package controller;
 
 import TestClasses.VerificationCodeRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.RealTimeDeliveryTrackingSystemApplication;
@@ -9,7 +11,6 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.OrderEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.TemporaryProductEntity;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.UserEntity;
-import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.entity.values.TemporaryProductVO;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.OrderStatus;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.enums.UserProfile;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.AddressRepository;
@@ -19,7 +20,9 @@ import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSyste
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.repository.UserRepository;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.request.LoginRequest;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.LoginResponse;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.response.OrderResponse;
 import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.service.mercadoPago.MercadoPagoService;
+import com.github.Real_TimeDeliveryTrackingSystem.Real_TimeDeliveryTrackingSystem.utils.PaginatedResponse;
 import config.TestConfigs;
 import constants.TestConstants;
 import io.restassured.builder.RequestSpecBuilder;
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -89,10 +93,6 @@ class OrderControllerTest extends AbstractionIntegrationTest {
 
         addressRepository.save(addressEntity);
         userRepository.save(userEntity);
-
-
-        TemporaryProductVO temporaryProductVO = new TemporaryProductVO(TestConstants.ID, TestConstants.PRODUCT_NAME,
-                TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY);
 
         TemporaryProductEntity temporaryProductEntity = new TemporaryProductEntity(TestConstants.ID, TestConstants.PRODUCT_NAME,
                 TestConstants.PRODUCT_DESCRIPTION, TestConstants.PRODUCT_PRICE, TestConstants.PRODUCT_QUANTITY);
@@ -173,9 +173,9 @@ class OrderControllerTest extends AbstractionIntegrationTest {
 
     @Test
     @Order(3)
-    void givenTemporaryObject_whenDeleteShoppingCartTemporaryProductById_ShouldDoNothing() {
+    void givenOrderById_WhenOrderIsFound_ShouldReturnOrderResponseObject() throws JsonProcessingException {
 
-        given().spec(specification)
+        var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
@@ -186,13 +186,22 @@ class OrderControllerTest extends AbstractionIntegrationTest {
                 .extract()
                 .body()
                 .asString();
+
+
+        OrderResponse orderResponse = objectMapper.readValue(content, OrderResponse.class);
+        assertNotNull(orderResponse);
+        assertNotNull(orderResponse.getId());
+        assertEquals(ORDER_STATUS, orderResponse.getOrderStatus());
+        assertEquals(1, orderResponse.getTemporaryProductEntities().size());
+
+
     }
 
     @Test
     @Order(4)
-    void givenAllOrders_WhenFindAllOrders_ShouldReturnAllOrders() {
+    void givenAllOrders_WhenFindAllOrders_ShouldReturnAllOrders() throws JsonProcessingException {
 
-        given().spec(specification)
+        var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_JSON)
                 .when()
                 .filter(new RequestLoggingFilter(LogDetail.ALL))
@@ -203,6 +212,12 @@ class OrderControllerTest extends AbstractionIntegrationTest {
                 .extract()
                 .body()
                 .asString();
+
+        PaginatedResponse<OrderResponse> paginatedResponse =
+                objectMapper.readValue(content, new TypeReference<>() {
+                });
+
+        assertEquals(1, paginatedResponse.getContent().size());
     }
 
 
