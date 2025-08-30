@@ -27,11 +27,11 @@ public class SecurityConfig {
 
     private static final String[] DRIVER_RESOURCES = {"/vehicle/**", "/driver/**", "/driverAddress/**"};
     private static final String[] CUSTOMER_RESOURCES = {"/customer/**", "/customer/product/**", "/shoppingCart/**",
-            "/payment/v1/checkout/**", "index/**", "/mercadoPago/**"};
+            "/payment/v1/checkout/**", "index/**", "/mercadoPago/**","/order/**"};
 
     private static final String[] CSRF_IGNORE_REQUEST_MATCHER = {"/vehicle/**", "/api/login", "/signInCustomer", "/customer/**",
             "/signInDriver/**", "/driver/**", "/driverAddress/**", "/customerAddress/**", "/verificationCode/**", "/product/**"
-            , "/customer/product/**", "/shoppingCart/**", "/payment/v1/checkout/**", "index/**", "/mercadoPago/**","/ipn/**"};
+            , "/customer/product/**", "/shoppingCart/**", "/payment/v1/checkout/**", "index/**", "/mercadoPago/**","/ipn/**","/order/**"};
     private static final String[] ADMIN_RESOURCES = {"/product/**"};
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_CUSTOMER = "CUSTOMER";
